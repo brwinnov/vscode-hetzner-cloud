@@ -99,6 +99,31 @@
       {
         "command": "hetznet.setTailscaleKey",
         "title": "HetzNet: Set Tailscale Auth Key"
+      },
+      {
+        "command": "hetznet.refreshProjects",
+        "title": "HetzNet: Refresh Projects",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "hetznet.removeProject",
+        "title": "HetzNet: Remove Project",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "hetznet.activateProject",
+        "title": "HetzNet: Activate Project",
+        "icon": "$(check)"
+      },
+      {
+        "command": "hetznet.deleteNetwork",
+        "title": "HetzNet: Delete Network",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "hetznet.sshKeyGuide",
+        "title": "HetzNet: SSH Key Generation Guide",
+        "icon": "$(book)"
       }
     ],
     "viewsContainers": {
@@ -113,25 +138,44 @@
     "views": {
       "hetznet": [
         {
+          "id": "hetznet.setup",
+          "name": "Setup",
+          "initialSize": 1
+        },
+        {
+          "id": "hetznet.projects",
+          "name": "Projects",
+          "initialSize": 1
+        },
+        {
           "id": "hetznet.servers",
-          "name": "Servers"
+          "name": "Servers",
+          "initialSize": 2
         },
         {
           "id": "hetznet.networks",
-          "name": "Networks"
+          "name": "Networks",
+          "initialSize": 2
         },
         {
           "id": "hetznet.images",
-          "name": "Images"
+          "name": "Images",
+          "initialSize": 2
         },
         {
           "id": "hetznet.sshKeys",
-          "name": "SSH Keys"
+          "name": "SSH Keys",
+          "initialSize": 2
         }
       ]
     },
     "menus": {
       "view/title": [
+        {
+          "command": "hetznet.refreshProjects",
+          "when": "view == hetznet.projects",
+          "group": "navigation"
+        },
         {
           "command": "hetznet.createServer",
           "when": "view == hetznet.servers",
@@ -158,6 +202,11 @@
           "group": "navigation"
         },
         {
+          "command": "hetznet.sshKeyGuide",
+          "when": "view == hetznet.sshKeys",
+          "group": "navigation"
+        },
+        {
           "command": "hetznet.refreshSshKeys",
           "when": "view == hetznet.sshKeys",
           "group": "navigation"
@@ -169,6 +218,16 @@
         }
       ],
       "view/item/context": [
+        {
+          "command": "hetznet.activateProject",
+          "when": "view == hetznet.projects && viewItem == project-inactive",
+          "group": "1_project@1"
+        },
+        {
+          "command": "hetznet.removeProject",
+          "when": "view == hetznet.projects",
+          "group": "9_danger@1"
+        },
         {
           "command": "hetznet.startServer",
           "when": "view == hetznet.servers && viewItem == server-off",
@@ -192,6 +251,11 @@
         {
           "command": "hetznet.deleteServer",
           "when": "view == hetznet.servers",
+          "group": "9_danger@1"
+        },
+        {
+          "command": "hetznet.deleteNetwork",
+          "when": "view == hetznet.networks && viewItem == network",
           "group": "9_danger@1"
         }
       ]

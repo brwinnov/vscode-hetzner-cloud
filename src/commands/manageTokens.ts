@@ -1,6 +1,9 @@
 import * as vscode from 'vscode';
 import { TokenManager } from '../utils/secretStorage';
 import { HetznerClient } from '../api/hetzner';
+import { SetupProvider } from '../providers/setupProvider';
+import { ProjectsProvider } from '../providers/projectsProvider';
+import { ProjectItem } from '../providers/projectsProvider';
 import { ServersProvider } from '../providers/serversProvider';
 import { NetworksProvider } from '../providers/networksProvider';
 import { ImagesProvider } from '../providers/imagesProvider';
@@ -10,12 +13,16 @@ export function registerTokenCommands(
   context: vscode.ExtensionContext,
   tokenManager: TokenManager,
   refreshStatusBar: () => Promise<void>,
+  setupProvider: SetupProvider,
+  projectsProvider: ProjectsProvider,
   serversProvider: ServersProvider,
   networksProvider: NetworksProvider,
   imagesProvider: ImagesProvider,
   sshKeysProvider: SshKeysProvider
 ) {
   const refreshAll = () => {
+    setupProvider.refresh();
+    projectsProvider.refresh();
     serversProvider.refresh();
     networksProvider.refresh();
     imagesProvider.refresh();
@@ -63,6 +70,19 @@ export function registerTokenCommands(
       await refreshStatusBar();
       refreshAll();
       vscode.window.showInformationMessage(`Project "${name}" added and activated.`);
+
+      // First-use: prompt SSH key guide if this is the first project
+      const allProjects = await tokenManager.listProjects();
+      if (allProjects.length === 1) {
+        const choice = await vscode.window.showInformationMessage(
+          'Project added! Do you have an SSH key pair set up? SSH keys are recommended for secure server access.',
+          'Open SSH Key Guide',
+          'Skip'
+        );
+        if (choice === 'Open SSH Key Guide') {
+          vscode.commands.executeCommand('hetznet.sshKeyGuide');
+        }
+      }
     })
   );
 
@@ -122,6 +142,79 @@ export function registerTokenCommands(
       await refreshStatusBar();
       refreshAll();
       vscode.window.showInformationMessage(`Switched to project "${picked.label}".`);
+    })
+  );
+
+  // Activate project directly from the Projects tree view
+  context.subscriptions.push(
+    vscode.commands.registerCommand('hetznet.activateProject', async (item: ProjectItem | undefined) => {
+      let projectName: string | undefined;
+
+      if (item instanceof ProjectItem) {
+        projectName = item.projectName;
+      } else {
+        // Invoked from command palette — show picker
+        const projects = await tokenManager.listProjects();
+        if (projects.length === 0) {
+          vscode.window.showInformationMessage('No projects configured.');
+          return;
+        }
+        const active = await tokenManager.getActiveProjectName();
+        const picked = await vscode.window.showQuickPick(
+          projects.map((p) => ({ label: p, description: p === active ? '$(check) active' : '' })),
+          { title: 'Activate Project', placeHolder: 'Select project to activate' }
+        );
+        if (!picked) return;
+        projectName = picked.label;
+      }
+
+      await tokenManager.setActiveProject(projectName);
+      await refreshStatusBar();
+      refreshAll();
+      vscode.window.showInformationMessage(`Project "${projectName}" is now active.`);
+    })
+  );
+
+  // Remove project from context menu
+  context.subscriptions.push(
+    vscode.commands.registerCommand('hetznet.removeProject', async (item: ProjectItem | undefined) => {
+      let projectName: string | undefined;
+
+      if (item instanceof ProjectItem) {
+        projectName = item.projectName;
+      } else {
+        const projects = await tokenManager.listProjects();
+        if (projects.length === 0) {
+          vscode.window.showInformationMessage('No projects configured.');
+          return;
+        }
+        const picked = await vscode.window.showQuickPick(projects, {
+          title: 'Remove Project',
+          placeHolder: 'Select project to remove',
+        });
+        if (!picked) return;
+        projectName = picked;
+      }
+
+      const confirm = await vscode.window.showWarningMessage(
+        `Remove project "${projectName}"? This deletes the stored API token.`,
+        { modal: true },
+        'Remove'
+      );
+      if (confirm !== 'Remove') return;
+
+      await tokenManager.deleteProject(projectName);
+      await refreshStatusBar();
+      refreshAll();
+      vscode.window.showInformationMessage(`Project "${projectName}" removed.`);
+    })
+  );
+
+  // Refresh projects tree
+  context.subscriptions.push(
+    vscode.commands.registerCommand('hetznet.refreshProjects', () => {
+      projectsProvider.refresh();
+      setupProvider.refresh();
     })
   );
 }

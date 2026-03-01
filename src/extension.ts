@@ -4,11 +4,14 @@ import { ServersProvider } from './providers/serversProvider';
 import { NetworksProvider } from './providers/networksProvider';
 import { ImagesProvider } from './providers/imagesProvider';
 import { SshKeysProvider } from './providers/sshKeysProvider';
+import { SetupProvider } from './providers/setupProvider';
+import { ProjectsProvider } from './providers/projectsProvider';
 import { registerTokenCommands } from './commands/manageTokens';
 import { registerServerCommands } from './commands/serverCommands';
 import { registerNetworkCommands } from './commands/networkCommands';
 import { registerSshKeyCommands } from './commands/sshKeyCommands';
 import { TailscaleAuthKeyManager } from './tailscale/authKeyManager';
+import { SshKeyGuidePanel } from './webviews/sshKeyGuide';
 
 export async function activate(context: vscode.ExtensionContext) {
   console.log('HetzNet extension activated');
@@ -17,12 +20,22 @@ export async function activate(context: vscode.ExtensionContext) {
   const tailscaleKeyManager = new TailscaleAuthKeyManager(context.secrets);
 
   // Tree data providers
+  const setupProvider = new SetupProvider(tokenManager);
+  const projectsProvider = new ProjectsProvider(tokenManager);
   const serversProvider = new ServersProvider(tokenManager);
   const networksProvider = new NetworksProvider(tokenManager);
   const imagesProvider = new ImagesProvider(tokenManager);
   const sshKeysProvider = new SshKeysProvider(tokenManager);
 
   // Register tree views
+  vscode.window.createTreeView('hetznet.setup', {
+    treeDataProvider: setupProvider,
+    showCollapseAll: false,
+  });
+  vscode.window.createTreeView('hetznet.projects', {
+    treeDataProvider: projectsProvider,
+    showCollapseAll: false,
+  });
   vscode.window.createTreeView('hetznet.servers', {
     treeDataProvider: serversProvider,
     showCollapseAll: false,
@@ -60,11 +73,12 @@ export async function activate(context: vscode.ExtensionContext) {
 
   await refreshStatusBar();
 
-  // Register all commands
-  registerTokenCommands(context, tokenManager, refreshStatusBar, serversProvider, networksProvider, imagesProvider, sshKeysProvider);
-  registerServerCommands(context, tokenManager, serversProvider, tailscaleKeyManager);
-  registerNetworkCommands(context, tokenManager, networksProvider);
-  registerSshKeyCommands(context, tokenManager, sshKeysProvider);
+  // SSH Key Guide command
+  context.subscriptions.push(
+    vscode.commands.registerCommand('hetznet.sshKeyGuide', () => {
+      SshKeyGuidePanel.create(context);
+    })
+  );
 
   // Tailscale key command
   context.subscriptions.push(
@@ -72,6 +86,22 @@ export async function activate(context: vscode.ExtensionContext) {
       await tailscaleKeyManager.promptAndSave();
     })
   );
+
+  // Register all commands
+  registerTokenCommands(
+    context,
+    tokenManager,
+    refreshStatusBar,
+    setupProvider,
+    projectsProvider,
+    serversProvider,
+    networksProvider,
+    imagesProvider,
+    sshKeysProvider
+  );
+  registerServerCommands(context, tokenManager, serversProvider, tailscaleKeyManager);
+  registerNetworkCommands(context, tokenManager, networksProvider);
+  registerSshKeyCommands(context, tokenManager, sshKeysProvider);
 }
 
 export function deactivate() {
