@@ -219,6 +219,7 @@ function getGuideHtml(): string {
   <div class="tab" onclick="showTab('wsl')"><span class="tab-icon">🐧</span> WSL</div>
   <div class="tab" onclick="showTab('linux')"><span class="tab-icon">🎩</span> Linux / RHEL</div>
   <div class="tab" onclick="showTab('whynot')"><span class="tab-icon">❓</span> Why SSH Keys?</div>
+  <div class="tab" onclick="showTab('whyed25519')"><span class="tab-icon">🔬</span> Why Ed25519?</div>
 </div>
 
 <div class="content">
@@ -558,6 +559,171 @@ EOF</code></pre>
       2. Add the public key to Hetzner via <strong>SSH Keys → + Add SSH Key</strong><br>
       3. Select that key when creating a new server<br>
       4. Connect with: <code>ssh root@SERVER_IP</code> — no password prompt
+    </div>
+  </div>
+
+  <!-- ── Why Ed25519 ── -->
+  <div class="tab-panel" id="tab-whyed25519">
+    <h2>What is Ed25519 and why does HetzNet recommend it?</h2>
+
+    <div class="info-box">
+      <div class="box-title">ℹ The <code>-t</code> flag in <code>ssh-keygen -t ed25519</code> means <em>type</em> — the cryptographic algorithm used to generate your key pair.</div>
+      Ed25519 is the name of that algorithm. You are not required to use it — RSA works perfectly fine with Hetzner — but Ed25519 is the modern best-practice recommendation.
+    </div>
+
+    <h3>Where does the name come from?</h3>
+    <p>
+      Ed25519 is an <strong>elliptic-curve digital signature scheme</strong> designed by cryptographer Daniel J. Bernstein in 2011.
+      The "25519" comes from the prime number 2<sup>255</sup> − 19 that defines the mathematical curve underneath it — <em>Curve25519</em>.
+      "Ed" stands for <strong>Edwards-curve</strong> (the geometric shape of the curve used).
+    </p>
+    <p>You don't need to understand the math. Just know it is widely peer-reviewed, used as the OpenSSH default since 2014, and recommended by NIST and CISA.</p>
+
+    <hr>
+
+    <h3>Algorithm comparison</h3>
+    <table style="width:100%;border-collapse:collapse;font-size:12px;margin:12px 0">
+      <thead>
+        <tr style="border-bottom:1px solid var(--vscode-panel-border)">
+          <th style="text-align:left;padding:8px;color:var(--vscode-descriptionForeground)">Algorithm</th>
+          <th style="text-align:left;padding:8px;color:var(--vscode-descriptionForeground)">Flag</th>
+          <th style="text-align:left;padding:8px;color:var(--vscode-descriptionForeground)">Key size</th>
+          <th style="text-align:left;padding:8px;color:var(--vscode-descriptionForeground)">Speed</th>
+          <th style="text-align:left;padding:8px;color:var(--vscode-descriptionForeground)">Public key length</th>
+          <th style="text-align:left;padding:8px;color:var(--vscode-descriptionForeground)">Recommendation</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid var(--vscode-panel-border);background:rgba(115,201,145,0.07)">
+          <td style="padding:8px"><strong>Ed25519</strong></td>
+          <td style="padding:8px"><code>-t ed25519</code></td>
+          <td style="padding:8px">256-bit (fixed)</td>
+          <td style="padding:8px">Fastest</td>
+          <td style="padding:8px">~68 chars</td>
+          <td style="padding:8px">✅ <strong>Recommended</strong></td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--vscode-panel-border)">
+          <td style="padding:8px">RSA 4096</td>
+          <td style="padding:8px"><code>-t rsa -b 4096</code></td>
+          <td style="padding:8px">4096-bit</td>
+          <td style="padding:8px">Slower</td>
+          <td style="padding:8px">~724 chars</td>
+          <td style="padding:8px">⚠ Legacy / max compatibility</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--vscode-panel-border)">
+          <td style="padding:8px">RSA 2048</td>
+          <td style="padding:8px"><code>-t rsa -b 2048</code></td>
+          <td style="padding:8px">2048-bit</td>
+          <td style="padding:8px">Moderate</td>
+          <td style="padding:8px">~372 chars</td>
+          <td style="padding:8px">⚠ Minimum acceptable RSA</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--vscode-panel-border)">
+          <td style="padding:8px">ECDSA</td>
+          <td style="padding:8px"><code>-t ecdsa</code></td>
+          <td style="padding:8px">256–521-bit</td>
+          <td style="padding:8px">Fast</td>
+          <td style="padding:8px">~140 chars</td>
+          <td style="padding:8px">⚠ Older elliptic curve standard</td>
+        </tr>
+        <tr>
+          <td style="padding:8px">DSA</td>
+          <td style="padding:8px"><code>-t dsa</code></td>
+          <td style="padding:8px">1024-bit</td>
+          <td style="padding:8px">Poor</td>
+          <td style="padding:8px">~600 chars</td>
+          <td style="padding:8px">❌ Deprecated — do not use</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <hr>
+
+    <h3>I already use RSA keys with PuTTY / Bitvise / WinSCP — do I need to change?</h3>
+
+    <div class="warn-box">
+      <div class="box-title">⚠ The algorithm (Ed25519 vs RSA) is a separate concern from the file format (.ppk vs OpenSSH PEM) — these are often confused</div>
+      Your existing RSA keys work perfectly with Hetzner. You do not need to regenerate anything.
+    </div>
+
+    <p style="margin-bottom:10px">Here is how the major tools relate to each side of this:</p>
+    <table style="width:100%;border-collapse:collapse;font-size:12px;margin:12px 0">
+      <thead>
+        <tr style="border-bottom:1px solid var(--vscode-panel-border)">
+          <th style="text-align:left;padding:8px;color:var(--vscode-descriptionForeground)">Tool</th>
+          <th style="text-align:left;padding:8px;color:var(--vscode-descriptionForeground)">Native private key format</th>
+          <th style="text-align:left;padding:8px;color:var(--vscode-descriptionForeground)">Ed25519?</th>
+          <th style="text-align:left;padding:8px;color:var(--vscode-descriptionForeground)">RSA?</th>
+          <th style="text-align:left;padding:8px;color:var(--vscode-descriptionForeground)">Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid var(--vscode-panel-border)">
+          <td style="padding:8px">OpenSSH (<code>ssh-keygen</code>)</td>
+          <td style="padding:8px">OpenSSH PEM</td>
+          <td style="padding:8px">✅ Yes</td>
+          <td style="padding:8px">✅ Yes</td>
+          <td style="padding:8px">Works on every platform command line</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--vscode-panel-border)">
+          <td style="padding:8px">PuTTY / PuTTYgen</td>
+          <td style="padding:8px">.ppk (proprietary)</td>
+          <td style="padding:8px">✅ v0.68+ (2017)</td>
+          <td style="padding:8px">✅ Always</td>
+          <td style="padding:8px">Must convert .ppk → OpenSSH for <code>ssh</code> CLI</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--vscode-panel-border)">
+          <td style="padding:8px">Bitvise SSH</td>
+          <td style="padding:8px">.bssk / imports OpenSSH</td>
+          <td style="padding:8px">✅ Yes</td>
+          <td style="padding:8px">✅ Yes</td>
+          <td style="padding:8px">Can import OpenSSH PEM keys directly</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--vscode-panel-border)">
+          <td style="padding:8px">WinSCP</td>
+          <td style="padding:8px">Uses PuTTY .ppk</td>
+          <td style="padding:8px">✅ Yes</td>
+          <td style="padding:8px">✅ Yes</td>
+          <td style="padding:8px">Use PuTTYgen to convert if needed</td>
+        </tr>
+        <tr>
+          <td style="padding:8px">VS Code Remote SSH</td>
+          <td style="padding:8px">OpenSSH PEM</td>
+          <td style="padding:8px">✅ Yes</td>
+          <td style="padding:8px">✅ Yes</td>
+          <td style="padding:8px">Uses the system OpenSSH client</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="info-box">
+      <div class="box-title">💡 The public key is always the same format regardless of tool or algorithm</div>
+      Whatever tool you used to generate your key pair, the <strong>public key you paste into Hetzner</strong> is always plain-text OpenSSH wire format — a single line starting with <code>ssh-ed25519</code> or <code>ssh-rsa</code>.
+      The private key file format difference only matters on your own machine.
+    </div>
+
+    <hr>
+
+    <h3>Which should I use?</h3>
+
+    <div class="code-block">
+      <button class="copy-btn" onclick="copy(this)">Copy</button>
+      <pre><code># Modern — recommended for terminal / VS Code / Linux workflows
+ssh-keygen -t ed25519 -C "your-email@example.com"</code></pre>
+    </div>
+
+    <div class="code-block">
+      <button class="copy-btn" onclick="copy(this)">Copy</button>
+      <pre><code># Legacy — use if you work heavily with PuTTY/WinSCP or enterprise systems
+# Also import this into PuTTYgen (File → Load) to get a .ppk for PuTTY/WinSCP
+ssh-keygen -t rsa -b 4096 -C "your-email@example.com"</code></pre>
+    </div>
+
+    <div class="success-box">
+      <div class="box-title">✓ Summary</div>
+      <strong>Ed25519</strong> — choose this if you work primarily from the terminal, VS Code, or Linux.<br>
+      <strong>RSA 4096</strong> — choose this if you already have RSA keys, use PuTTY or WinSCP regularly, or are in an enterprise environment with older SSH policies.<br><br>
+      Both work with Hetzner Cloud. Both work with HetzNet. The difference is speed, key size, and compatibility with older tools.
     </div>
   </div>
 
