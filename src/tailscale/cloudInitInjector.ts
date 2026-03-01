@@ -23,7 +23,6 @@ export function injectTailscale(cloudInit: string, authKey: string, extraArgs?: 
       `$1${tailscaleBlock
         .split('\n')
         .filter((l) => l.startsWith('  -'))
-        .map((l) => `  ${l}`)
         .join('\n')}\n`
     );
   }

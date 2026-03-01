@@ -53,7 +53,7 @@ export function registerTokenCommands(
           { location: vscode.ProgressLocation.Notification, title: 'Validating token...' },
           async () => {
             const client = new HetznerClient(token.trim());
-            await client.getServers();
+            await client.validateToken();
           }
         );
       } catch {
@@ -213,8 +213,7 @@ export function registerTokenCommands(
   // Refresh projects tree
   context.subscriptions.push(
     vscode.commands.registerCommand('hcloud.refreshProjects', () => {
-      projectsProvider.refresh();
-      setupProvider.refresh();
+      refreshAll();
     })
   );
 }

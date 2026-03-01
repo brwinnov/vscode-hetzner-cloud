@@ -36,27 +36,8 @@ export interface StoredProject {
 
 export class TokenManager {
   private secrets: vscode.SecretStorage;
-  private activeProjectName: string | undefined;
-
   constructor(secrets: vscode.SecretStorage) {
     this.secrets = secrets;
-  }
-
-  async addProject(name: string, token: string): Promise<void> {
-    await this.secrets.store(`${SECRET_PREFIX}${name}`, token);
-    // Auto-activate if first project
-    const projects = await this.listProjects();
-    if (projects.length === 1) {
-      await this.setActiveProject(name);
-    }
-  }
-
-  async removeProject(name: string): Promise<void> {
-    await this.secrets.delete(`${SECRET_PREFIX}${name}`);
-    if (this.activeProjectName === name) {
-      this.activeProjectName = undefined;
-      await this.secrets.delete(ACTIVE_KEY);
-    }
   }
 
   async listProjects(): Promise<string[]> {
@@ -96,13 +77,11 @@ export class TokenManager {
     const active = await this.secrets.get(ACTIVE_KEY);
     if (active === name) {
       await this.secrets.delete(ACTIVE_KEY);
-      this.activeProjectName = undefined;
     }
   }
 
   async setActiveProject(name: string): Promise<void> {
     await this.secrets.store(ACTIVE_KEY, name);
-    this.activeProjectName = name;
   }
 
   async getActiveProjectName(): Promise<string | undefined> {

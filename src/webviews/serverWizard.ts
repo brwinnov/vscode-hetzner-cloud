@@ -52,7 +52,6 @@ export class ServerWizardPanel {
       vscode.ViewColumn.One,
       {
         enableScripts: true,
-        retainContextWhenHidden: true,
         localResourceRoots: [vscode.Uri.joinPath(context.extensionUri, 'resources')],
       }
     );
@@ -855,6 +854,10 @@ function getWizardHtml(data: WizardData): string {
 
       <div id="tailscaleKeyBanner" class="banner info" style="display:none">
         ⚠ No Tailscale auth key set. <a href="#" onclick="setTailscaleKey()" style="color:var(--vscode-textLink-foreground)">Set key now</a>
+      </div>
+
+      <div class="banner warning">
+        🔒 <strong>Security notice:</strong> The Tailscale auth key is embedded as plaintext in cloud-init user-data and is readable via the Hetzner API by anyone with API access. Use a <strong>short-lived ephemeral key</strong> to minimise exposure.
       </div>
 
       <div class="field">

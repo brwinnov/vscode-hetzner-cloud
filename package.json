@@ -20,13 +20,13 @@
   ],
   "icon": "resources/icon.png",
   "license": "MIT",
-  "homepage": "https://github.com/brwinnov/hcloud.ext#readme",
+  "homepage": "https://github.com/brwinnov/vscode-hetzner-cloud#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/brwinnov/hcloud.ext.git"
+    "url": "https://github.com/brwinnov/vscode-hetzner-cloud.git"
   },
   "bugs": {
-    "url": "https://github.com/brwinnov/hcloud.ext/issues"
+    "url": "https://github.com/brwinnov/vscode-hetzner-cloud/issues"
   },
   "galleryBanner": {
     "color": "#D50C2D",
@@ -137,6 +137,11 @@
         "command": "hcloud.sshKeyGuide",
         "title": "Hetzner Cloud: SSH Key Generation Guide",
         "icon": "$(book)"
+      },
+      {
+        "command": "hcloud.deleteSshKey",
+        "title": "Hetzner Cloud: Remove SSH Key",
+        "icon": "$(trash)"
       }
     ],
     "viewsContainers": {
@@ -269,6 +274,11 @@
         {
           "command": "hcloud.deleteNetwork",
           "when": "view == hcloud.networks && viewItem == network",
+          "group": "9_danger@1"
+        },
+        {
+          "command": "hcloud.deleteSshKey",
+          "when": "view == hcloud.sshKeys && viewItem == sshkey",
           "group": "9_danger@1"
         }
       ]

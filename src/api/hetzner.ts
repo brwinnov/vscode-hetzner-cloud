@@ -107,11 +107,27 @@ export class HetznerClient {
     return res.json() as Promise<T>;
   }
 
+  /**
+   * Follows Hetzner's cursor-based pagination, collecting all items across pages.
+   * @param basePath Path with optional query params (e.g. '/servers' or '/images?type=system')
+   * @param arrayKey The key in the response body that holds the array of items
+   */
+  private async paginateList<T>(basePath: string, arrayKey: string): Promise<T[]> {
+    const results: T[] = [];
+    let page: number | null = 1;
+    const sep = basePath.includes('?') ? '&' : '?';
+    while (page !== null) {
+      const data = await this.request<any>('GET', `${basePath}${sep}per_page=50&page=${page}`);
+      results.push(...(data[arrayKey] as T[]));
+      page = (data.meta?.pagination?.next_page as number | null | undefined) ?? null;
+    }
+    return results;
+  }
+
   // ── Servers ────────────────────────────────────────────────────────────────
 
   async getServers(): Promise<HServer[]> {
-    const data = await this.request<{ servers: HServer[] }>('GET', '/servers?per_page=50');
-    return data.servers;
+    return this.paginateList<HServer>('/servers', 'servers');
   }
 
   async getServer(id: number): Promise<HServer> {
@@ -143,8 +159,7 @@ export class HetznerClient {
   // ── Networks ───────────────────────────────────────────────────────────────
 
   async getNetworks(): Promise<HNetwork[]> {
-    const data = await this.request<{ networks: HNetwork[] }>('GET', '/networks?per_page=50');
-    return data.networks;
+    return this.paginateList<HNetwork>('/networks', 'networks');
   }
 
   async createNetwork(name: string, ipRange: string): Promise<HNetwork> {
@@ -162,9 +177,8 @@ export class HetznerClient {
   // ── Images ─────────────────────────────────────────────────────────────────
 
   async getImages(type?: string): Promise<HImage[]> {
-    const query = type ? `?type=${type}&per_page=100` : '?per_page=100';
-    const data = await this.request<{ images: HImage[] }>('GET', `/images${query}`);
-    return data.images;
+    const basePath = type ? `/images?type=${type}` : '/images';
+    return this.paginateList<HImage>(basePath, 'images');
   }
 
   async deleteImage(id: number): Promise<void> {
@@ -174,8 +188,7 @@ export class HetznerClient {
   // ── SSH Keys ───────────────────────────────────────────────────────────────
 
   async getSshKeys(): Promise<HSshKey[]> {
-    const data = await this.request<{ ssh_keys: HSshKey[] }>('GET', '/ssh_keys?per_page=50');
-    return data.ssh_keys;
+    return this.paginateList<HSshKey>('/ssh_keys', 'ssh_keys');
   }
 
   async addSshKey(name: string, publicKey: string): Promise<HSshKey> {
@@ -198,8 +211,7 @@ export class HetznerClient {
   }
 
   async getServerTypes(): Promise<HServerType[]> {
-    const data = await this.request<{ server_types: HServerType[] }>('GET', '/server_types?per_page=100');
-    return data.server_types;
+    return this.paginateList<HServerType>('/server_types', 'server_types');
   }
 
   // ── Validate token ─────────────────────────────────────────────────────────
