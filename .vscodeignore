@@ -1,5 +1,13 @@
 node_modules
-dist
+src
 out
 .vscode-test
 *.vsix
+tsconfig.json
+esbuild.js
+codereview
+PLAN.md
+overview.md
+.gitignore
+.vscode
+dist/extension.js.map
