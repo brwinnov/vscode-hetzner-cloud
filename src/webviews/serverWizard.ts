@@ -105,11 +105,26 @@ export class ServerWizardPanel {
         await this.tailscaleKeyManager.promptAndSave();
         this.panel.webview.postMessage({ command: 'tailscaleKeySet' });
         break;
-      case 'addSshKey':
+      case 'addSshKey': {
+        // Snapshot existing keys so we can detect what was newly added
+        const existingKeys = await this.client.getSshKeys();
+        const existingNames = new Set(existingKeys.map((k) => k.name));
+
         await vscode.commands.executeCommand('hcloud.addSshKey');
-        // Reload wizard data so the new key appears
-        await this.loadAndRender();
+
+        // Re-fetch and diff — don't reload the whole wizard (that loses all state)
+        const updatedKeys = await this.client.getSshKeys();
+        const newKeyNames = updatedKeys
+          .filter((k) => !existingNames.has(k.name))
+          .map((k) => k.name);
+
+        this.panel.webview.postMessage({
+          command: 'sshKeysUpdated',
+          keys: updatedKeys,
+          newKeyNames,
+        });
         break;
+      }
       case 'createNetwork': {
         const name = await vscode.window.showInputBox({
           title: 'Create Network — Name',
@@ -902,7 +917,7 @@ const vscode = acquireVsCodeInstance();
 const LOCATIONS = ${locationsJson};
 const SERVER_TYPES = ${serverTypesJson};
 const IMAGES = ${imagesJson};
-const SSH_KEYS = ${sshKeysJson};
+let SSH_KEYS = ${sshKeysJson};
 const NETWORKS = ${networksJson};
 
 // ── State ──────────────────────────────────────────────────────────────────
@@ -930,6 +945,14 @@ window.addEventListener('message', (e) => {
   if (msg.command === 'error') { hideLoading(); showError(msg.message); }
   if (msg.command === 'tailscaleKeySet') {
     document.getElementById('tailscaleKeyBanner').style.display = 'none';
+  }
+  if (msg.command === 'sshKeysUpdated') {
+    SSH_KEYS = msg.keys;
+    // Auto-select any newly added keys
+    msg.newKeyNames.forEach(name => {
+      if (!state.sshKeys.includes(name)) state.sshKeys.push(name);
+    });
+    renderSshKeys();
   }
 });
 
