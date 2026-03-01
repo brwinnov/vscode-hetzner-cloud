@@ -6,10 +6,12 @@ import { ImagesProvider } from './providers/imagesProvider';
 import { SshKeysProvider } from './providers/sshKeysProvider';
 import { SetupProvider } from './providers/setupProvider';
 import { ProjectsProvider } from './providers/projectsProvider';
+import { FirewallsProvider } from './providers/firewallsProvider';
 import { registerTokenCommands } from './commands/manageTokens';
 import { registerServerCommands } from './commands/serverCommands';
 import { registerNetworkCommands } from './commands/networkCommands';
 import { registerSshKeyCommands } from './commands/sshKeyCommands';
+import { registerFirewallCommands } from './commands/firewallCommands';
 import { TailscaleAuthKeyManager } from './tailscale/authKeyManager';
 import { SshKeyGuidePanel } from './webviews/sshKeyGuide';
 import { cleanupLegacyKeys } from './utils/secretStorage';
@@ -37,6 +39,7 @@ export async function activate(context: vscode.ExtensionContext) {
   const networksProvider = new NetworksProvider(tokenManager);
   const imagesProvider = new ImagesProvider(tokenManager);
   const sshKeysProvider = new SshKeysProvider(tokenManager);
+  const firewallsProvider = new FirewallsProvider(tokenManager);
 
   // Register tree views
   vscode.window.createTreeView('hcloud.setup', {
@@ -61,6 +64,10 @@ export async function activate(context: vscode.ExtensionContext) {
   });
   vscode.window.createTreeView('hcloud.sshKeys', {
     treeDataProvider: sshKeysProvider,
+    showCollapseAll: false,
+  });
+  vscode.window.createTreeView('hcloud.firewalls', {
+    treeDataProvider: firewallsProvider,
     showCollapseAll: false,
   });
 
@@ -113,6 +120,7 @@ export async function activate(context: vscode.ExtensionContext) {
   registerServerCommands(context, tokenManager, serversProvider, tailscaleKeyManager);
   registerNetworkCommands(context, tokenManager, networksProvider);
   registerSshKeyCommands(context, tokenManager, sshKeysProvider);
+  registerFirewallCommands(context, tokenManager, tailscaleKeyManager, firewallsProvider);
 }
 
 export function deactivate() {

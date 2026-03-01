@@ -157,6 +157,41 @@
         "command": "hcloud.deleteSshKey",
         "title": "Hetzner Cloud: Remove SSH Key",
         "icon": "$(trash)"
+      },
+      {
+        "command": "hcloud.refreshFirewalls",
+        "title": "Hetzner Cloud: Refresh Firewalls",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "hcloud.createFirewall",
+        "title": "Hetzner Cloud: Create Firewall",
+        "icon": "$(add)"
+      },
+      {
+        "command": "hcloud.deleteFirewall",
+        "title": "Hetzner Cloud: Delete Firewall",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "hcloud.addFirewallRule",
+        "title": "Hetzner Cloud: Add Firewall Rule",
+        "icon": "$(add)"
+      },
+      {
+        "command": "hcloud.deleteFirewallRule",
+        "title": "Hetzner Cloud: Delete Firewall Rule",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "hcloud.applyFirewallToServer",
+        "title": "Hetzner Cloud: Apply Firewall to Server",
+        "icon": "$(vm)"
+      },
+      {
+        "command": "hcloud.removeFirewallFromServer",
+        "title": "Hetzner Cloud: Remove Firewall from Server",
+        "icon": "$(close)"
       }
     ],
     "viewsContainers": {
@@ -198,6 +233,11 @@
         {
           "id": "hcloud.sshKeys",
           "name": "SSH Keys",
+          "initialSize": 2
+        },
+        {
+          "id": "hcloud.firewalls",
+          "name": "Firewalls",
           "initialSize": 2
         }
       ]
@@ -247,6 +287,16 @@
         {
           "command": "hcloud.refreshImages",
           "when": "view == hcloud.images",
+          "group": "navigation"
+        },
+        {
+          "command": "hcloud.createFirewall",
+          "when": "view == hcloud.firewalls",
+          "group": "navigation"
+        },
+        {
+          "command": "hcloud.refreshFirewalls",
+          "when": "view == hcloud.firewalls",
           "group": "navigation"
         }
       ],
@@ -309,6 +359,31 @@
         {
           "command": "hcloud.deleteSshKey",
           "when": "view == hcloud.sshKeys && viewItem == sshkey",
+          "group": "9_danger@1"
+        },
+        {
+          "command": "hcloud.addFirewallRule",
+          "when": "view == hcloud.firewalls && viewItem == firewall",
+          "group": "1_firewall@1"
+        },
+        {
+          "command": "hcloud.applyFirewallToServer",
+          "when": "view == hcloud.firewalls && viewItem == firewall",
+          "group": "1_firewall@2"
+        },
+        {
+          "command": "hcloud.removeFirewallFromServer",
+          "when": "view == hcloud.firewalls && viewItem == firewall",
+          "group": "1_firewall@3"
+        },
+        {
+          "command": "hcloud.deleteFirewall",
+          "when": "view == hcloud.firewalls && viewItem == firewall",
+          "group": "9_danger@1"
+        },
+        {
+          "command": "hcloud.deleteFirewallRule",
+          "when": "view == hcloud.firewalls && viewItem == firewall-rule",
           "group": "9_danger@1"
         }
       ]

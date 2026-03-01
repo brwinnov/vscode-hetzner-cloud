@@ -87,6 +87,27 @@ export interface CreateServerOptions {
   start_after_create?: boolean;
 }
 
+export interface HFirewallRule {
+  direction: 'in' | 'out';
+  protocol: 'tcp' | 'udp' | 'icmp' | 'esp' | 'gre';
+  port?: string;            // required for tcp/udp; ranges like "80-443" are valid
+  source_ips: string[];     // inbound rules
+  destination_ips: string[]; // outbound rules
+  description?: string;
+}
+
+export interface HFirewall {
+  id: number;
+  name: string;
+  rules: HFirewallRule[];
+  applied_to: Array<{
+    type: 'server' | 'label_selector';
+    server?: { id: number };
+    label_selector?: { selector: string };
+  }>;
+  created: string;
+}
+
 export class HetznerClient {
   private token: string;
 
@@ -247,5 +268,41 @@ export class HetznerClient {
   async validateToken(): Promise<{ id: number; description: string }> {
     const data = await this.request<{ token: { id: number; description: string } }>('GET', '/');
     return data.token;
+  }
+
+  // ── Firewalls ──────────────────────────────────────────────────────────────
+
+  async getFirewalls(): Promise<HFirewall[]> {
+    return this.paginateList<HFirewall>('/firewalls', 'firewalls');
+  }
+
+  async getFirewall(id: number): Promise<HFirewall> {
+    const data = await this.request<{ firewall: HFirewall }>('GET', `/firewalls/${id}`);
+    return data.firewall;
+  }
+
+  async createFirewall(name: string, rules: HFirewallRule[]): Promise<HFirewall> {
+    const data = await this.request<{ firewall: HFirewall }>('POST', '/firewalls', { name, rules });
+    return data.firewall;
+  }
+
+  async deleteFirewall(id: number): Promise<void> {
+    await this.request('DELETE', `/firewalls/${id}`);
+  }
+
+  async setFirewallRules(firewallId: number, rules: HFirewallRule[]): Promise<void> {
+    await this.request('POST', `/firewalls/${firewallId}/actions/set_rules`, { rules });
+  }
+
+  async applyFirewallToServer(firewallId: number, serverId: number): Promise<void> {
+    await this.request('POST', `/firewalls/${firewallId}/actions/apply_to_resources`, {
+      apply_to: [{ type: 'server', server: { id: serverId } }],
+    });
+  }
+
+  async removeFirewallFromServer(firewallId: number, serverId: number): Promise<void> {
+    await this.request('POST', `/firewalls/${firewallId}/actions/remove_from_resources`, {
+      remove_from: [{ type: 'server', server: { id: serverId } }],
+    });
   }
 }
