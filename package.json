@@ -1,0 +1,242 @@
+{
+  "name": "hetznet-ext",
+  "displayName": "HetzNet",
+  "description": "Manage Hetzner Cloud infrastructure from VS Code",
+  "version": "0.1.0",
+  "publisher": "brwinnov",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "hetzner",
+    "cloud",
+    "vps",
+    "server",
+    "tailscale",
+    "infrastructure"
+  ],
+  "icon": "resources/icon.png",
+  "activationEvents": [],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "hetznet.addToken",
+        "title": "HetzNet: Add API Token",
+        "icon": "$(add)"
+      },
+      {
+        "command": "hetznet.removeToken",
+        "title": "HetzNet: Remove API Token"
+      },
+      {
+        "command": "hetznet.switchToken",
+        "title": "HetzNet: Switch Active Project"
+      },
+      {
+        "command": "hetznet.refreshServers",
+        "title": "HetzNet: Refresh Servers",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "hetznet.createServer",
+        "title": "HetzNet: Create Server",
+        "icon": "$(add)"
+      },
+      {
+        "command": "hetznet.startServer",
+        "title": "HetzNet: Start Server",
+        "icon": "$(play)"
+      },
+      {
+        "command": "hetznet.stopServer",
+        "title": "HetzNet: Stop Server",
+        "icon": "$(debug-stop)"
+      },
+      {
+        "command": "hetznet.rebootServer",
+        "title": "HetzNet: Reboot Server",
+        "icon": "$(debug-restart)"
+      },
+      {
+        "command": "hetznet.deleteServer",
+        "title": "HetzNet: Delete Server",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "hetznet.sshServer",
+        "title": "HetzNet: Open SSH Terminal",
+        "icon": "$(terminal)"
+      },
+      {
+        "command": "hetznet.refreshNetworks",
+        "title": "HetzNet: Refresh Networks",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "hetznet.createNetwork",
+        "title": "HetzNet: Create Network",
+        "icon": "$(add)"
+      },
+      {
+        "command": "hetznet.refreshImages",
+        "title": "HetzNet: Refresh Images",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "hetznet.refreshSshKeys",
+        "title": "HetzNet: Refresh SSH Keys",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "hetznet.addSshKey",
+        "title": "HetzNet: Add SSH Key",
+        "icon": "$(add)"
+      },
+      {
+        "command": "hetznet.setTailscaleKey",
+        "title": "HetzNet: Set Tailscale Auth Key"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "hetznet",
+          "title": "HetzNet",
+          "icon": "resources/hetznet.svg"
+        }
+      ]
+    },
+    "views": {
+      "hetznet": [
+        {
+          "id": "hetznet.servers",
+          "name": "Servers"
+        },
+        {
+          "id": "hetznet.networks",
+          "name": "Networks"
+        },
+        {
+          "id": "hetznet.images",
+          "name": "Images"
+        },
+        {
+          "id": "hetznet.sshKeys",
+          "name": "SSH Keys"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "hetznet.createServer",
+          "when": "view == hetznet.servers",
+          "group": "navigation"
+        },
+        {
+          "command": "hetznet.refreshServers",
+          "when": "view == hetznet.servers",
+          "group": "navigation"
+        },
+        {
+          "command": "hetznet.createNetwork",
+          "when": "view == hetznet.networks",
+          "group": "navigation"
+        },
+        {
+          "command": "hetznet.refreshNetworks",
+          "when": "view == hetznet.networks",
+          "group": "navigation"
+        },
+        {
+          "command": "hetznet.addSshKey",
+          "when": "view == hetznet.sshKeys",
+          "group": "navigation"
+        },
+        {
+          "command": "hetznet.refreshSshKeys",
+          "when": "view == hetznet.sshKeys",
+          "group": "navigation"
+        },
+        {
+          "command": "hetznet.refreshImages",
+          "when": "view == hetznet.images",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "hetznet.startServer",
+          "when": "view == hetznet.servers && viewItem == server-off",
+          "group": "1_server@1"
+        },
+        {
+          "command": "hetznet.stopServer",
+          "when": "view == hetznet.servers && viewItem == server-on",
+          "group": "1_server@2"
+        },
+        {
+          "command": "hetznet.rebootServer",
+          "when": "view == hetznet.servers && viewItem == server-on",
+          "group": "1_server@3"
+        },
+        {
+          "command": "hetznet.sshServer",
+          "when": "view == hetznet.servers && viewItem == server-on",
+          "group": "1_server@4"
+        },
+        {
+          "command": "hetznet.deleteServer",
+          "when": "view == hetznet.servers",
+          "group": "9_danger@1"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "HetzNet",
+      "properties": {
+        "hetznet.tailscale.enableByDefault": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically inject Tailscale installation into every cloud-init script."
+        },
+        "hetznet.tailscale.extraArgs": {
+          "type": "string",
+          "default": "--accept-routes --ssh",
+          "description": "Extra arguments passed to `tailscale up` during cloud-init."
+        },
+        "hetznet.defaultRegion": {
+          "type": "string",
+          "default": "nbg1",
+          "enum": ["nbg1", "fsn1", "hel1", "ash", "hil"],
+          "description": "Default datacenter location for new servers."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run build:prod",
+    "build": "node esbuild.js",
+    "build:prod": "node esbuild.js --production",
+    "watch": "node esbuild.js --watch",
+    "lint": "eslint src --ext ts",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "@vscode/test-cli": "^0.0.6",
+    "@vscode/test-electron": "^2.3.8",
+    "esbuild": "^0.20.0",
+    "eslint": "^8.56.0",
+    "prettier": "^3.2.0",
+    "typescript": "^5.3.0"
+  },
+  "dependencies": {}
+}
