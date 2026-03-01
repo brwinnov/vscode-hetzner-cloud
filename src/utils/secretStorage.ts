@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import { HetznerClient } from '../api/hetzner';
 
-const SECRET_PREFIX = 'hetznet.token.';
-const ACTIVE_KEY = 'hetznet.activeProject';
+const SECRET_PREFIX = 'hcloud.token.';
+const ACTIVE_KEY = 'hcloud.activeProject';
 
 export interface StoredProject {
   name: string;
@@ -36,7 +36,7 @@ export class TokenManager {
 
   async listProjects(): Promise<string[]> {
     // SecretStorage doesn't support listing keys; we maintain a CSV index
-    const index = await this.secrets.get('hetznet.projectIndex');
+    const index = await this.secrets.get('hcloud.projectIndex');
     if (!index) return [];
     return index.split(',').filter(Boolean);
   }
@@ -44,14 +44,14 @@ export class TokenManager {
   async addToIndex(name: string): Promise<void> {
     const existing = await this.listProjects();
     if (!existing.includes(name)) {
-      await this.secrets.store('hetznet.projectIndex', [...existing, name].join(','));
+      await this.secrets.store('hcloud.projectIndex', [...existing, name].join(','));
     }
   }
 
   async removeFromIndex(name: string): Promise<void> {
     const existing = await this.listProjects();
     await this.secrets.store(
-      'hetznet.projectIndex',
+      'hcloud.projectIndex',
       existing.filter((p) => p !== name).join(',')
     );
   }

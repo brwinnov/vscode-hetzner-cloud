@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to HetzNet are documented here.  
+All notable changes to Hetzner Cloud Toolkit are documented here.  
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).  
 Versioning follows [Semantic Versioning](https://semver.org/).
 
@@ -40,5 +40,5 @@ Initial release.
 - **Status bar item** — shows active project name; click to switch
 - **First-use onboarding** — SSH key guide prompt on first project add
 
-[Unreleased]: https://github.com/brwinnov/HetzNet.ext/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/brwinnov/HetzNet.ext/releases/tag/v0.1.0
+[Unreleased]: https://github.com/brwinnov/vscode-hetzner-cloud/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/brwinnov/vscode-hetzner-cloud/releases/tag/v0.1.0

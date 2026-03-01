@@ -11,12 +11,12 @@ export function registerServerCommands(
   tailscaleKeyManager: TailscaleAuthKeyManager
 ) {  // Refresh
   context.subscriptions.push(
-    vscode.commands.registerCommand('hetznet.refreshServers', () => serversProvider.refresh())
+    vscode.commands.registerCommand('hcloud.refreshServers', () => serversProvider.refresh())
   );
 
   // Start
   context.subscriptions.push(
-    vscode.commands.registerCommand('hetznet.startServer', async (item: ServerItem) => {
+    vscode.commands.registerCommand('hcloud.startServer', async (item: ServerItem) => {
       const client = await tokenManager.getActiveClient();
       if (!client) return;
       await vscode.window.withProgress(
@@ -29,7 +29,7 @@ export function registerServerCommands(
 
   // Stop
   context.subscriptions.push(
-    vscode.commands.registerCommand('hetznet.stopServer', async (item: ServerItem) => {
+    vscode.commands.registerCommand('hcloud.stopServer', async (item: ServerItem) => {
       const confirm = await vscode.window.showWarningMessage(
         `Stop server "${item.server.name}"?`,
         { modal: true },
@@ -49,7 +49,7 @@ export function registerServerCommands(
 
   // Reboot
   context.subscriptions.push(
-    vscode.commands.registerCommand('hetznet.rebootServer', async (item: ServerItem) => {
+    vscode.commands.registerCommand('hcloud.rebootServer', async (item: ServerItem) => {
       const confirm = await vscode.window.showWarningMessage(
         `Reboot server "${item.server.name}"?`,
         { modal: true },
@@ -69,7 +69,7 @@ export function registerServerCommands(
 
   // Delete
   context.subscriptions.push(
-    vscode.commands.registerCommand('hetznet.deleteServer', async (item: ServerItem) => {
+    vscode.commands.registerCommand('hcloud.deleteServer', async (item: ServerItem) => {
       const confirm = await vscode.window.showWarningMessage(
         `Permanently delete server "${item.server.name}"? This cannot be undone.`,
         { modal: true },
@@ -89,7 +89,7 @@ export function registerServerCommands(
 
   // SSH
   context.subscriptions.push(
-    vscode.commands.registerCommand('hetznet.sshServer', (item: ServerItem) => {
+    vscode.commands.registerCommand('hcloud.sshServer', (item: ServerItem) => {
       const ip = item.server.public_net.ipv4?.ip ?? item.server.public_net.ipv6?.ip;
       if (!ip) {
         vscode.window.showErrorMessage('Server has no public IP address.');
@@ -103,7 +103,7 @@ export function registerServerCommands(
 
   // Create Server — opens WebView wizard
   context.subscriptions.push(
-    vscode.commands.registerCommand('hetznet.createServer', async () => {
+    vscode.commands.registerCommand('hcloud.createServer', async () => {
       await ServerWizardPanel.create(context, tokenManager, tailscaleKeyManager, serversProvider);
     })
   );

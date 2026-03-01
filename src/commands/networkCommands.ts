@@ -8,11 +8,11 @@ export function registerNetworkCommands(
   networksProvider: NetworksProvider
 ) {
   context.subscriptions.push(
-    vscode.commands.registerCommand('hetznet.refreshNetworks', () => networksProvider.refresh())
+    vscode.commands.registerCommand('hcloud.refreshNetworks', () => networksProvider.refresh())
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('hetznet.createNetwork', async () => {
+    vscode.commands.registerCommand('hcloud.createNetwork', async () => {
       const client = await tokenManager.getActiveClient();
       if (!client) {
         vscode.window.showErrorMessage('No active Hetzner project.');
@@ -51,7 +51,7 @@ export function registerNetworkCommands(
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('hetznet.deleteNetwork', async (item: NetworkItem) => {
+    vscode.commands.registerCommand('hcloud.deleteNetwork', async (item: NetworkItem) => {
       const confirm = await vscode.window.showWarningMessage(
         `Delete network "${item.network.name}"?`,
         { modal: true },

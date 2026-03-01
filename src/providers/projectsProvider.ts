@@ -25,7 +25,7 @@ export class ProjectItem extends vscode.TreeItem {
     // Click to activate
     if (!isActive) {
       this.command = {
-        command: 'hetznet.activateProject',
+        command: 'hcloud.activateProject',
         title: 'Activate Project',
         arguments: [this],
       };
@@ -56,7 +56,7 @@ export class ProjectsProvider implements vscode.TreeDataProvider<ProjectItem> {
     if (projects.length === 0) {
       const empty = new vscode.TreeItem('No projects — add an API key in Setup');
       empty.iconPath = new vscode.ThemeIcon('info');
-      empty.command = { command: 'hetznet.addToken', title: 'Add API Token' };
+      empty.command = { command: 'hcloud.addToken', title: 'Add API Token' };
       return [empty as ProjectItem];
     }
 

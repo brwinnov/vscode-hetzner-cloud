@@ -14,7 +14,7 @@ import { TailscaleAuthKeyManager } from './tailscale/authKeyManager';
 import { SshKeyGuidePanel } from './webviews/sshKeyGuide';
 
 export async function activate(context: vscode.ExtensionContext) {
-  console.log('HetzNet extension activated');
+  console.log('Hetzner Cloud Toolkit extension activated');
 
   const tokenManager = new TokenManager(context.secrets);
   const tailscaleKeyManager = new TailscaleAuthKeyManager(context.secrets);
@@ -28,44 +28,44 @@ export async function activate(context: vscode.ExtensionContext) {
   const sshKeysProvider = new SshKeysProvider(tokenManager);
 
   // Register tree views
-  vscode.window.createTreeView('hetznet.setup', {
+  vscode.window.createTreeView('hcloud.setup', {
     treeDataProvider: setupProvider,
     showCollapseAll: false,
   });
-  vscode.window.createTreeView('hetznet.projects', {
+  vscode.window.createTreeView('hcloud.projects', {
     treeDataProvider: projectsProvider,
     showCollapseAll: false,
   });
-  vscode.window.createTreeView('hetznet.servers', {
+  vscode.window.createTreeView('hcloud.servers', {
     treeDataProvider: serversProvider,
     showCollapseAll: false,
   });
-  vscode.window.createTreeView('hetznet.networks', {
+  vscode.window.createTreeView('hcloud.networks', {
     treeDataProvider: networksProvider,
     showCollapseAll: false,
   });
-  vscode.window.createTreeView('hetznet.images', {
+  vscode.window.createTreeView('hcloud.images', {
     treeDataProvider: imagesProvider,
     showCollapseAll: false,
   });
-  vscode.window.createTreeView('hetznet.sshKeys', {
+  vscode.window.createTreeView('hcloud.sshKeys', {
     treeDataProvider: sshKeysProvider,
     showCollapseAll: false,
   });
 
   // Status bar item — shows active project name
   const statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
-  statusBar.command = 'hetznet.switchToken';
+  statusBar.command = 'hcloud.switchToken';
   context.subscriptions.push(statusBar);
 
   const refreshStatusBar = async () => {
     const name = await tokenManager.getActiveProjectName();
     if (name) {
-      statusBar.text = `$(cloud) HetzNet: ${name}`;
+      statusBar.text = `$(cloud) Hetzner Cloud: ${name}`;
       statusBar.tooltip = 'Click to switch Hetzner project';
       statusBar.show();
     } else {
-      statusBar.text = `$(cloud) HetzNet: No project`;
+      statusBar.text = `$(cloud) Hetzner Cloud: No project`;
       statusBar.tooltip = 'Click to add a Hetzner API token';
       statusBar.show();
     }
@@ -75,14 +75,14 @@ export async function activate(context: vscode.ExtensionContext) {
 
   // SSH Key Guide command
   context.subscriptions.push(
-    vscode.commands.registerCommand('hetznet.sshKeyGuide', () => {
+    vscode.commands.registerCommand('hcloud.sshKeyGuide', () => {
       SshKeyGuidePanel.create(context);
     })
   );
 
   // Tailscale key command
   context.subscriptions.push(
-    vscode.commands.registerCommand('hetznet.setTailscaleKey', async () => {
+    vscode.commands.registerCommand('hcloud.setTailscaleKey', async () => {
       await tailscaleKeyManager.promptAndSave();
     })
   );
@@ -105,5 +105,5 @@ export async function activate(context: vscode.ExtensionContext) {
 }
 
 export function deactivate() {
-  console.log('HetzNet extension deactivated');
+  console.log('Hetzner Cloud Toolkit extension deactivated');
 }

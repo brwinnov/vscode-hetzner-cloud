@@ -1,4 +1,4 @@
-# HetzNet.ext — Project Blueprint
+# vscode-hetzner-cloud — Project Blueprint
 
 A first-class VS Code extension for managing Hetzner Cloud infrastructure without leaving your editor.
 

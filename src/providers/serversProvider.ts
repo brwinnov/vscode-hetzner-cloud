@@ -57,7 +57,7 @@ export class ServersProvider implements vscode.TreeDataProvider<ServerItem> {
 
   private noTokenItem(): ServerItem {
     const item = new vscode.TreeItem('Add a Hetzner API token to get started');
-    item.command = { command: 'hetznet.addToken', title: 'Add Token' };
+    item.command = { command: 'hcloud.addToken', title: 'Add Token' };
     return item as ServerItem;
   }
 }

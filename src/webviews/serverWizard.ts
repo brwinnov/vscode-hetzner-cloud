@@ -47,7 +47,7 @@ export class ServerWizardPanel {
     }
 
     const panel = vscode.window.createWebviewPanel(
-      'hetznet.serverWizard',
+      'hcloud.serverWizard',
       'Create Server',
       vscode.ViewColumn.One,
       {
@@ -65,8 +65,8 @@ export class ServerWizardPanel {
     this.panel.webview.html = getLoadingHtml();
 
     try {
-      const cfg = vscode.workspace.getConfiguration('hetznet');
-      const tailscaleCfg = vscode.workspace.getConfiguration('hetznet.tailscale');
+      const cfg = vscode.workspace.getConfiguration('hcloud');
+      const tailscaleCfg = vscode.workspace.getConfiguration('hcloud.tailscale');
 
       const [locations, serverTypes, systemImages, snapshots, sshKeys, networks] =
         await Promise.all([
@@ -107,7 +107,7 @@ export class ServerWizardPanel {
         this.panel.webview.postMessage({ command: 'tailscaleKeySet' });
         break;
       case 'addSshKey':
-        await vscode.commands.executeCommand('hetznet.addSshKey');
+        await vscode.commands.executeCommand('hcloud.addSshKey');
         // Reload wizard data so the new key appears
         await this.loadAndRender();
         break;

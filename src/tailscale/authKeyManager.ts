@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-const TAILSCALE_SECRET_KEY = 'hetznet.tailscale.authkey';
+const TAILSCALE_SECRET_KEY = 'hcloud.tailscale.authkey';
 
 export class TailscaleAuthKeyManager {
   private secrets: vscode.SecretStorage;

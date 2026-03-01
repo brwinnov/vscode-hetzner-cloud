@@ -6,7 +6,7 @@ import * as vscode from 'vscode';
  * only the Tailscale block.
  */
 export function injectTailscale(cloudInit: string, authKey: string, extraArgs?: string): string {
-  const cfg = vscode.workspace.getConfiguration('hetznet.tailscale');
+  const cfg = vscode.workspace.getConfiguration('hcloud.tailscale');
   const args = extraArgs ?? cfg.get<string>('extraArgs') ?? '--accept-routes --ssh';
 
   const tailscaleBlock = buildTailscaleBlock(authKey, args);
@@ -44,6 +44,6 @@ runcmd:
  */
 export function isTailscaleEnabled(): boolean {
   return vscode.workspace
-    .getConfiguration('hetznet.tailscale')
+    .getConfiguration('hcloud.tailscale')
     .get<boolean>('enableByDefault', true);
 }

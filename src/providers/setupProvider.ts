@@ -31,7 +31,7 @@ export class SetupProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
     addToken.tooltip = hasProject
       ? 'API token configured. Click to add another project.'
       : 'No API token yet. Click to add your Hetzner Cloud API token.';
-    addToken.command = { command: 'hetznet.addToken', title: 'Add API Token' };
+    addToken.command = { command: 'hcloud.addToken', title: 'Add API Token' };
     addToken.contextValue = 'setup-addtoken';
     items.push(addToken);
 
@@ -43,7 +43,7 @@ export class SetupProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
     );
     sshKey.description = 'Recommended for secure access';
     sshKey.tooltip = 'Open SSH key generation guide for Windows, macOS, WSL and Linux';
-    sshKey.command = { command: 'hetznet.sshKeyGuide', title: 'SSH Key Guide' };
+    sshKey.command = { command: 'hcloud.sshKeyGuide', title: 'SSH Key Guide' };
     sshKey.contextValue = 'setup-sshguide';
     items.push(sshKey);
 
@@ -52,7 +52,7 @@ export class SetupProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
     tailscale.iconPath = new vscode.ThemeIcon('lock', new vscode.ThemeColor('charts.purple'));
     tailscale.description = 'Optional — auto-install on every server';
     tailscale.tooltip = 'Set a Tailscale auth key to auto-provision servers into your Tailnet';
-    tailscale.command = { command: 'hetznet.setTailscaleKey', title: 'Set Tailscale Key' };
+    tailscale.command = { command: 'hcloud.setTailscaleKey', title: 'Set Tailscale Key' };
     tailscale.contextValue = 'setup-tailscale';
     items.push(tailscale);
 

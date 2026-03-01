@@ -11,11 +11,11 @@ export function registerSshKeyCommands(
   sshKeysProvider: SshKeysProvider
 ) {
   context.subscriptions.push(
-    vscode.commands.registerCommand('hetznet.refreshSshKeys', () => sshKeysProvider.refresh())
+    vscode.commands.registerCommand('hcloud.refreshSshKeys', () => sshKeysProvider.refresh())
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('hetznet.addSshKey', async () => {
+    vscode.commands.registerCommand('hcloud.addSshKey', async () => {
       const client = await tokenManager.getActiveClient();
       if (!client) {
         vscode.window.showErrorMessage('No active Hetzner project.');
@@ -81,7 +81,7 @@ export function registerSshKeyCommands(
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('hetznet.deleteSshKey', async (item: SshKeyItem) => {
+    vscode.commands.registerCommand('hcloud.deleteSshKey', async (item: SshKeyItem) => {
       const confirm = await vscode.window.showWarningMessage(
         `Remove SSH key "${item.key.name}" from Hetzner?`,
         { modal: true },

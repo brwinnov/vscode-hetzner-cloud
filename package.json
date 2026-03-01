@@ -1,7 +1,7 @@
 {
-  "name": "hetznet-ext",
-  "displayName": "HetzNet",
-  "description": "Manage Hetzner Cloud infrastructure from VS Code",
+  "name": "vscode-hetzner-cloud",
+  "displayName": "Hetzner Cloud Toolkit",
+  "description": "Manage Hetzner Cloud infrastructure directly from VS Code — servers, networks, SSH keys, Tailscale and more",
   "version": "0.1.0",
   "publisher": "brwinnov",
   "engines": {
@@ -20,13 +20,13 @@
   ],
   "icon": "resources/icon.png",
   "license": "MIT",
-  "homepage": "https://github.com/brwinnov/HetzNet.ext#readme",
+  "homepage": "https://github.com/brwinnov/hcloud.ext#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/brwinnov/HetzNet.ext.git"
+    "url": "https://github.com/brwinnov/hcloud.ext.git"
   },
   "bugs": {
-    "url": "https://github.com/brwinnov/HetzNet.ext/issues"
+    "url": "https://github.com/brwinnov/hcloud.ext/issues"
   },
   "galleryBanner": {
     "color": "#D50C2D",
@@ -37,146 +37,146 @@
   "contributes": {
     "commands": [
       {
-        "command": "hetznet.addToken",
-        "title": "HetzNet: Add API Token",
+        "command": "hcloud.addToken",
+        "title": "Hetzner Cloud: Add API Token",
         "icon": "$(add)"
       },
       {
-        "command": "hetznet.removeToken",
-        "title": "HetzNet: Remove API Token"
+        "command": "hcloud.removeToken",
+        "title": "Hetzner Cloud: Remove API Token"
       },
       {
-        "command": "hetznet.switchToken",
-        "title": "HetzNet: Switch Active Project"
+        "command": "hcloud.switchToken",
+        "title": "Hetzner Cloud: Switch Active Project"
       },
       {
-        "command": "hetznet.refreshServers",
-        "title": "HetzNet: Refresh Servers",
+        "command": "hcloud.refreshServers",
+        "title": "Hetzner Cloud: Refresh Servers",
         "icon": "$(refresh)"
       },
       {
-        "command": "hetznet.createServer",
-        "title": "HetzNet: Create Server",
+        "command": "hcloud.createServer",
+        "title": "Hetzner Cloud: Create Server",
         "icon": "$(add)"
       },
       {
-        "command": "hetznet.startServer",
-        "title": "HetzNet: Start Server",
+        "command": "hcloud.startServer",
+        "title": "Hetzner Cloud: Start Server",
         "icon": "$(play)"
       },
       {
-        "command": "hetznet.stopServer",
-        "title": "HetzNet: Stop Server",
+        "command": "hcloud.stopServer",
+        "title": "Hetzner Cloud: Stop Server",
         "icon": "$(debug-stop)"
       },
       {
-        "command": "hetznet.rebootServer",
-        "title": "HetzNet: Reboot Server",
+        "command": "hcloud.rebootServer",
+        "title": "Hetzner Cloud: Reboot Server",
         "icon": "$(debug-restart)"
       },
       {
-        "command": "hetznet.deleteServer",
-        "title": "HetzNet: Delete Server",
+        "command": "hcloud.deleteServer",
+        "title": "Hetzner Cloud: Delete Server",
         "icon": "$(trash)"
       },
       {
-        "command": "hetznet.sshServer",
-        "title": "HetzNet: Open SSH Terminal",
+        "command": "hcloud.sshServer",
+        "title": "Hetzner Cloud: Open SSH Terminal",
         "icon": "$(terminal)"
       },
       {
-        "command": "hetznet.refreshNetworks",
-        "title": "HetzNet: Refresh Networks",
+        "command": "hcloud.refreshNetworks",
+        "title": "Hetzner Cloud: Refresh Networks",
         "icon": "$(refresh)"
       },
       {
-        "command": "hetznet.createNetwork",
-        "title": "HetzNet: Create Network",
+        "command": "hcloud.createNetwork",
+        "title": "Hetzner Cloud: Create Network",
         "icon": "$(add)"
       },
       {
-        "command": "hetznet.refreshImages",
-        "title": "HetzNet: Refresh Images",
+        "command": "hcloud.refreshImages",
+        "title": "Hetzner Cloud: Refresh Images",
         "icon": "$(refresh)"
       },
       {
-        "command": "hetznet.refreshSshKeys",
-        "title": "HetzNet: Refresh SSH Keys",
+        "command": "hcloud.refreshSshKeys",
+        "title": "Hetzner Cloud: Refresh SSH Keys",
         "icon": "$(refresh)"
       },
       {
-        "command": "hetznet.addSshKey",
-        "title": "HetzNet: Add SSH Key",
+        "command": "hcloud.addSshKey",
+        "title": "Hetzner Cloud: Add SSH Key",
         "icon": "$(add)"
       },
       {
-        "command": "hetznet.setTailscaleKey",
-        "title": "HetzNet: Set Tailscale Auth Key"
+        "command": "hcloud.setTailscaleKey",
+        "title": "Hetzner Cloud: Set Tailscale Auth Key"
       },
       {
-        "command": "hetznet.refreshProjects",
-        "title": "HetzNet: Refresh Projects",
+        "command": "hcloud.refreshProjects",
+        "title": "Hetzner Cloud: Refresh Projects",
         "icon": "$(refresh)"
       },
       {
-        "command": "hetznet.removeProject",
-        "title": "HetzNet: Remove Project",
+        "command": "hcloud.removeProject",
+        "title": "Hetzner Cloud: Remove Project",
         "icon": "$(trash)"
       },
       {
-        "command": "hetznet.activateProject",
-        "title": "HetzNet: Activate Project",
+        "command": "hcloud.activateProject",
+        "title": "Hetzner Cloud: Activate Project",
         "icon": "$(check)"
       },
       {
-        "command": "hetznet.deleteNetwork",
-        "title": "HetzNet: Delete Network",
+        "command": "hcloud.deleteNetwork",
+        "title": "Hetzner Cloud: Delete Network",
         "icon": "$(trash)"
       },
       {
-        "command": "hetznet.sshKeyGuide",
-        "title": "HetzNet: SSH Key Generation Guide",
+        "command": "hcloud.sshKeyGuide",
+        "title": "Hetzner Cloud: SSH Key Generation Guide",
         "icon": "$(book)"
       }
     ],
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "hetznet",
-          "title": "HetzNet",
-          "icon": "resources/hetznet.svg"
+          "id": "Hetzner Cloud Toolkit",
+          "title": "Hetzner Cloud Toolkit",
+          "icon": "resources/hcloud.svg"
         }
       ]
     },
     "views": {
-      "hetznet": [
+      "Hetzner Cloud Toolkit": [
         {
-          "id": "hetznet.setup",
+          "id": "hcloud.setup",
           "name": "Setup",
           "initialSize": 1
         },
         {
-          "id": "hetznet.projects",
+          "id": "hcloud.projects",
           "name": "Projects",
           "initialSize": 1
         },
         {
-          "id": "hetznet.servers",
+          "id": "hcloud.servers",
           "name": "Servers",
           "initialSize": 2
         },
         {
-          "id": "hetznet.networks",
+          "id": "hcloud.networks",
           "name": "Networks",
           "initialSize": 2
         },
         {
-          "id": "hetznet.images",
+          "id": "hcloud.images",
           "name": "Images",
           "initialSize": 2
         },
         {
-          "id": "hetznet.sshKeys",
+          "id": "hcloud.sshKeys",
           "name": "SSH Keys",
           "initialSize": 2
         }
@@ -185,108 +185,108 @@
     "menus": {
       "view/title": [
         {
-          "command": "hetznet.refreshProjects",
-          "when": "view == hetznet.projects",
+          "command": "hcloud.refreshProjects",
+          "when": "view == hcloud.projects",
           "group": "navigation"
         },
         {
-          "command": "hetznet.createServer",
-          "when": "view == hetznet.servers",
+          "command": "hcloud.createServer",
+          "when": "view == hcloud.servers",
           "group": "navigation"
         },
         {
-          "command": "hetznet.refreshServers",
-          "when": "view == hetznet.servers",
+          "command": "hcloud.refreshServers",
+          "when": "view == hcloud.servers",
           "group": "navigation"
         },
         {
-          "command": "hetznet.createNetwork",
-          "when": "view == hetznet.networks",
+          "command": "hcloud.createNetwork",
+          "when": "view == hcloud.networks",
           "group": "navigation"
         },
         {
-          "command": "hetznet.refreshNetworks",
-          "when": "view == hetznet.networks",
+          "command": "hcloud.refreshNetworks",
+          "when": "view == hcloud.networks",
           "group": "navigation"
         },
         {
-          "command": "hetznet.addSshKey",
-          "when": "view == hetznet.sshKeys",
+          "command": "hcloud.addSshKey",
+          "when": "view == hcloud.sshKeys",
           "group": "navigation"
         },
         {
-          "command": "hetznet.sshKeyGuide",
-          "when": "view == hetznet.sshKeys",
+          "command": "hcloud.sshKeyGuide",
+          "when": "view == hcloud.sshKeys",
           "group": "navigation"
         },
         {
-          "command": "hetznet.refreshSshKeys",
-          "when": "view == hetznet.sshKeys",
+          "command": "hcloud.refreshSshKeys",
+          "when": "view == hcloud.sshKeys",
           "group": "navigation"
         },
         {
-          "command": "hetznet.refreshImages",
-          "when": "view == hetznet.images",
+          "command": "hcloud.refreshImages",
+          "when": "view == hcloud.images",
           "group": "navigation"
         }
       ],
       "view/item/context": [
         {
-          "command": "hetznet.activateProject",
-          "when": "view == hetznet.projects && viewItem == project-inactive",
+          "command": "hcloud.activateProject",
+          "when": "view == hcloud.projects && viewItem == project-inactive",
           "group": "1_project@1"
         },
         {
-          "command": "hetznet.removeProject",
-          "when": "view == hetznet.projects",
+          "command": "hcloud.removeProject",
+          "when": "view == hcloud.projects",
           "group": "9_danger@1"
         },
         {
-          "command": "hetznet.startServer",
-          "when": "view == hetznet.servers && viewItem == server-off",
+          "command": "hcloud.startServer",
+          "when": "view == hcloud.servers && viewItem == server-off",
           "group": "1_server@1"
         },
         {
-          "command": "hetznet.stopServer",
-          "when": "view == hetznet.servers && viewItem == server-on",
+          "command": "hcloud.stopServer",
+          "when": "view == hcloud.servers && viewItem == server-on",
           "group": "1_server@2"
         },
         {
-          "command": "hetznet.rebootServer",
-          "when": "view == hetznet.servers && viewItem == server-on",
+          "command": "hcloud.rebootServer",
+          "when": "view == hcloud.servers && viewItem == server-on",
           "group": "1_server@3"
         },
         {
-          "command": "hetznet.sshServer",
-          "when": "view == hetznet.servers && viewItem == server-on",
+          "command": "hcloud.sshServer",
+          "when": "view == hcloud.servers && viewItem == server-on",
           "group": "1_server@4"
         },
         {
-          "command": "hetznet.deleteServer",
-          "when": "view == hetznet.servers",
+          "command": "hcloud.deleteServer",
+          "when": "view == hcloud.servers",
           "group": "9_danger@1"
         },
         {
-          "command": "hetznet.deleteNetwork",
-          "when": "view == hetznet.networks && viewItem == network",
+          "command": "hcloud.deleteNetwork",
+          "when": "view == hcloud.networks && viewItem == network",
           "group": "9_danger@1"
         }
       ]
     },
     "configuration": {
-      "title": "HetzNet",
+      "title": "Hetzner Cloud Toolkit",
       "properties": {
-        "hetznet.tailscale.enableByDefault": {
+        "hcloud.tailscale.enableByDefault": {
           "type": "boolean",
           "default": true,
           "description": "Automatically inject Tailscale installation into every cloud-init script."
         },
-        "hetznet.tailscale.extraArgs": {
+        "hcloud.tailscale.extraArgs": {
           "type": "string",
           "default": "--accept-routes --ssh",
           "description": "Extra arguments passed to `tailscale up` during cloud-init."
         },
-        "hetznet.defaultRegion": {
+        "hcloud.defaultRegion": {
           "type": "string",
           "default": "nbg1",
           "enum": ["nbg1", "fsn1", "hel1", "ash", "hil"],

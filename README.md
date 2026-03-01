@@ -1,20 +1,20 @@
 <div align="center">
 
-<img src="resources/icon.png" width="96" alt="HetzNet icon">
+<img src="resources/icon.png" width="96" alt="Hetzner Cloud Toolkit icon">
 
-# HetzNet
+# Hetzner Cloud Toolkit
 
 **Manage your Hetzner Cloud infrastructure directly from VS Code.**
 
-[![Version](https://img.shields.io/visual-studio-marketplace/v/brwinnov.hetznet-ext?color=D50C2D&label=marketplace)](https://marketplace.visualstudio.com/items?itemName=brwinnov.hetznet-ext)
-[![Installs](https://img.shields.io/visual-studio-marketplace/i/brwinnov.hetznet-ext)](https://marketplace.visualstudio.com/items?itemName=brwinnov.hetznet-ext)
+[![Version](https://img.shields.io/visual-studio-marketplace/v/brwinnov.Hetzner Cloud Toolkit-ext?color=D50C2D&label=marketplace)](https://marketplace.visualstudio.com/items?itemName=brwinnov.Hetzner Cloud Toolkit-ext)
+[![Installs](https://img.shields.io/visual-studio-marketplace/i/brwinnov.Hetzner Cloud Toolkit-ext)](https://marketplace.visualstudio.com/items?itemName=brwinnov.Hetzner Cloud Toolkit-ext)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 </div>
 
 ---
 
-HetzNet brings the Hetzner Cloud control panel into your editor. Create servers, manage networks, organise SSH keys, and inject Tailscale — all without leaving VS Code.
+Hetzner Cloud Toolkit brings the Hetzner Cloud control panel into your editor. Create servers, manage networks, organise SSH keys, and inject Tailscale — all without leaving VS Code.
 
 ## Features
 
@@ -61,16 +61,16 @@ HetzNet brings the Hetzner Cloud control panel into your editor. Create servers,
 3. Click **Generate API Token** — give it Read & Write permissions
 4. Copy the token (shown only once)
 
-### 2. Add the token to HetzNet
+### 2. Add the token to Hetzner Cloud Toolkit
 
-1. Open the HetzNet sidebar (cloud icon in the Activity Bar)
+1. Open the Hetzner Cloud Toolkit sidebar (cloud icon in the Activity Bar)
 2. In **SETUP**, click **Add Hetzner Project API Key**
 3. Enter a project name and paste your token
 4. Your servers, networks, images, and SSH keys will load automatically
 
 ### 3. Create your first server
 
-1. In the **SERVERS** panel, click the **＋** button or run `HetzNet: Create Server`
+1. In the **SERVERS** panel, click the **＋** button or run `Hetzner Cloud Toolkit: Create Server`
 2. Work through the 7-step wizard
 3. Your new server appears in the tree within seconds
 
@@ -80,8 +80,8 @@ HetzNet brings the Hetzner Cloud control panel into your editor. Create servers,
 
 | Setting | Default | Description |
 |---|---|---|
-| `hetznet.tailscale.enableByDefault` | `true` | Pre-check the Tailscale toggle in the server wizard |
-| `hetznet.tailscale.extraArgs` | `--accept-routes --ssh` | Extra arguments passed to `tailscale up` in cloud-init |
+| `Hetzner Cloud Toolkit.tailscale.enableByDefault` | `true` | Pre-check the Tailscale toggle in the server wizard |
+| `Hetzner Cloud Toolkit.tailscale.extraArgs` | `--accept-routes --ssh` | Extra arguments passed to `tailscale up` in cloud-init |
 
 ---
 
@@ -103,7 +103,7 @@ HetzNet brings the Hetzner Cloud control panel into your editor. Create servers,
 
 ## Contributing
 
-Issues and PRs welcome at [github.com/brwinnov/HetzNet.ext](https://github.com/brwinnov/HetzNet.ext).
+Issues and PRs welcome at [github.com/brwinnov/vscode-hetzner-cloud](https://github.com/brwinnov/vscode-hetzner-cloud).
 
 ---
 

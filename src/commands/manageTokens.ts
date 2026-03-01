@@ -30,7 +30,7 @@ export function registerTokenCommands(
   };
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('hetznet.addToken', async () => {
+    vscode.commands.registerCommand('hcloud.addToken', async () => {
       const name = await vscode.window.showInputBox({
         title: 'Project Name',
         prompt: 'Enter a name for this Hetzner project',
@@ -80,14 +80,14 @@ export function registerTokenCommands(
           'Skip'
         );
         if (choice === 'Open SSH Key Guide') {
-          vscode.commands.executeCommand('hetznet.sshKeyGuide');
+          vscode.commands.executeCommand('hcloud.sshKeyGuide');
         }
       }
     })
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('hetznet.removeToken', async () => {
+    vscode.commands.registerCommand('hcloud.removeToken', async () => {
       const projects = await tokenManager.listProjects();
       if (projects.length === 0) {
         vscode.window.showInformationMessage('No projects configured.');
@@ -115,14 +115,14 @@ export function registerTokenCommands(
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('hetznet.switchToken', async () => {
+    vscode.commands.registerCommand('hcloud.switchToken', async () => {
       const projects = await tokenManager.listProjects();
       if (projects.length === 0) {
         const add = await vscode.window.showInformationMessage(
           'No projects configured. Add one now?',
           'Add Token'
         );
-        if (add) vscode.commands.executeCommand('hetznet.addToken');
+        if (add) vscode.commands.executeCommand('hcloud.addToken');
         return;
       }
 
@@ -147,7 +147,7 @@ export function registerTokenCommands(
 
   // Activate project directly from the Projects tree view
   context.subscriptions.push(
-    vscode.commands.registerCommand('hetznet.activateProject', async (item: ProjectItem | undefined) => {
+    vscode.commands.registerCommand('hcloud.activateProject', async (item: ProjectItem | undefined) => {
       let projectName: string | undefined;
 
       if (item instanceof ProjectItem) {
@@ -177,7 +177,7 @@ export function registerTokenCommands(
 
   // Remove project from context menu
   context.subscriptions.push(
-    vscode.commands.registerCommand('hetznet.removeProject', async (item: ProjectItem | undefined) => {
+    vscode.commands.registerCommand('hcloud.removeProject', async (item: ProjectItem | undefined) => {
       let projectName: string | undefined;
 
       if (item instanceof ProjectItem) {
@@ -212,7 +212,7 @@ export function registerTokenCommands(
 
   // Refresh projects tree
   context.subscriptions.push(
-    vscode.commands.registerCommand('hetznet.refreshProjects', () => {
+    vscode.commands.registerCommand('hcloud.refreshProjects', () => {
       projectsProvider.refresh();
       setupProvider.refresh();
     })

@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 export class SshKeyGuidePanel {
   static create(context: vscode.ExtensionContext): void {
     const panel = vscode.window.createWebviewPanel(
-      'hetznet.sshKeyGuide',
+      'hcloud.sshKeyGuide',
       'SSH Key Generation Guide',
       vscode.ViewColumn.One,
       { enableScripts: true }
@@ -326,7 +326,7 @@ function getGuideHtml(): string {
     <div class="success-box">
       <div class="box-title">✓ Keys are at:</div>
       Private: <code>~/.ssh/id_ed25519</code> &nbsp;·&nbsp; Public: <code>~/.ssh/id_ed25519.pub</code><br><br>
-      Use the <strong>+ Add SSH Key</strong> button in HetzNet — it auto-detects keys in <code>~/.ssh/</code>.
+      Use the <strong>+ Add SSH Key</strong> button in the extension — it auto-detects keys in <code>~/.ssh/</code>.
     </div>
 
     <h2>Configure SSH for Hetzner</h2>
@@ -551,7 +551,7 @@ EOF</code></pre>
     </table>
 
     <h3>What happens if you don't add an SSH key?</h3>
-    <p>Hetzner will generate a random <strong>root password</strong> and show it once after server creation. You'll receive it in HetzNet's notification dialog. While this works, it's less secure and inconvenient for automation.</p>
+    <p>Hetzner will generate a random <strong>root password</strong> and show it once after server creation. You'll receive it in the extension's notification dialog. While this works, it's less secure and inconvenient for automation.</p>
 
     <div class="info-box">
       <div class="box-title">💡 Best practice workflow</div>
@@ -564,7 +564,7 @@ EOF</code></pre>
 
   <!-- ── Why Ed25519 ── -->
   <div class="tab-panel" id="tab-whyed25519">
-    <h2>What is Ed25519 and why does HetzNet recommend it?</h2>
+    <h2>What is Ed25519 and why do we recommend it?</h2>
 
     <div class="info-box">
       <div class="box-title">ℹ The <code>-t</code> flag in <code>ssh-keygen -t ed25519</code> means <em>type</em> — the cryptographic algorithm used to generate your key pair.</div>
@@ -723,7 +723,7 @@ ssh-keygen -t rsa -b 4096 -C "your-email@example.com"</code></pre>
       <div class="box-title">✓ Summary</div>
       <strong>Ed25519</strong> — choose this if you work primarily from the terminal, VS Code, or Linux.<br>
       <strong>RSA 4096</strong> — choose this if you already have RSA keys, use PuTTY or WinSCP regularly, or are in an enterprise environment with older SSH policies.<br><br>
-      Both work with Hetzner Cloud. Both work with HetzNet. The difference is speed, key size, and compatibility with older tools.
+      Both work with Hetzner Cloud. Both work with hcloud. The difference is speed, key size, and compatibility with older tools.
     </div>
   </div>
 

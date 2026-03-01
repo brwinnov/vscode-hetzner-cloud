@@ -1,13 +1,13 @@
-# HetzNet.ext — Project Plan
+# vscode-hetzner-cloud — Project Plan
 
-> Last updated: 2026-03-01 (marketplace assets added)
+> Last updated: 2026-03-01 (project renamed to Hetzner Cloud Toolkit)
 
 ---
 
 ## Project Overview
 
 A VS Code extension for managing Hetzner Cloud infrastructure directly from the editor.  
-Repo: `brwinnov/HetzNet.ext` (private)  
+Repo: `brwinnov/vscode-hetzner-cloud` (private)  
 Language: TypeScript · Bundler: esbuild · Engine: VS Code ^1.85.0
 
 ---
@@ -34,7 +34,7 @@ src/
                   sshKeyGuide.ts      — SSH key generation guide (tabbed WebView)
   extension.ts    — activate/deactivate, wires all providers & commands
 resources/
-  hetznet.svg     — activity bar icon
+  Hetzner Cloud Toolkit.svg     — activity bar icon
 ```
 
 ---
@@ -42,7 +42,7 @@ resources/
 ## Completed Work
 
 ### Phase 1 — Repo & Scaffolding
-- [x] Created private GitHub repo `brwinnov/HetzNet.ext`
+- [x] Created private GitHub repo `brwinnov/vscode-hetzner-cloud`
 - [x] GitHub CLI installed, authenticated via browser OAuth
 - [x] PAT stored in Windows Credential Manager
 - [x] Full TypeScript project scaffolded (esbuild, ESLint, Prettier, tsconfig)
@@ -89,6 +89,14 @@ resources/
 - [x] `resources/icon.png` — 128×128 PNG (Hetzner red background, white cloud + network nodes)
 - [x] `package.json` — added `license`, `homepage`, `repository`, `bugs`, `galleryBanner` fields
 
+### Phase 7 — Project Rename
+- [x] Renamed from `HetzNet` to `Hetzner Cloud Toolkit` throughout all source files
+- [x] npm package name: `vscode-hetzner-cloud` (was `hetznet-ext`)
+- [x] All command/view/config/SecretStorage key prefixes: `hcloud.` (was `hetznet.`)
+- [x] GitHub repo renamed: `brwinnov/vscode-hetzner-cloud` (was `brwinnov/vscode-hetzner-cloud`)
+- [x] Git remote updated to new repo URL
+- [x] All markdown files updated
+
 ---
 
 ## In Progress
@@ -100,7 +108,7 @@ _Nothing currently in flight._
 ## Backlog / Next Steps
 
 ### Near-term
-- [ ] **Tailscale key command** — `hetznet.setTailscaleKey` exists in extension.ts but `TailscaleAuthKeyManager.promptAndSave()` needs verification it stores and retrieves correctly
+- [ ] **Tailscale key command** — `Hetzner Cloud Toolkit.setTailscaleKey` exists in extension.ts but `TailscaleAuthKeyManager.promptAndSave()` needs verification it stores and retrieves correctly
 - [ ] **Server power state refresh** — after power on/off/reboot, auto-refresh servers tree
 - [ ] **Network subnets** — SubnetItem in networksProvider; add/remove subnet commands
 - [ ] **SSH key import from wizard** — after "Add SSH Key" in wizard, newly added key should auto-select in the wizard step
@@ -127,6 +135,7 @@ _Nothing currently in flight._
 | 2026-02 | WebView wizard over QuickPick for server creation | Complex multi-step form with interdependencies needs proper UI |
 | 2026-02 | esbuild over webpack/tsc | Faster builds, simpler config for single-file output |
 | 2026-03 | Recommend Ed25519 but show RSA 4096 as alternative | Ed25519 is best practice; RSA needed for PuTTY/enterprise compat |
+| 2026-03-01 | Renamed to `Hetzner Cloud Toolkit`, prefix `hcloud`, repo `vscode-hetzner-cloud` | "Hetzner Cloud" is user's search term; "Toolkit" signals unofficial third-party tool; `hcloud` matches Hetzner's own CLI shorthand |
 | 2026-03 | PLAN.md maintained as living log | Track progress and decisions across sessions |
 
 ---
