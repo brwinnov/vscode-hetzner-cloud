@@ -6,6 +6,23 @@ export interface StorageBoxMount {
 }
 
 /**
+ * POSIX single-quote shell escaping: any literal ' becomes '\''.
+ * Safe for values embedded inside '...' in shell scripts.
+ * e.g.  foo'bar  →  foo'\''bar
+ */
+function shellEsc(s: string): string {
+  return s.replace(/'/g, "'\\''");
+}
+
+/**
+ * Removes characters that could break a YAML literal block scalar or
+ * a credentials file (newlines, carriage returns, null bytes).
+ */
+function sanitizeForYaml(s: string): string {
+  return s.replace(/[\r\n\0]/g, '');
+}
+
+/**
  * Injects CIFS Storage Box mount configuration into an existing cloud-init string.
  * Uses a credentials file (/etc/cifs-credentials/<login>) with 0600 permissions
  * rather than embedding credentials directly in fstab.
@@ -30,12 +47,13 @@ export function injectStorageBoxMounts(cloudInit: string, mounts: StorageBoxMoun
   );
 
   // write_files: one credentials file per box
+  // Passwords are sanitized to remove characters that could break YAML block literals.
   const writeEntries = mounts.flatMap((m) => [
     `  - path: /etc/cifs-credentials/${m.login}`,
     `    permissions: '0600'`,
     `    content: |`,
     `      username=${m.login}`,
-    `      password=${m.password}`,
+    `      password=${sanitizeForYaml(m.password)}`,
   ]);
   content = injectItems(content, 'write_files', writeEntries);
 
@@ -116,17 +134,21 @@ export function generateMountScript(mounts: StorageBoxMount[]): string {
   ];
 
   for (const m of mounts) {
+    // Shell-escape the password so single quotes in the password don't break
+    // the printf argument or allow shell injection.
+    const safePass = shellEsc(m.password);
+    const safeServer = shellEsc(m.server); // defence-in-depth (API value)
     lines.push(
       `# ── Storage Box: ${m.login} → /mnt/${m.mountName}`,
-      `printf 'username=%s\\npassword=%s\\n' '${m.login}' '${m.password}' \\`,
+      `printf 'username=%s\\npassword=%s\\n' '${m.login}' '${safePass}' \\`,
       `  > /etc/cifs-credentials/${m.login}`,
       `chmod 600 /etc/cifs-credentials/${m.login}`,
       `mkdir -p /mnt/${m.mountName}`,
-      `mount -t cifs //${m.server}/backup /mnt/${m.mountName} \\`,
+      `mount -t cifs //${safeServer}/backup /mnt/${m.mountName} \\`,
       `  -o credentials=/etc/cifs-credentials/${m.login},iocharset=utf8,rw,noperm,_netdev`,
       `# Persist in fstab`,
-      `grep -q '${m.server}' /etc/fstab || \\`,
-      `  echo "//${m.server}/backup /mnt/${m.mountName} cifs credentials=/etc/cifs-credentials/${m.login},iocharset=utf8,rw,noperm,_netdev 0 0" >> /etc/fstab`,
+      `grep -qF '//${safeServer}/backup' /etc/fstab || \\`,
+      `  echo "//${safeServer}/backup /mnt/${m.mountName} cifs credentials=/etc/cifs-credentials/${m.login},iocharset=utf8,rw,noperm,_netdev 0 0" >> /etc/fstab`,
       `echo "Mounted Storage Box '${m.login}' at /mnt/${m.mountName}"`,
       '',
     );

@@ -139,11 +139,25 @@ function statusLabel(status: HServer['status']): string {
   return status.charAt(0).toUpperCase() + status.slice(1);
 }
 
+/** Cryptographically-adequate nonce for CSP inline script allowlisting. */
+function generateNonce(): string {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let n = '';
+  for (let i = 0; i < 32; i++) n += chars.charAt(Math.floor(Math.random() * chars.length));
+  return n;
+}
+
+/** HTML-escape a string for safe use in text content and attribute values. */
+function escHtml(s: string): string {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
 function row(label: string, value: string): string {
-  return `<tr><td class="lbl">${label}</td><td class="val">${value}</td></tr>`;
+  return `<tr><td class="lbl">${escHtml(label)}</td><td class="val">${escHtml(value)}</td></tr>`;
 }
 
 function renderHtml(s: HServer): string {
+  const nonce = generateNonce();
   const ipv4 = s.public_net.ipv4?.ip ?? '—';
   const ipv6 = s.public_net.ipv6?.ip ?? '—';
   const image = s.image ? (s.image.name ?? s.image.description) : '—';
@@ -158,6 +172,7 @@ function renderHtml(s: HServer): string {
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'nonce-${nonce}';"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -230,7 +245,7 @@ function renderHtml(s: HServer): string {
 </head>
 <body>
 <div class="header">
-  <h1>${s.name}</h1>
+  <h1>${escHtml(s.name)}</h1>
   <span class="badge">${statusLabel(s.status)}</span>
   <button class="btn-icon" onclick="send('refresh')" title="Refresh">↺ Refresh</button>
 </div>
@@ -291,10 +306,10 @@ function renderHtml(s: HServer): string {
 ${labelEntries.length > 0 ? `
 <div class="section">
   <div class="section-title">Labels</div>
-  <div>${labelEntries.map(([k, v]) => `<span class="label-chip">${k}=${v}</span>`).join('')}</div>
+  <div>${labelEntries.map(([k, v]) => `<span class="label-chip">${escHtml(k)}=${escHtml(v)}</span>`).join('')}</div>
 </div>` : ''}
 
-<script>
+<script nonce="${nonce}">
 const vscode = acquireVsCodeApi();
 function send(cmd) { vscode.postMessage({ command: cmd }); }
 function copyText(t) {

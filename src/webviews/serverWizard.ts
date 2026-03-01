@@ -308,6 +308,14 @@ interface CreateServerPayload {
   tailscaleEnabled: boolean;
 }
 
+/** Cryptographically-adequate nonce for CSP inline script allowlisting. */
+function generateNonce(): string {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let n = '';
+  for (let i = 0; i < 32; i++) n += chars.charAt(Math.floor(Math.random() * chars.length));
+  return n;
+}
+
 function getLoadingHtml(): string {
   return `<!DOCTYPE html><html><body style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:var(--vscode-font-family);color:var(--vscode-foreground);background:var(--vscode-editor-background)">
     <div style="text-align:center"><div style="font-size:24px;margin-bottom:12px">⏳</div><div>Loading Hetzner data...</div></div>
@@ -315,12 +323,14 @@ function getLoadingHtml(): string {
 }
 
 function getErrorHtml(msg: string): string {
+  const safe = msg.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   return `<!DOCTYPE html><html><body style="padding:24px;font-family:var(--vscode-font-family);color:var(--vscode-errorForeground);background:var(--vscode-editor-background)">
-    <h2>Failed to load wizard</h2><p>${msg}</p>
+    <h2>Failed to load wizard</h2><p>${safe}</p>
   </body></html>`;
 }
 
 function getWizardHtml(data: WizardData): string {
+  const nonce = generateNonce();
   const locationsJson = JSON.stringify(data.locations);
   const serverTypesJson = JSON.stringify(data.serverTypes);
   const imagesJson = JSON.stringify(data.images);
@@ -331,6 +341,7 @@ function getWizardHtml(data: WizardData): string {
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'nonce-${nonce}';">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Create Server</title>
 <style>
@@ -1001,13 +1012,18 @@ function getWizardHtml(data: WizardData): string {
   </div><!-- /main -->
 </div><!-- /wizard -->
 
-<script>
+<script nonce="${nonce}">
 const vscode = acquireVsCodeInstance();
 const LOCATIONS = ${locationsJson};
 const SERVER_TYPES = ${serverTypesJson};
 const IMAGES = ${imagesJson};
 let SSH_KEYS = ${sshKeysJson};
 const NETWORKS = ${networksJson};
+
+// HTML-escape helper — used in all innerHTML renders
+function h(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
 
 // ── State ──────────────────────────────────────────────────────────────────
 const state = {
@@ -1227,10 +1243,10 @@ function renderImages() {
     const iconKey = Object.keys(osIcons).find(k => label.toLowerCase().includes(k)) || 'default';
     return \`
       <div class="card \${i.name === state.image ? 'selected' : ''}"
-           onclick="selectImage('\${i.name || i.id}', '\${label.replace(/'/g, "\\\\'")}', this)">
-        <div class="card-badge">\${i.type}</div>
-        <div class="card-title">\${osIcons[iconKey]} \${label}</div>
-        <div class="card-desc">\${i.os_flavor} \${i.os_version || ''}</div>
+           onclick="selectImage(\${JSON.stringify(i.name || i.id)}, \${JSON.stringify(label)}, this)">
+        <div class="card-badge">\${h(i.type)}</div>
+        <div class="card-title">\${osIcons[iconKey]} \${h(label)}</div>
+        <div class="card-desc">\${h(i.os_flavor)} \${h(i.os_version || '')}</div>
       </div>
     \`;
   }).join('');
@@ -1253,11 +1269,11 @@ function renderSshKeys() {
   }
   container.innerHTML = SSH_KEYS.map(k => \`
     <label class="check-card \${state.sshKeys.includes(k.name) ? 'selected' : ''}"
-           onclick="toggleSshKey('\${k.name}', this)">
+           onclick="toggleSshKey(\${JSON.stringify(k.name)}, this)">
       <div class="check-icon">\${state.sshKeys.includes(k.name) ? '✓' : ''}</div>
       <div>
-        <div style="font-size:13px;font-weight:600">\${k.name}</div>
-        <div style="font-size:11px;color:var(--vscode-descriptionForeground)">\${k.fingerprint.substring(0, 28)}…</div>
+        <div style="font-size:13px;font-weight:600">\${h(k.name)}</div>
+        <div style="font-size:11px;color:var(--vscode-descriptionForeground)">\${h(k.fingerprint.substring(0, 28))}…</div>
       </div>
     </label>
   \`).join('');
@@ -1288,8 +1304,8 @@ function renderNetworks() {
            onclick="toggleNetwork(\${n.id}, this)">
       <div class="check-icon">\${state.networks.includes(n.id) ? '✓' : ''}</div>
       <div>
-        <div style="font-size:13px;font-weight:600">\${n.name}</div>
-        <div style="font-size:11px;color:var(--vscode-descriptionForeground)">\${n.ip_range}</div>
+        <div style="font-size:13px;font-weight:600">\${h(n.name)}</div>
+        <div style="font-size:11px;color:var(--vscode-descriptionForeground)">\${h(n.ip_range)}</div>
       </div>
     </label>
   \`).join('');
@@ -1340,8 +1356,8 @@ function renderSummary() {
 
   document.getElementById('summaryTable').innerHTML = rows.map(([k, v]) => \`
     <div class="summary-row">
-      <span class="summary-key">\${k}</span>
-      <span class="summary-val">\${v}</span>
+      <span class="summary-key">\${h(k)}</span>
+      <span class="summary-val">\${h(v)}</span>
     </div>
   \`).join('');
 }

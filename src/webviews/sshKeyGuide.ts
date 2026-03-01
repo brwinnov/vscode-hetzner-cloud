@@ -13,11 +13,21 @@ export class SshKeyGuidePanel {
   }
 }
 
+/** Cryptographically-adequate nonce for CSP inline script allowlisting. */
+function generateNonce(): string {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let n = '';
+  for (let i = 0; i < 32; i++) n += chars.charAt(Math.floor(Math.random() * chars.length));
+  return n;
+}
+
 function getGuideHtml(): string {
+  const nonce = generateNonce();
   return /* html */ `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'nonce-${nonce}';">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SSH Key Generation Guide</title>
 <style>
@@ -729,7 +739,7 @@ ssh-keygen -t rsa -b 4096 -C "your-email@example.com"</code></pre>
 
 </div><!-- /content -->
 
-<script>
+<script nonce="${nonce}">
 function showTab(name, event) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
