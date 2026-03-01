@@ -33,6 +33,7 @@ export async function activate(context: vscode.ExtensionContext) {
   const setupProvider = new SetupProvider(tokenManager);
   const projectsProvider = new ProjectsProvider(tokenManager);
   const serversProvider = new ServersProvider(tokenManager);
+  context.subscriptions.push(serversProvider);
   const networksProvider = new NetworksProvider(tokenManager);
   const imagesProvider = new ImagesProvider(tokenManager);
   const sshKeysProvider = new SshKeysProvider(tokenManager);
