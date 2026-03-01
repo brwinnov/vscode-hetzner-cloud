@@ -1,10 +1,11 @@
 import * as vscode from 'vscode';
-import { TokenManager } from '../utils/secretStorage';
+import { TokenManager, CloudInitLibrary, RobotCredentialManager, StorageBoxPasswordManager } from '../utils/secretStorage';
 import { ServersProvider } from '../providers/serversProvider';
 import { TailscaleAuthKeyManager } from '../tailscale/authKeyManager';
 import { injectTailscale } from '../tailscale/cloudInitInjector';
 import { HetznerClient, HLocation, HServerType, HImage, HSshKey, HNetwork } from '../api/hetzner';
-import { CloudInitLibrary } from '../utils/secretStorage';
+import { injectStorageBoxMounts } from '../utils/storageBoxInjector';
+import { promptStorageBoxMounts } from '../commands/storageBoxCommands';
 
 interface WizardData {
   locations: HLocation[];
@@ -25,7 +26,9 @@ export class ServerWizardPanel {
     private readonly client: HetznerClient,
     private readonly tailscaleKeyManager: TailscaleAuthKeyManager,
     private readonly serversProvider: ServersProvider,
-    private readonly library: CloudInitLibrary
+    private readonly library: CloudInitLibrary,
+    private readonly robotCredManager: RobotCredentialManager,
+    private readonly boxPwdManager: StorageBoxPasswordManager
   ) {
     this.panel = panel;
     this.panel.onDidDispose(() => this.dispose(), null, this.disposables);
@@ -40,7 +43,9 @@ export class ServerWizardPanel {
     context: vscode.ExtensionContext,
     tokenManager: TokenManager,
     tailscaleKeyManager: TailscaleAuthKeyManager,
-    serversProvider: ServersProvider
+    serversProvider: ServersProvider,
+    robotCredManager: RobotCredentialManager,
+    boxPwdManager: StorageBoxPasswordManager
   ): Promise<void> {
     const client = await tokenManager.getActiveClient();
     if (!client) {
@@ -63,7 +68,9 @@ export class ServerWizardPanel {
       client,
       tailscaleKeyManager,
       serversProvider,
-      new CloudInitLibrary(context.secrets)
+      new CloudInitLibrary(context.secrets),
+      robotCredManager,
+      boxPwdManager
     );
     await wizard.loadAndRender();
   }
@@ -213,6 +220,17 @@ export class ServerWizardPanel {
         if (confirmDel !== 'Delete') break;
         await this.library.deleteTemplate(pickedDel.label);
         vscode.window.showInformationMessage(`Template "${pickedDel.label}" deleted.`);
+        break;
+      }
+      case 'requestStorageBoxMounts': {
+        const existingCloudInit = ((msg.payload as { existingCloudInit?: string }) ?? {}).existingCloudInit ?? '';
+        const mounts = await promptStorageBoxMounts(this.robotCredManager, this.boxPwdManager);
+        if (!mounts || mounts.length === 0) break;
+        const injected = injectStorageBoxMounts(existingCloudInit, mounts);
+        this.panel.webview.postMessage({ command: 'cloudInitTemplateLoaded', content: injected });
+        vscode.window.showInformationMessage(
+          `Storage Box mount config injected into cloud-init (${mounts.length} box${mounts.length > 1 ? 'es' : ''}).`
+        );
         break;
       }
     }
@@ -955,6 +973,7 @@ function getWizardHtml(data: WizardData): string {
           <button class="btn-secondary" style="font-size:12px;padding:4px 10px" onclick="saveCloudInitTemplate()">&#128190; Save as Template</button>
           <button class="btn-secondary" style="font-size:12px;padding:4px 10px" onclick="loadCloudInitTemplate()">&#128194; Load Template</button>
           <button class="btn-secondary" style="font-size:12px;padding:4px 10px" onclick="deleteCloudInitTemplate()">&#128465; Delete Template</button>
+          <button class="btn-secondary" style="font-size:12px;padding:4px 10px" onclick="requestStorageBoxMounts()">&#128230; Mount Storage Boxes</button>
         </div>
       </div>
 
@@ -1038,6 +1057,9 @@ function loadCloudInitTemplate() {
 }
 function deleteCloudInitTemplate() {
   vscode.postMessage({ command: 'deleteCloudInitTemplate' });
+}
+function requestStorageBoxMounts() {
+  vscode.postMessage({ command: 'requestStorageBoxMounts', payload: { existingCloudInit: document.getElementById('cloudInitInput').value } });
 }
 
 function acquireVsCodeInstance() {

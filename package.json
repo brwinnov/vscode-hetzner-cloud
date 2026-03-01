@@ -222,6 +222,31 @@
         "command": "hcloud.resizeVolume",
         "title": "Hetzner Cloud: Resize Volume",
         "icon": "$(arrow-up)"
+      },
+      {
+        "command": "hcloud.setRobotCredentials",
+        "title": "Hetzner Cloud: Set Robot API Credentials",
+        "icon": "$(key)"
+      },
+      {
+        "command": "hcloud.clearRobotCredentials",
+        "title": "Hetzner Cloud: Clear Robot API Credentials",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "hcloud.refreshStorageBoxes",
+        "title": "Hetzner Cloud: Refresh Storage Boxes",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "hcloud.mountStorageBoxToServer",
+        "title": "Hetzner Cloud: Mount Storage Box to Server",
+        "icon": "$(vm-connect)"
+      },
+      {
+        "command": "hcloud.copyStorageBoxMountCommands",
+        "title": "Hetzner Cloud: Copy Mount Commands to Clipboard",
+        "icon": "$(clippy)"
       }
     ],
     "viewsContainers": {
@@ -273,6 +298,11 @@
         {
           "id": "hcloud.volumes",
           "name": "Volumes",
+          "initialSize": 2
+        },
+        {
+          "id": "hcloud.storageBoxes",
+          "name": "Storage Boxes",
           "initialSize": 2
         }
       ]
@@ -342,6 +372,16 @@
         {
           "command": "hcloud.refreshVolumes",
           "when": "view == hcloud.volumes",
+          "group": "navigation"
+        },
+        {
+          "command": "hcloud.setRobotCredentials",
+          "when": "view == hcloud.storageBoxes",
+          "group": "navigation"
+        },
+        {
+          "command": "hcloud.refreshStorageBoxes",
+          "when": "view == hcloud.storageBoxes",
           "group": "navigation"
         }
       ],
@@ -450,6 +490,16 @@
           "command": "hcloud.deleteVolume",
           "when": "view == hcloud.volumes && viewItem == volume-detached",
           "group": "9_danger@1"
+        },
+        {
+          "command": "hcloud.mountStorageBoxToServer",
+          "when": "view == hcloud.storageBoxes && viewItem == storagebox",
+          "group": "1_storagebox@1"
+        },
+        {
+          "command": "hcloud.copyStorageBoxMountCommands",
+          "when": "view == hcloud.storageBoxes && viewItem == storagebox",
+          "group": "1_storagebox@2"
         }
       ]
     },

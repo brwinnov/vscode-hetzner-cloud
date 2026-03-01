@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { TokenManager } from './utils/secretStorage';
+import { TokenManager, RobotCredentialManager, StorageBoxPasswordManager } from './utils/secretStorage';
 import { ServersProvider } from './providers/serversProvider';
 import { NetworksProvider } from './providers/networksProvider';
 import { ImagesProvider } from './providers/imagesProvider';
@@ -8,12 +8,14 @@ import { SetupProvider } from './providers/setupProvider';
 import { ProjectsProvider } from './providers/projectsProvider';
 import { FirewallsProvider } from './providers/firewallsProvider';
 import { VolumesProvider } from './providers/volumesProvider';
+import { StorageBoxProvider } from './providers/storageBoxProvider';
 import { registerTokenCommands } from './commands/manageTokens';
 import { registerServerCommands } from './commands/serverCommands';
 import { registerNetworkCommands } from './commands/networkCommands';
 import { registerSshKeyCommands } from './commands/sshKeyCommands';
 import { registerFirewallCommands } from './commands/firewallCommands';
 import { registerVolumeCommands } from './commands/volumeCommands';
+import { registerStorageBoxCommands } from './commands/storageBoxCommands';
 import { TailscaleAuthKeyManager } from './tailscale/authKeyManager';
 import { SshKeyGuidePanel } from './webviews/sshKeyGuide';
 import { cleanupLegacyKeys } from './utils/secretStorage';
@@ -32,6 +34,8 @@ export async function activate(context: vscode.ExtensionContext) {
 
   const tokenManager = new TokenManager(context.secrets);
   const tailscaleKeyManager = new TailscaleAuthKeyManager(context.secrets);
+  const robotCredManager = new RobotCredentialManager(context.secrets);
+  const boxPwdManager = new StorageBoxPasswordManager(context.secrets);
 
   // Tree data providers
   const setupProvider = new SetupProvider(tokenManager);
@@ -43,6 +47,7 @@ export async function activate(context: vscode.ExtensionContext) {
   const sshKeysProvider = new SshKeysProvider(tokenManager);
   const firewallsProvider = new FirewallsProvider(tokenManager);
   const volumesProvider = new VolumesProvider(tokenManager);
+  const storageBoxProvider = new StorageBoxProvider(robotCredManager);
 
   // Register tree views
   vscode.window.createTreeView('hcloud.setup', {
@@ -75,6 +80,10 @@ export async function activate(context: vscode.ExtensionContext) {
   });
   vscode.window.createTreeView('hcloud.volumes', {
     treeDataProvider: volumesProvider,
+    showCollapseAll: false,
+  });
+  vscode.window.createTreeView('hcloud.storageBoxes', {
+    treeDataProvider: storageBoxProvider,
     showCollapseAll: false,
   });
 
@@ -124,11 +133,12 @@ export async function activate(context: vscode.ExtensionContext) {
     imagesProvider,
     sshKeysProvider
   );
-  registerServerCommands(context, tokenManager, serversProvider, tailscaleKeyManager);
+  registerServerCommands(context, tokenManager, serversProvider, tailscaleKeyManager, robotCredManager, boxPwdManager);
   registerNetworkCommands(context, tokenManager, networksProvider);
   registerSshKeyCommands(context, tokenManager, sshKeysProvider);
   registerFirewallCommands(context, tokenManager, tailscaleKeyManager, firewallsProvider);
   registerVolumeCommands(context, tokenManager, volumesProvider);
+  registerStorageBoxCommands(context, tokenManager, robotCredManager, boxPwdManager, storageBoxProvider);
 }
 
 export function deactivate() {
