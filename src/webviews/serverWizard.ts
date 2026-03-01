@@ -4,6 +4,7 @@ import { ServersProvider } from '../providers/serversProvider';
 import { TailscaleAuthKeyManager } from '../tailscale/authKeyManager';
 import { injectTailscale } from '../tailscale/cloudInitInjector';
 import { HetznerClient, HLocation, HServerType, HImage, HSshKey, HNetwork } from '../api/hetzner';
+import { CloudInitLibrary } from '../utils/secretStorage';
 
 interface WizardData {
   locations: HLocation[];
@@ -23,7 +24,8 @@ export class ServerWizardPanel {
     panel: vscode.WebviewPanel,
     private readonly client: HetznerClient,
     private readonly tailscaleKeyManager: TailscaleAuthKeyManager,
-    private readonly serversProvider: ServersProvider
+    private readonly serversProvider: ServersProvider,
+    private readonly library: CloudInitLibrary
   ) {
     this.panel = panel;
     this.panel.onDidDispose(() => this.dispose(), null, this.disposables);
@@ -56,7 +58,13 @@ export class ServerWizardPanel {
       }
     );
 
-    const wizard = new ServerWizardPanel(panel, client, tailscaleKeyManager, serversProvider);
+    const wizard = new ServerWizardPanel(
+      panel,
+      client,
+      tailscaleKeyManager,
+      serversProvider,
+      new CloudInitLibrary(context.secrets)
+    );
     await wizard.loadAndRender();
   }
 
@@ -148,6 +156,63 @@ export class ServerWizardPanel {
         } catch (err: unknown) {
           vscode.window.showErrorMessage(`Failed to create network: ${(err as Error).message}`);
         }
+        break;
+      }
+      case 'saveCloudInitTemplate': {
+        const content = (msg.payload as { content: string }).content;
+        if (!content.trim()) {
+          vscode.window.showWarningMessage('Cannot save an empty cloud-init template.');
+          break;
+        }
+        const tplName = await vscode.window.showInputBox({
+          title: 'Save Cloud-init Template',
+          prompt: 'Enter a name for this template',
+          placeHolder: 'e.g. nodejs-setup',
+          validateInput: (v) => (!v?.trim() ? 'Name cannot be empty' : undefined),
+        });
+        if (!tplName) break;
+        await this.library.saveTemplate(tplName.trim(), content);
+        vscode.window.showInformationMessage(`Cloud-init template "${tplName}" saved.`);
+        break;
+      }
+      case 'loadCloudInitTemplate': {
+        const templates = await this.library.listTemplates();
+        if (templates.length === 0) {
+          vscode.window.showInformationMessage(
+            'No saved cloud-init templates. Write a script and click \u201cSave as Template\u201d first.'
+          );
+          break;
+        }
+        const picked = await vscode.window.showQuickPick(
+          templates.map((t) => ({ label: t, description: 'cloud-init template' })),
+          { placeHolder: 'Select a template to load', title: 'Load Cloud-init Template' }
+        );
+        if (!picked) break;
+        const tplContent = await this.library.loadTemplate(picked.label);
+        if (tplContent !== undefined) {
+          this.panel.webview.postMessage({ command: 'cloudInitTemplateLoaded', content: tplContent });
+        }
+        break;
+      }
+      case 'deleteCloudInitTemplate': {
+        const allTemplates = await this.library.listTemplates();
+        if (allTemplates.length === 0) {
+          vscode.window.showInformationMessage('No saved cloud-init templates.');
+          break;
+        }
+        const pickedDel = await vscode.window.showQuickPick(
+          allTemplates.map((t) => ({ label: t })),
+          { placeHolder: 'Select a template to delete', title: 'Delete Cloud-init Template' }
+        );
+        if (!pickedDel) break;
+        const confirmDel = await vscode.window.showWarningMessage(
+          `Delete cloud-init template "${pickedDel.label}"?`,
+          { modal: true },
+          'Delete'
+        );
+        if (confirmDel !== 'Delete') break;
+        await this.library.deleteTemplate(pickedDel.label);
+        vscode.window.showInformationMessage(`Template "${pickedDel.label}" deleted.`);
         break;
       }
     }
@@ -886,6 +951,11 @@ function getWizardHtml(data: WizardData): string {
         <label>Cloud-init Script <span style="font-weight:400;text-transform:none">(optional)</span></label>
         <textarea class="code" id="cloudInitInput" placeholder="#cloud-config&#10;&#10;# Your cloud-init YAML here.&#10;# Tailscale block will be appended automatically if enabled."></textarea>
         <div class="field-hint">YAML cloud-config format. Tailscale runcmd will be merged in automatically.</div>
+        <div style="display:flex;gap:8px;margin-top:6px">
+          <button class="btn-secondary" style="font-size:12px;padding:4px 10px" onclick="saveCloudInitTemplate()">&#128190; Save as Template</button>
+          <button class="btn-secondary" style="font-size:12px;padding:4px 10px" onclick="loadCloudInitTemplate()">&#128194; Load Template</button>
+          <button class="btn-secondary" style="font-size:12px;padding:4px 10px" onclick="deleteCloudInitTemplate()">&#128465; Delete Template</button>
+        </div>
       </div>
 
       <div class="actions">
@@ -954,7 +1024,21 @@ window.addEventListener('message', (e) => {
     });
     renderSshKeys();
   }
+  if (msg.command === 'cloudInitTemplateLoaded') {
+    document.getElementById('cloudInitInput').value = msg.content;
+    state.cloudInit = msg.content;
+  }
 });
+
+function saveCloudInitTemplate() {
+  vscode.postMessage({ command: 'saveCloudInitTemplate', payload: { content: document.getElementById('cloudInitInput').value } });
+}
+function loadCloudInitTemplate() {
+  vscode.postMessage({ command: 'loadCloudInitTemplate' });
+}
+function deleteCloudInitTemplate() {
+  vscode.postMessage({ command: 'deleteCloudInitTemplate' });
+}
 
 function acquireVsCodeInstance() {
   try { return acquireVsCodeApi(); } catch(e) { return { postMessage: console.log }; }

@@ -100,3 +100,36 @@ export class TokenManager {
     return new HetznerClient(token);
   }
 }
+
+// ── Cloud-init Template Library ───────────────────────────────────────────
+
+const TEMPLATE_INDEX_KEY = 'hcloud.cloudInit.index';
+const TEMPLATE_KEY_PREFIX = 'hcloud.cloudInit.';
+
+export class CloudInitLibrary {
+  constructor(private readonly secrets: vscode.SecretStorage) {}
+
+  async listTemplates(): Promise<string[]> {
+    const index = await this.secrets.get(TEMPLATE_INDEX_KEY);
+    if (!index) return [];
+    return index.split(',').filter(Boolean);
+  }
+
+  async saveTemplate(name: string, content: string): Promise<void> {
+    await this.secrets.store(`${TEMPLATE_KEY_PREFIX}${name}`, content);
+    const existing = await this.listTemplates();
+    if (!existing.includes(name)) {
+      await this.secrets.store(TEMPLATE_INDEX_KEY, [...existing, name].join(','));
+    }
+  }
+
+  async loadTemplate(name: string): Promise<string | undefined> {
+    return this.secrets.get(`${TEMPLATE_KEY_PREFIX}${name}`);
+  }
+
+  async deleteTemplate(name: string): Promise<void> {
+    await this.secrets.delete(`${TEMPLATE_KEY_PREFIX}${name}`);
+    const existing = await this.listTemplates();
+    await this.secrets.store(TEMPLATE_INDEX_KEY, existing.filter((n) => n !== name).join(','));
+  }
+}
