@@ -80,6 +80,11 @@
         "icon": "$(trash)"
       },
       {
+        "command": "hcloud.showServerDetail",
+        "title": "Hetzner Cloud: Show Server Details",
+        "icon": "$(info)"
+      },
+      {
         "command": "hcloud.sshServer",
         "title": "Hetzner Cloud: Open SSH Terminal",
         "icon": "$(terminal)"
@@ -275,6 +280,11 @@
           "command": "hcloud.sshServer",
           "when": "view == hcloud.servers && viewItem == server-on",
           "group": "1_server@4"
+        },
+        {
+          "command": "hcloud.showServerDetail",
+          "when": "view == hcloud.servers",
+          "group": "1_server@5"
         },
         {
           "command": "hcloud.deleteServer",

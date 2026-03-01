@@ -20,6 +20,11 @@ export class ServerItem extends vscode.TreeItem {
     );
 
     this.contextValue = server.status === 'running' ? 'server-on' : 'server-off';
+    this.command = {
+      command: 'hcloud.showServerDetail',
+      title: 'Show Server Details',
+      arguments: [this],
+    };
   }
 }
 

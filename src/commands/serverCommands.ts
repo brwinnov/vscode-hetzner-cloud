@@ -3,6 +3,7 @@ import { TokenManager } from '../utils/secretStorage';
 import { ServersProvider, ServerItem } from '../providers/serversProvider';
 import { TailscaleAuthKeyManager } from '../tailscale/authKeyManager';
 import { ServerWizardPanel } from '../webviews/serverWizard';
+import { ServerDetailPanel } from '../webviews/serverDetail';
 
 export function registerServerCommands(
   context: vscode.ExtensionContext,
@@ -105,6 +106,15 @@ export function registerServerCommands(
   context.subscriptions.push(
     vscode.commands.registerCommand('hcloud.createServer', async () => {
       await ServerWizardPanel.create(context, tokenManager, tailscaleKeyManager, serversProvider);
+    })
+  );
+
+  // Show Server Detail panel
+  context.subscriptions.push(
+    vscode.commands.registerCommand('hcloud.showServerDetail', async (item: ServerItem) => {
+      const client = await tokenManager.getActiveClient();
+      if (!client) return;
+      ServerDetailPanel.open(context, item.server, client, serversProvider);
     })
   );
 }
