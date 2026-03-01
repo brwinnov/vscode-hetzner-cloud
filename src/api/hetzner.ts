@@ -121,6 +121,44 @@ export interface HVolume {
   labels: Record<string, string>;
 }
 
+export interface HLoadBalancerType {
+  id: number;
+  name: string;
+  description: string;
+  max_connections: number;
+  max_targets: number;
+  max_assigned_certificates: number;
+  max_services: number;
+}
+
+export interface HLoadBalancer {
+  id: number;
+  name: string;
+  public_net: {
+    enabled: boolean;
+    ipv4: { ip: string | null } | null;
+    ipv6: { ip: string | null } | null;
+  };
+  location: { name: string; city: string };
+  load_balancer_type: { name: string; description: string };
+  algorithm: { type: 'round_robin' | 'least_connections' };
+  services: Array<{
+    protocol: 'tcp' | 'http' | 'https';
+    listen_port: number;
+    destination_port: number;
+    proxyprotocol: boolean;
+  }>;
+  targets: Array<{
+    type: 'server' | 'label_selector' | 'ip';
+    server?: { id: number };
+    label_selector?: { selector: string };
+    ip?: { ip: string };
+    use_private_ip?: boolean;
+  }>;
+  created: string;
+  labels: Record<string, string>;
+}
+
 export class HetznerClient {
   private token: string;
 
@@ -356,5 +394,59 @@ export class HetznerClient {
 
   async resizeVolume(volumeId: number, size: number): Promise<void> {
     await this.request('POST', `/volumes/${volumeId}/actions/resize`, { size });
+  }
+
+  // ── Load Balancers ─────────────────────────────────────────────────────────
+
+  async getLoadBalancerTypes(): Promise<HLoadBalancerType[]> {
+    const data = await this.request<{ load_balancer_types: HLoadBalancerType[] }>('GET', '/load_balancer_types');
+    return data.load_balancer_types;
+  }
+
+  async getLoadBalancers(): Promise<HLoadBalancer[]> {
+    return this.paginateList<HLoadBalancer>('/load_balancers', 'load_balancers');
+  }
+
+  async getLoadBalancer(id: number): Promise<HLoadBalancer> {
+    const data = await this.request<{ load_balancer: HLoadBalancer }>('GET', `/load_balancers/${id}`);
+    return data.load_balancer;
+  }
+
+  async createLoadBalancer(
+    name: string,
+    loadBalancerType: string,
+    location: string,
+    algorithm: 'round_robin' | 'least_connections'
+  ): Promise<HLoadBalancer> {
+    const data = await this.request<{ load_balancer: HLoadBalancer }>('POST', '/load_balancers', {
+      name,
+      load_balancer_type: loadBalancerType,
+      location,
+      algorithm: { type: algorithm },
+    });
+    return data.load_balancer;
+  }
+
+  async deleteLoadBalancer(id: number): Promise<void> {
+    await this.request('DELETE', `/load_balancers/${id}`);
+  }
+
+  async addLoadBalancerTarget(
+    loadBalancerId: number,
+    serverId: number,
+    usePrivateIp = false
+  ): Promise<void> {
+    await this.request('POST', `/load_balancers/${loadBalancerId}/actions/add_target`, {
+      type: 'server',
+      server: { id: serverId },
+      use_private_ip: usePrivateIp,
+    });
+  }
+
+  async removeLoadBalancerTarget(loadBalancerId: number, serverId: number): Promise<void> {
+    await this.request('POST', `/load_balancers/${loadBalancerId}/actions/remove_target`, {
+      type: 'server',
+      server: { id: serverId },
+    });
   }
 }

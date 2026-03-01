@@ -9,6 +9,7 @@ import { ProjectsProvider } from './providers/projectsProvider';
 import { FirewallsProvider } from './providers/firewallsProvider';
 import { VolumesProvider } from './providers/volumesProvider';
 import { StorageBoxProvider } from './providers/storageBoxProvider';
+import { LoadBalancersProvider } from './providers/loadBalancersProvider';
 import { registerTokenCommands } from './commands/manageTokens';
 import { registerServerCommands } from './commands/serverCommands';
 import { registerNetworkCommands } from './commands/networkCommands';
@@ -16,6 +17,7 @@ import { registerSshKeyCommands } from './commands/sshKeyCommands';
 import { registerFirewallCommands } from './commands/firewallCommands';
 import { registerVolumeCommands } from './commands/volumeCommands';
 import { registerStorageBoxCommands } from './commands/storageBoxCommands';
+import { registerLoadBalancerCommands } from './commands/loadBalancerCommands';
 import { TailscaleAuthKeyManager } from './tailscale/authKeyManager';
 import { SshKeyGuidePanel } from './webviews/sshKeyGuide';
 import { cleanupLegacyKeys } from './utils/secretStorage';
@@ -48,6 +50,7 @@ export async function activate(context: vscode.ExtensionContext) {
   const firewallsProvider = new FirewallsProvider(tokenManager);
   const volumesProvider = new VolumesProvider(tokenManager);
   const storageBoxProvider = new StorageBoxProvider(robotCredManager);
+  const loadBalancersProvider = new LoadBalancersProvider(tokenManager);
 
   // Register tree views
   vscode.window.createTreeView('hcloud.setup', {
@@ -84,6 +87,10 @@ export async function activate(context: vscode.ExtensionContext) {
   });
   vscode.window.createTreeView('hcloud.storageBoxes', {
     treeDataProvider: storageBoxProvider,
+    showCollapseAll: false,
+  });
+  vscode.window.createTreeView('hcloud.loadBalancers', {
+    treeDataProvider: loadBalancersProvider,
     showCollapseAll: false,
   });
 
@@ -131,7 +138,10 @@ export async function activate(context: vscode.ExtensionContext) {
     serversProvider,
     networksProvider,
     imagesProvider,
-    sshKeysProvider
+    sshKeysProvider,
+    firewallsProvider,
+    volumesProvider,
+    loadBalancersProvider
   );
   registerServerCommands(context, tokenManager, serversProvider, tailscaleKeyManager, robotCredManager, boxPwdManager);
   registerNetworkCommands(context, tokenManager, networksProvider);
@@ -139,6 +149,7 @@ export async function activate(context: vscode.ExtensionContext) {
   registerFirewallCommands(context, tokenManager, tailscaleKeyManager, firewallsProvider);
   registerVolumeCommands(context, tokenManager, volumesProvider);
   registerStorageBoxCommands(context, tokenManager, robotCredManager, boxPwdManager, storageBoxProvider);
+  registerLoadBalancerCommands(context, tokenManager, loadBalancersProvider);
 }
 
 export function deactivate() {

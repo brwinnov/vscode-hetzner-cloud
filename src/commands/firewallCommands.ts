@@ -245,7 +245,14 @@ export function registerFirewallCommands(
 
       try {
         const fresh = await client.getFirewall(item.firewallId);
-        const updatedRules = fresh.rules.filter((_, i) => i !== item.ruleIndex);
+        const target = item.rule;
+        const updatedRules = fresh.rules.filter((r) =>
+          !(r.direction === target.direction &&
+            r.protocol === target.protocol &&
+            r.port === target.port &&
+            JSON.stringify(r.source_ips) === JSON.stringify(target.source_ips) &&
+            JSON.stringify(r.destination_ips) === JSON.stringify(target.destination_ips))
+        );
         await vscode.window.withProgress(
           { location: vscode.ProgressLocation.Notification, title: 'Removing rule...' },
           () => client.setFirewallRules(item.firewallId, updatedRules)

@@ -247,6 +247,31 @@
         "command": "hcloud.copyStorageBoxMountCommands",
         "title": "Hetzner Cloud: Copy Mount Commands to Clipboard",
         "icon": "$(clippy)"
+      },
+      {
+        "command": "hcloud.createLoadBalancer",
+        "title": "Hetzner Cloud: Create Load Balancer",
+        "icon": "$(add)"
+      },
+      {
+        "command": "hcloud.deleteLoadBalancer",
+        "title": "Hetzner Cloud: Delete Load Balancer",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "hcloud.addLoadBalancerTarget",
+        "title": "Hetzner Cloud: Add Target to Load Balancer",
+        "icon": "$(vm)"
+      },
+      {
+        "command": "hcloud.removeLoadBalancerTarget",
+        "title": "Hetzner Cloud: Remove Target from Load Balancer",
+        "icon": "$(close)"
+      },
+      {
+        "command": "hcloud.refreshLoadBalancers",
+        "title": "Hetzner Cloud: Refresh Load Balancers",
+        "icon": "$(refresh)"
       }
     ],
     "viewsContainers": {
@@ -303,6 +328,11 @@
         {
           "id": "hcloud.storageBoxes",
           "name": "Storage Boxes",
+          "initialSize": 2
+        },
+        {
+          "id": "hcloud.loadBalancers",
+          "name": "Load Balancers",
           "initialSize": 2
         }
       ]
@@ -382,6 +412,16 @@
         {
           "command": "hcloud.refreshStorageBoxes",
           "when": "view == hcloud.storageBoxes",
+          "group": "navigation"
+        },
+        {
+          "command": "hcloud.createLoadBalancer",
+          "when": "view == hcloud.loadBalancers",
+          "group": "navigation"
+        },
+        {
+          "command": "hcloud.refreshLoadBalancers",
+          "when": "view == hcloud.loadBalancers",
           "group": "navigation"
         }
       ],
@@ -500,6 +540,21 @@
           "command": "hcloud.copyStorageBoxMountCommands",
           "when": "view == hcloud.storageBoxes && viewItem == storagebox",
           "group": "1_storagebox@2"
+        },
+        {
+          "command": "hcloud.addLoadBalancerTarget",
+          "when": "view == hcloud.loadBalancers && viewItem == loadbalancer",
+          "group": "1_lb@1"
+        },
+        {
+          "command": "hcloud.removeLoadBalancerTarget",
+          "when": "view == hcloud.loadBalancers && viewItem == lb-target",
+          "group": "9_danger@1"
+        },
+        {
+          "command": "hcloud.deleteLoadBalancer",
+          "when": "view == hcloud.loadBalancers && viewItem == loadbalancer",
+          "group": "9_danger@2"
         }
       ]
     },

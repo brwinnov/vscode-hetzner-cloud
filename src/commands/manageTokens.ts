@@ -8,6 +8,9 @@ import { ServersProvider } from '../providers/serversProvider';
 import { NetworksProvider } from '../providers/networksProvider';
 import { ImagesProvider } from '../providers/imagesProvider';
 import { SshKeysProvider } from '../providers/sshKeysProvider';
+import { FirewallsProvider } from '../providers/firewallsProvider';
+import { VolumesProvider } from '../providers/volumesProvider';
+import { LoadBalancersProvider } from '../providers/loadBalancersProvider';
 
 export function registerTokenCommands(
   context: vscode.ExtensionContext,
@@ -18,7 +21,10 @@ export function registerTokenCommands(
   serversProvider: ServersProvider,
   networksProvider: NetworksProvider,
   imagesProvider: ImagesProvider,
-  sshKeysProvider: SshKeysProvider
+  sshKeysProvider: SshKeysProvider,
+  firewallsProvider: FirewallsProvider,
+  volumesProvider: VolumesProvider,
+  loadBalancersProvider: LoadBalancersProvider
 ) {
   const refreshAll = () => {
     setupProvider.refresh();
@@ -27,6 +33,9 @@ export function registerTokenCommands(
     networksProvider.refresh();
     imagesProvider.refresh();
     sshKeysProvider.refresh();
+    firewallsProvider.refresh();
+    volumesProvider.refresh();
+    loadBalancersProvider.refresh();
   };
 
   context.subscriptions.push(

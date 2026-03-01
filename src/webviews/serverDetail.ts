@@ -129,9 +129,9 @@ export class ServerDetailPanel {
 
 function statusColor(status: HServer['status']): string {
   switch (status) {
-    case 'running': return '#4caf50';
-    case 'off':     return '#f44336';
-    default:        return '#ff9800';
+    case 'running': return 'var(--vscode-testing-iconPassed)';
+    case 'off':     return 'var(--vscode-testing-iconFailed)';
+    default:        return 'var(--vscode-testing-iconQueued)';
   }
 }
 
@@ -189,7 +189,7 @@ function renderHtml(s: HServer): string {
   .badge {
     display: inline-flex; align-items: center; gap: 6px;
     padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;
-    background: ${color}22; color: ${color}; border: 1px solid ${color}66;
+    background: color-mix(in srgb, ${color} 13%, transparent); color: ${color}; border: 1px solid color-mix(in srgb, ${color} 40%, transparent);
   }
   .badge::before {
     content: ''; display: inline-block; width: 7px; height: 7px;

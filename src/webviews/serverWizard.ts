@@ -68,7 +68,7 @@ export class ServerWizardPanel {
       client,
       tailscaleKeyManager,
       serversProvider,
-      new CloudInitLibrary(context.secrets),
+      new CloudInitLibrary(context.globalState),
       robotCredManager,
       boxPwdManager
     );
@@ -158,8 +158,9 @@ export class ServerWizardPanel {
         if (!ipRange) break;
         try {
           await this.client.createNetwork(name.trim(), ipRange.trim());
+          const updatedNetworks = await this.client.getNetworks();
+          this.panel.webview.postMessage({ command: 'networksUpdated', networks: updatedNetworks });
           vscode.window.showInformationMessage(`Network "${name}" created.`);
-          await this.loadAndRender();
         } catch (err: unknown) {
           vscode.window.showErrorMessage(`Failed to create network: ${(err as Error).message}`);
         }
@@ -1018,7 +1019,7 @@ const LOCATIONS = ${locationsJson};
 const SERVER_TYPES = ${serverTypesJson};
 const IMAGES = ${imagesJson};
 let SSH_KEYS = ${sshKeysJson};
-const NETWORKS = ${networksJson};
+let NETWORKS = ${networksJson};
 
 // HTML-escape helper — used in all innerHTML renders
 function h(s) {
@@ -1062,6 +1063,10 @@ window.addEventListener('message', (e) => {
   if (msg.command === 'cloudInitTemplateLoaded') {
     document.getElementById('cloudInitInput').value = msg.content;
     state.cloudInit = msg.content;
+  }
+  if (msg.command === 'networksUpdated') {
+    NETWORKS = msg.networks;
+    renderNetworks();
   }
 });
 

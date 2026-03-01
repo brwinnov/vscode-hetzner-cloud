@@ -3,7 +3,6 @@ import { TokenManager } from '../utils/secretStorage';
 import { VolumesProvider, VolumeItem } from '../providers/volumesProvider';
 
 const FORMATS = ['ext4', 'xfs'];
-const VOLUME_LOCATIONS = ['nbg1', 'fsn1', 'hel1', 'ash', 'hil'];
 
 export function registerVolumeCommands(
   context: vscode.ExtensionContext,
@@ -45,8 +44,16 @@ export function registerVolumeCommands(
       if (!sizeInput) return;
       const size = parseInt(sizeInput, 10);
 
+      let locations;
+      try {
+        locations = await client.getLocations();
+      } catch (err: unknown) {
+        vscode.window.showErrorMessage(`Failed to fetch locations: ${(err as Error).message}`);
+        return;
+      }
+
       const locationPick = await vscode.window.showQuickPick(
-        VOLUME_LOCATIONS.map((l) => ({ label: l })),
+        locations.map((l) => ({ label: l.name, description: l.city })),
         { title: 'Create Volume — Location', placeHolder: 'Select datacenter' }
       );
       if (!locationPick) return;
