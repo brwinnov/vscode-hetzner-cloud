@@ -4,6 +4,31 @@ import { HetznerClient } from '../api/hetzner';
 const SECRET_PREFIX = 'hcloud.token.';
 const ACTIVE_KEY = 'hcloud.activeProject';
 
+/**
+ * One-time migration: removes all keys written under the old 'hetznet.' prefix.
+ * Safe to call on every activation — does nothing when there is nothing to clean up.
+ */
+export async function cleanupLegacyKeys(secrets: vscode.SecretStorage): Promise<boolean> {
+  const oldIndex = await secrets.get('hetznet.projectIndex');
+  let cleaned = false;
+
+  if (oldIndex) {
+    const names = oldIndex.split(',').filter(Boolean);
+    for (const name of names) {
+      await secrets.delete(`hetznet.token.${name}`);
+    }
+    await secrets.delete('hetznet.projectIndex');
+    cleaned = true;
+  }
+
+  // Delete remaining known legacy keys regardless of index
+  for (const key of ['hetznet.activeProject', 'hetznet.tailscale.authkey']) {
+    await secrets.delete(key);
+  }
+
+  return cleaned;
+}
+
 export interface StoredProject {
   name: string;
   token: string;

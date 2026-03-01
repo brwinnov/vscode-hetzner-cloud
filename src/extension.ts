@@ -12,9 +12,19 @@ import { registerNetworkCommands } from './commands/networkCommands';
 import { registerSshKeyCommands } from './commands/sshKeyCommands';
 import { TailscaleAuthKeyManager } from './tailscale/authKeyManager';
 import { SshKeyGuidePanel } from './webviews/sshKeyGuide';
+import { cleanupLegacyKeys } from './utils/secretStorage';
 
 export async function activate(context: vscode.ExtensionContext) {
   console.log('Hetzner Cloud Toolkit extension activated');
+
+  // One-time cleanup of old hetznet.* SecretStorage keys from pre-rename installs
+  if (!context.globalState.get<boolean>('hcloud.legacyKeysCleaned')) {
+    const cleaned = await cleanupLegacyKeys(context.secrets);
+    await context.globalState.update('hcloud.legacyKeysCleaned', true);
+    if (cleaned) {
+      console.log('Hetzner Cloud Toolkit: removed legacy hetznet.* SecretStorage keys');
+    }
+  }
 
   const tokenManager = new TokenManager(context.secrets);
   const tailscaleKeyManager = new TailscaleAuthKeyManager(context.secrets);
