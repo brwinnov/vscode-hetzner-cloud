@@ -1,6 +1,6 @@
 # HetzNet.ext — Project Plan
 
-> Last updated: 2026-03-01
+> Last updated: 2026-03-01 (marketplace assets added)
 
 ---
 
@@ -82,6 +82,13 @@ resources/
   - File format vs algorithm distinction (.ppk vs OpenSSH PEM)
   - Both command variants with guidance on when to choose each
 
+### Phase 6 — Marketplace Assets
+- [x] `README.md` — full marketplace page (features, getting started, settings, privacy)
+- [x] `CHANGELOG.md` — Keep a Changelog format, v0.1.0 entry
+- [x] `LICENSE` — MIT
+- [x] `resources/icon.png` — 128×128 PNG (Hetzner red background, white cloud + network nodes)
+- [x] `package.json` — added `license`, `homepage`, `repository`, `bugs`, `galleryBanner` fields
+
 ---
 
 ## In Progress
@@ -107,7 +114,7 @@ _Nothing currently in flight._
 - [ ] **Firewall rules** — Hetzner Firewall CRUD
 - [ ] **Volumes** — block storage attach/detach
 - [ ] **Load balancers** — basic CRUD
-- [ ] **Extension marketplace packaging** — `vsce package`, publish to VS Code Marketplace
+- [ ] **Extension marketplace packaging** — `vsce package` to produce .vsix, then `vsce publish` (assets now ready)
 
 ---
 
