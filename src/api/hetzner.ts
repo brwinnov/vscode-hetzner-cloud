@@ -108,6 +108,19 @@ export interface HFirewall {
   created: string;
 }
 
+export interface HVolume {
+  id: number;
+  name: string;
+  size: number;             // GB
+  status: 'available' | 'creating';
+  server: number | null;    // attached server id, or null if detached
+  location: { name: string; city: string };
+  linux_device: string;     // e.g. /dev/disk/by-id/scsi-...
+  format: string | null;    // ext4, xfs, or null
+  created: string;
+  labels: Record<string, string>;
+}
+
 export class HetznerClient {
   private token: string;
 
@@ -304,5 +317,44 @@ export class HetznerClient {
     await this.request('POST', `/firewalls/${firewallId}/actions/remove_from_resources`, {
       remove_from: [{ type: 'server', server: { id: serverId } }],
     });
+  }
+
+  // ── Volumes ───────────────────────────────────────────────────
+
+  async getVolumes(): Promise<HVolume[]> {
+    return this.paginateList<HVolume>('/volumes', 'volumes');
+  }
+
+  async createVolume(
+    name: string,
+    size: number,
+    location: string,
+    format: string,
+    automount: boolean,
+    serverId?: number
+  ): Promise<HVolume> {
+    const body: Record<string, unknown> = { name, size, location, format, automount };
+    if (serverId !== undefined) body.server = serverId;
+    const data = await this.request<{ volume: HVolume }>('POST', '/volumes', body);
+    return data.volume;
+  }
+
+  async deleteVolume(id: number): Promise<void> {
+    await this.request('DELETE', `/volumes/${id}`);
+  }
+
+  async attachVolume(volumeId: number, serverId: number, automount: boolean): Promise<void> {
+    await this.request('POST', `/volumes/${volumeId}/actions/attach`, {
+      server: serverId,
+      automount,
+    });
+  }
+
+  async detachVolume(volumeId: number): Promise<void> {
+    await this.request('POST', `/volumes/${volumeId}/actions/detach`);
+  }
+
+  async resizeVolume(volumeId: number, size: number): Promise<void> {
+    await this.request('POST', `/volumes/${volumeId}/actions/resize`, { size });
   }
 }

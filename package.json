@@ -192,6 +192,36 @@
         "command": "hcloud.removeFirewallFromServer",
         "title": "Hetzner Cloud: Remove Firewall from Server",
         "icon": "$(close)"
+      },
+      {
+        "command": "hcloud.refreshVolumes",
+        "title": "Hetzner Cloud: Refresh Volumes",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "hcloud.createVolume",
+        "title": "Hetzner Cloud: Create Volume",
+        "icon": "$(add)"
+      },
+      {
+        "command": "hcloud.deleteVolume",
+        "title": "Hetzner Cloud: Delete Volume",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "hcloud.attachVolume",
+        "title": "Hetzner Cloud: Attach Volume to Server",
+        "icon": "$(vm)"
+      },
+      {
+        "command": "hcloud.detachVolume",
+        "title": "Hetzner Cloud: Detach Volume from Server",
+        "icon": "$(close)"
+      },
+      {
+        "command": "hcloud.resizeVolume",
+        "title": "Hetzner Cloud: Resize Volume",
+        "icon": "$(arrow-up)"
       }
     ],
     "viewsContainers": {
@@ -238,6 +268,11 @@
         {
           "id": "hcloud.firewalls",
           "name": "Firewalls",
+          "initialSize": 2
+        },
+        {
+          "id": "hcloud.volumes",
+          "name": "Volumes",
           "initialSize": 2
         }
       ]
@@ -297,6 +332,16 @@
         {
           "command": "hcloud.refreshFirewalls",
           "when": "view == hcloud.firewalls",
+          "group": "navigation"
+        },
+        {
+          "command": "hcloud.createVolume",
+          "when": "view == hcloud.volumes",
+          "group": "navigation"
+        },
+        {
+          "command": "hcloud.refreshVolumes",
+          "when": "view == hcloud.volumes",
           "group": "navigation"
         }
       ],
@@ -384,6 +429,26 @@
         {
           "command": "hcloud.deleteFirewallRule",
           "when": "view == hcloud.firewalls && viewItem == firewall-rule",
+          "group": "9_danger@1"
+        },
+        {
+          "command": "hcloud.attachVolume",
+          "when": "view == hcloud.volumes && viewItem == volume-detached",
+          "group": "1_volume@1"
+        },
+        {
+          "command": "hcloud.detachVolume",
+          "when": "view == hcloud.volumes && viewItem == volume-attached",
+          "group": "1_volume@1"
+        },
+        {
+          "command": "hcloud.resizeVolume",
+          "when": "view == hcloud.volumes && (viewItem == volume-attached || viewItem == volume-detached)",
+          "group": "1_volume@2"
+        },
+        {
+          "command": "hcloud.deleteVolume",
+          "when": "view == hcloud.volumes && viewItem == volume-detached",
           "group": "9_danger@1"
         }
       ]

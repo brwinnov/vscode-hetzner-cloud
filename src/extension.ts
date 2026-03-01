@@ -7,11 +7,13 @@ import { SshKeysProvider } from './providers/sshKeysProvider';
 import { SetupProvider } from './providers/setupProvider';
 import { ProjectsProvider } from './providers/projectsProvider';
 import { FirewallsProvider } from './providers/firewallsProvider';
+import { VolumesProvider } from './providers/volumesProvider';
 import { registerTokenCommands } from './commands/manageTokens';
 import { registerServerCommands } from './commands/serverCommands';
 import { registerNetworkCommands } from './commands/networkCommands';
 import { registerSshKeyCommands } from './commands/sshKeyCommands';
 import { registerFirewallCommands } from './commands/firewallCommands';
+import { registerVolumeCommands } from './commands/volumeCommands';
 import { TailscaleAuthKeyManager } from './tailscale/authKeyManager';
 import { SshKeyGuidePanel } from './webviews/sshKeyGuide';
 import { cleanupLegacyKeys } from './utils/secretStorage';
@@ -40,6 +42,7 @@ export async function activate(context: vscode.ExtensionContext) {
   const imagesProvider = new ImagesProvider(tokenManager);
   const sshKeysProvider = new SshKeysProvider(tokenManager);
   const firewallsProvider = new FirewallsProvider(tokenManager);
+  const volumesProvider = new VolumesProvider(tokenManager);
 
   // Register tree views
   vscode.window.createTreeView('hcloud.setup', {
@@ -68,6 +71,10 @@ export async function activate(context: vscode.ExtensionContext) {
   });
   vscode.window.createTreeView('hcloud.firewalls', {
     treeDataProvider: firewallsProvider,
+    showCollapseAll: false,
+  });
+  vscode.window.createTreeView('hcloud.volumes', {
+    treeDataProvider: volumesProvider,
     showCollapseAll: false,
   });
 
@@ -121,6 +128,7 @@ export async function activate(context: vscode.ExtensionContext) {
   registerNetworkCommands(context, tokenManager, networksProvider);
   registerSshKeyCommands(context, tokenManager, sshKeysProvider);
   registerFirewallCommands(context, tokenManager, tailscaleKeyManager, firewallsProvider);
+  registerVolumeCommands(context, tokenManager, volumesProvider);
 }
 
 export function deactivate() {
