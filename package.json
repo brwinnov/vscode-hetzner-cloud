@@ -134,6 +134,16 @@
         "icon": "$(trash)"
       },
       {
+        "command": "hcloud.addSubnet",
+        "title": "Hetzner Cloud: Add Subnet",
+        "icon": "$(add)"
+      },
+      {
+        "command": "hcloud.deleteSubnet",
+        "title": "Hetzner Cloud: Remove Subnet",
+        "icon": "$(trash)"
+      },
+      {
         "command": "hcloud.sshKeyGuide",
         "title": "Hetzner Cloud: SSH Key Generation Guide",
         "icon": "$(book)"
@@ -274,6 +284,16 @@
         {
           "command": "hcloud.deleteNetwork",
           "when": "view == hcloud.networks && viewItem == network",
+          "group": "9_danger@1"
+        },
+        {
+          "command": "hcloud.addSubnet",
+          "when": "view == hcloud.networks && viewItem == network",
+          "group": "1_network@1"
+        },
+        {
+          "command": "hcloud.deleteSubnet",
+          "when": "view == hcloud.networks && viewItem == subnet",
           "group": "9_danger@1"
         },
         {

@@ -1,6 +1,8 @@
 import * as vscode from 'vscode';
 import { TokenManager } from '../utils/secretStorage';
-import { NetworksProvider, NetworkItem } from '../providers/networksProvider';
+import { NetworksProvider, NetworkItem, SubnetItem } from '../providers/networksProvider';
+
+const NETWORK_ZONES = ['eu-central', 'us-east', 'us-west', 'ap-southeast'];
 
 export function registerNetworkCommands(
   context: vscode.ExtensionContext,
@@ -64,6 +66,71 @@ export function registerNetworkCommands(
       await client.deleteNetwork(item.network.id);
       networksProvider.refresh();
       vscode.window.showInformationMessage(`Network "${item.network.name}" deleted.`);
+    })
+  );
+
+  // ── Subnet commands ────────────────────────────────────────────────────────
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('hcloud.addSubnet', async (item: NetworkItem) => {
+      const client = await tokenManager.getActiveClient();
+      if (!client) {
+        vscode.window.showErrorMessage('No active Hetzner project.');
+        return;
+      }
+
+      const ipRange = await vscode.window.showInputBox({
+        title: `Add Subnet to "${item.network.name}"`,
+        prompt: 'Enter subnet CIDR range (must be within the network range)',
+        placeHolder: 'e.g. 10.0.1.0/24',
+        validateInput: (v) => {
+          if (!v?.trim()) return 'IP range cannot be empty';
+          if (!/^\d+\.\d+\.\d+\.\d+\/\d+$/.test(v.trim())) return 'Must be a valid CIDR range';
+          return undefined;
+        },
+      });
+      if (!ipRange) return;
+
+      const zone = await vscode.window.showQuickPick(NETWORK_ZONES, {
+        title: 'Network Zone',
+        placeHolder: 'Select the network zone for this subnet',
+      });
+      if (!zone) return;
+
+      try {
+        await vscode.window.withProgress(
+          { location: vscode.ProgressLocation.Notification, title: `Adding subnet ${ipRange}...` },
+          () => client.addSubnet(item.network.id, ipRange.trim(), zone)
+        );
+        networksProvider.refresh();
+        vscode.window.showInformationMessage(`Subnet ${ipRange} added to "${item.network.name}".`);
+      } catch (err: any) {
+        vscode.window.showErrorMessage(`Failed to add subnet: ${err?.message ?? err}`);
+      }
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('hcloud.deleteSubnet', async (item: SubnetItem) => {
+      const confirm = await vscode.window.showWarningMessage(
+        `Remove subnet ${item.subnet.ip_range} from network "${item.networkName}"?`,
+        { modal: true },
+        'Remove'
+      );
+      if (confirm !== 'Remove') return;
+
+      const client = await tokenManager.getActiveClient();
+      if (!client) return;
+
+      try {
+        await vscode.window.withProgress(
+          { location: vscode.ProgressLocation.Notification, title: `Removing subnet ${item.subnet.ip_range}...` },
+          () => client.deleteSubnet(item.networkId, item.subnet.ip_range)
+        );
+        networksProvider.refresh();
+      } catch (err: any) {
+        vscode.window.showErrorMessage(`Failed to remove subnet: ${err?.message ?? err}`);
+      }
     })
   );
 }

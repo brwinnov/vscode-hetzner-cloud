@@ -183,6 +183,25 @@ export class HetznerClient {
     await this.request('DELETE', `/networks/${id}`);
   }
 
+  async addSubnet(
+    networkId: number,
+    ipRange: string,
+    networkZone: string,
+    type = 'cloud'
+  ): Promise<void> {
+    await this.request('POST', `/networks/${networkId}/actions/add_subnet`, {
+      type,
+      ip_range: ipRange,
+      network_zone: networkZone,
+    });
+  }
+
+  async deleteSubnet(networkId: number, ipRange: string): Promise<void> {
+    await this.request('POST', `/networks/${networkId}/actions/delete_subnet`, {
+      ip_range: ipRange,
+    });
+  }
+
   // ── Images ─────────────────────────────────────────────────────────────────
 
   async getImages(type?: string): Promise<HImage[]> {

@@ -13,9 +13,14 @@ export class NetworkItem extends vscode.TreeItem {
 }
 
 export class SubnetItem extends vscode.TreeItem {
-  constructor(subnet: { type: string; ip_range: string; network_zone: string }) {
+  constructor(
+    public readonly subnet: { type: string; ip_range: string; network_zone: string },
+    public readonly networkId: number,
+    public readonly networkName: string
+  ) {
     super(subnet.ip_range, vscode.TreeItemCollapsibleState.None);
     this.description = `${subnet.network_zone} · ${subnet.type}`;
+    this.tooltip = `Subnet: ${subnet.ip_range}\nZone: ${subnet.network_zone}\nType: ${subnet.type}\nNetwork: ${networkName}`;
     this.iconPath = new vscode.ThemeIcon('symbol-namespace');
     this.contextValue = 'subnet';
   }
@@ -37,7 +42,9 @@ export class NetworksProvider implements vscode.TreeDataProvider<NetworkItem | S
 
   async getChildren(element?: NetworkItem): Promise<(NetworkItem | SubnetItem)[]> {
     if (element) {
-      return element.network.subnets.map((s) => new SubnetItem(s));
+      return element.network.subnets.map(
+        (s) => new SubnetItem(s, element.network.id, element.network.name)
+      );
     }
 
     const client = await this.tokenManager.getActiveClient();
