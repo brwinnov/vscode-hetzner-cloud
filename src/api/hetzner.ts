@@ -119,9 +119,9 @@ export class HetznerClient {
     return data.server;
   }
 
-  async createServer(opts: CreateServerOptions): Promise<HServer> {
-    const data = await this.request<{ server: HServer }>('POST', '/servers', opts);
-    return data.server;
+  async createServer(opts: CreateServerOptions): Promise<{ server: HServer; root_password: string | null }> {
+    const data = await this.request<{ server: HServer; root_password: string | null }>('POST', '/servers', opts);
+    return { server: data.server, root_password: data.root_password ?? null };
   }
 
   async powerOnServer(id: number): Promise<void> {

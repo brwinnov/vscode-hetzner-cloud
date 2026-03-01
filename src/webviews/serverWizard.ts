@@ -106,6 +106,36 @@ export class ServerWizardPanel {
         await this.tailscaleKeyManager.promptAndSave();
         this.panel.webview.postMessage({ command: 'tailscaleKeySet' });
         break;
+      case 'addSshKey':
+        await vscode.commands.executeCommand('hetznet.addSshKey');
+        // Reload wizard data so the new key appears
+        await this.loadAndRender();
+        break;
+      case 'createNetwork': {
+        const name = await vscode.window.showInputBox({
+          title: 'Create Network — Name',
+          prompt: 'Enter a name for the private network',
+          placeHolder: 'e.g. my-network',
+          validateInput: (v) => (!v?.trim() ? 'Name cannot be empty' : undefined),
+        });
+        if (!name) break;
+        const ipRange = await vscode.window.showInputBox({
+          title: 'Create Network — IP Range',
+          prompt: 'CIDR notation',
+          placeHolder: '10.0.0.0/8',
+          value: '10.0.0.0/8',
+          validateInput: (v) => (!v?.trim() || !/^\d+\.\d+\.\d+\.\d+\/\d+$/.test(v.trim()) ? 'Must be a valid CIDR range' : undefined),
+        });
+        if (!ipRange) break;
+        try {
+          await this.client.createNetwork(name.trim(), ipRange.trim());
+          vscode.window.showInformationMessage(`Network "${name}" created.`);
+          await this.loadAndRender();
+        } catch (err: unknown) {
+          vscode.window.showErrorMessage(`Failed to create network: ${(err as Error).message}`);
+        }
+        break;
+      }
     }
   }
 
@@ -127,7 +157,7 @@ export class ServerWizardPanel {
         cloudInit = injectTailscale(cloudInit, tsKey);
       }
 
-      await this.client.createServer({
+      const { root_password } = await this.client.createServer({
         name: payload.name,
         server_type: payload.serverType,
         image: payload.image,
@@ -140,7 +170,21 @@ export class ServerWizardPanel {
 
       this.serversProvider.refresh();
       this.panel.dispose();
-      vscode.window.showInformationMessage(`✓ Server "${payload.name}" created successfully!`);
+
+      if (root_password) {
+        // Show root password in a modal — only time it's ever displayed
+        const copy = await vscode.window.showInformationMessage(
+          `✓ Server "${payload.name}" created!\n\nRoot password (save this now — shown only once):\n${root_password}`,
+          { modal: true },
+          'Copy Password'
+        );
+        if (copy === 'Copy Password') {
+          await vscode.env.clipboard.writeText(root_password);
+          vscode.window.showInformationMessage('Root password copied to clipboard.');
+        }
+      } else {
+        vscode.window.showInformationMessage(`✓ Server "${payload.name}" created successfully!`);
+      }
     } catch (err: unknown) {
       this.panel.webview.postMessage({
         command: 'error',
@@ -754,11 +798,12 @@ function getWizardHtml(data: WizardData): string {
 
       <div id="sshKeyCards" class="check-cards"></div>
       <div id="noSshKeysMsg" class="empty-state" style="display:none">
-        No SSH keys found. <a href="#" onclick="vscode.postMessage({command:'addSshKey'})" style="color:var(--vscode-textLink-foreground)">Add one</a> first.
+        No SSH keys found. Proceeding without one will generate a root password shown after creation.
       </div>
 
       <div class="actions">
         <button class="btn-secondary" onclick="prevStep(3)">← Back</button>
+        <button class="btn-secondary" onclick="addSshKeyFromWizard()">+ Add SSH Key</button>
         <button class="btn-primary ml-auto" onclick="nextStep(3)">Next →</button>
       </div>
     </div>
@@ -766,11 +811,24 @@ function getWizardHtml(data: WizardData): string {
     <!-- ── Step 4: Network ── -->
     <div class="step-panel" id="step4">
       <h1>Network</h1>
-      <p class="subtitle">Attach private networks (optional). The server always gets a public IP.</p>
+      <p class="subtitle">Attach private networks (optional). The server always gets a public IPv4 address.</p>
+
+      <div class="toggle-row" style="margin-bottom:16px">
+        <div>
+          <div class="toggle-label">🌐 Public IPv4</div>
+          <div class="toggle-sub">Always enabled — every server gets a public IP</div>
+        </div>
+        <span style="font-size:11px;padding:2px 8px;border-radius:10px;background:var(--vscode-testing-iconPassed,#73c991);color:#000">Always on</span>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <label style="margin:0;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em">Private Networks</label>
+        <button class="btn-secondary" style="padding:4px 12px;font-size:12px" onclick="createNetworkFromWizard()">+ Create Network</button>
+      </div>
 
       <div id="networkCards" class="check-cards"></div>
       <div id="noNetworksMsg" class="empty-state" style="display:none">
-        No private networks configured. Server will use public IP only.
+        No private networks yet. Click "+ Create Network" to add one, or continue with public IP only.
       </div>
 
       <div class="actions">
@@ -1108,6 +1166,14 @@ function toggleNetwork(id, el) {
     el.classList.add('selected');
     el.querySelector('.check-icon').textContent = '✓';
   }
+}
+
+function addSshKeyFromWizard() {
+  vscode.postMessage({ command: 'addSshKey' });
+}
+
+function createNetworkFromWizard() {
+  vscode.postMessage({ command: 'createNetwork' });
 }
 
 // ── Step 5: Cloud-init / Tailscale ─────────────────────────────────────────
