@@ -4,3 +4,6 @@ out/
 .vscode-test/
 *.vsix
 .env
+
+# Internal AI dev notes — not for public repo
+PLAN.md
