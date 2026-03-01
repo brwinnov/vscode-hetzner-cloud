@@ -5,6 +5,12 @@
 
 const API_BASE = 'https://api.hetzner.cloud/v1';
 
+/** Typed envelope for all Hetzner paginated list responses. */
+interface HetznerPage {
+  meta?: { pagination?: { next_page: number | null } };
+  [key: string]: unknown;
+}
+
 export interface HServer {
   id: number;
   name: string;
@@ -117,9 +123,12 @@ export class HetznerClient {
     let page: number | null = 1;
     const sep = basePath.includes('?') ? '&' : '?';
     while (page !== null) {
-      const data = await this.request<any>('GET', `${basePath}${sep}per_page=50&page=${page}`);
-      results.push(...(data[arrayKey] as T[]));
-      page = (data.meta?.pagination?.next_page as number | null | undefined) ?? null;
+      const data = await this.request<HetznerPage>('GET', `${basePath}${sep}per_page=50&page=${page}`);
+      const items = data[arrayKey] as T[] | undefined;
+      if (Array.isArray(items)) {
+        results.push(...items);
+      }
+      page = data.meta?.pagination?.next_page ?? null;
     }
     return results;
   }

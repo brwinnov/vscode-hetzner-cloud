@@ -145,7 +145,7 @@ export class ServerWizardPanel {
       let cloudInit = payload.cloudInit || '';
 
       if (payload.tailscaleEnabled) {
-        let tsKey = await this.tailscaleKeyManager.getAuthKey();
+        const tsKey = await this.tailscaleKeyManager.getAuthKey();
         if (!tsKey) {
           this.panel.webview.postMessage({
             command: 'error',
@@ -629,6 +629,13 @@ function getWizardHtml(data: WizardData): string {
   .banner.info {
     background: rgba(0,127,212,0.12);
     border: 1px solid var(--vscode-focusBorder);
+    color: var(--vscode-foreground);
+    display: block;
+  }
+
+  .banner.warning {
+    background: rgba(255,180,0,0.1);
+    border: 1px solid rgba(255,180,0,0.5);
     color: var(--vscode-foreground);
     display: block;
   }

@@ -91,8 +91,16 @@ export function registerSshKeyCommands(
 
       const client = await tokenManager.getActiveClient();
       if (!client) return;
-      await client.deleteSshKey(item.key.id);
-      sshKeysProvider.refresh();
+
+      try {
+        await vscode.window.withProgress(
+          { location: vscode.ProgressLocation.Notification, title: `Removing SSH key "${item.key.name}"...` },
+          () => client.deleteSshKey(item.key.id)
+        );
+        sshKeysProvider.refresh();
+      } catch (err: any) {
+        vscode.window.showErrorMessage(`Failed to remove SSH key: ${err?.message ?? err}`);
+      }
     })
   );
 }

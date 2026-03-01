@@ -17,14 +17,23 @@ export function injectTailscale(cloudInit: string, authKey: string, extraArgs?: 
 
   // Merge into existing cloud-init
   if (cloudInit.includes('runcmd:')) {
-    // Append to existing runcmd list
-    return cloudInit.replace(
-      /^(runcmd:\s*\n)/m,
-      `$1${tailscaleBlock
-        .split('\n')
-        .filter((l) => l.startsWith('  -'))
-        .join('\n')}\n`
-    );
+    // Truly append after the last existing runcmd entry (not after the header)
+    const newLines = tailscaleBlock
+      .split('\n')
+      .filter((l) => l.startsWith('  -'));
+    const lines = cloudInit.split('\n');
+    const runcmdIdx = lines.findIndex((l) => /^runcmd:\s*$/.test(l));
+    if (runcmdIdx === -1) {
+      // runcmd found via includes() but not as a standalone key — append new block
+      return `${cloudInit.trimEnd()}\n${tailscaleBlock}`;
+    }
+    // Scan past all indented lines that form the existing sequence
+    let insertIdx = runcmdIdx + 1;
+    while (insertIdx < lines.length && /^\s/.test(lines[insertIdx])) {
+      insertIdx++;
+    }
+    lines.splice(insertIdx, 0, ...newLines);
+    return lines.join('\n');
   }
 
   return `${cloudInit.trimEnd()}\n${tailscaleBlock}`;

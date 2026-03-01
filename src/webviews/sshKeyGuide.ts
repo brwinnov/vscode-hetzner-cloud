@@ -214,12 +214,12 @@ function getGuideHtml(): string {
 </div>
 
 <div class="tabs">
-  <div class="tab active" onclick="showTab('windows')"><span class="tab-icon">🪟</span> Windows</div>
-  <div class="tab" onclick="showTab('macos')"><span class="tab-icon">🍎</span> macOS</div>
-  <div class="tab" onclick="showTab('wsl')"><span class="tab-icon">🐧</span> WSL</div>
-  <div class="tab" onclick="showTab('linux')"><span class="tab-icon">🎩</span> Linux / RHEL</div>
-  <div class="tab" onclick="showTab('whynot')"><span class="tab-icon">❓</span> Why SSH Keys?</div>
-  <div class="tab" onclick="showTab('whyed25519')"><span class="tab-icon">🔬</span> Why Ed25519?</div>
+  <div class="tab active" onclick="showTab('windows', event)"><span class="tab-icon">🪟</span> Windows</div>
+  <div class="tab" onclick="showTab('macos', event)"><span class="tab-icon">🍎</span> macOS</div>
+  <div class="tab" onclick="showTab('wsl', event)"><span class="tab-icon">🐧</span> WSL</div>
+  <div class="tab" onclick="showTab('linux', event)"><span class="tab-icon">🎩</span> Linux / RHEL</div>
+  <div class="tab" onclick="showTab('whynot', event)"><span class="tab-icon">❓</span> Why SSH Keys?</div>
+  <div class="tab" onclick="showTab('whyed25519', event)"><span class="tab-icon">🔬</span> Why Ed25519?</div>
 </div>
 
 <div class="content">
@@ -730,7 +730,7 @@ ssh-keygen -t rsa -b 4096 -C "your-email@example.com"</code></pre>
 </div><!-- /content -->
 
 <script>
-function showTab(name) {
+function showTab(name, event) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.getElementById('tab-' + name).classList.add('active');
