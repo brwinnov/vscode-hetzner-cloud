@@ -165,8 +165,10 @@ function renderHtml(s: HServer): string {
   const labelEntries = Object.entries(s.labels);
   const isOn = s.status === 'running';
   const isOff = s.status === 'off';
-  const sshCmd = ipv4 !== '—' ? `ssh root@${ipv4}` : `ssh root@${ipv6}`;
   const color = statusColor(s.status);
+  const lastRefresh = window.__lastRefreshTime || 0;
+  const canRefresh = Date.now() - lastRefresh >= 30000;
+  const refreshDisabled = !canRefresh ? 'disabled' : '';
 
   return /* html */`<!DOCTYPE html>
 <html lang="en">
@@ -247,7 +249,7 @@ function renderHtml(s: HServer): string {
 <div class="header">
   <h1>${escHtml(s.name)}</h1>
   <span class="badge">${statusLabel(s.status)}</span>
-  <button class="btn-icon" id="refreshBtn" title="Refresh">↺ Refresh</button>
+  <button class="btn-icon" id="refreshBtn" title="Refresh (30 sec limit)" ${refreshDisabled}>↺ Refresh</button>
 </div>
 
 <div id="loadingBar">⏳ Working…</div>
@@ -256,7 +258,6 @@ function renderHtml(s: HServer): string {
   <button class="btn btn-primary" id="startBtn"   ${isOn  ? 'disabled' : ''}>▶ Start</button>
   <button class="btn btn-secondary" id="stopBtn"  ${isOff ? 'disabled' : ''}>■ Stop</button>
   <button class="btn btn-secondary" id="rebootBtn"${isOff ? 'disabled' : ''}>↺ Reboot</button>
-  <button class="btn btn-secondary" id="sshBtn"   ${ipv4 === '—' && ipv6 === '—' ? 'disabled' : ''}>⌨ Open SSH Terminal</button>
   <button class="btn btn-danger" id="deleteBtn">✕ Delete</button>
 </div>
 
@@ -265,10 +266,8 @@ function renderHtml(s: HServer): string {
   <table>
     ${row('IPv4', ipv4)}
     ${row('IPv6', ipv6)}
-<div class="section">
-  <div class="section-title">SSH Command</div>
-  <div class="code">
-    <span id="sshCmdText">${sshCmd}</span>
+  </table>
+</div>
 
 <div class="section">
   <div class="section-title">Specification</div>
@@ -323,11 +322,9 @@ window.addEventListener('message', e => {
 // Wire button event listeners (CSP-compliant)
 document.addEventListener('DOMContentLoaded', () => {
   const btns = {
-    refreshBtn: 'refresh',
     startBtn: 'start',
     stopBtn: 'stop',
     rebootBtn: 'reboot',
-    sshBtn: 'ssh',
     deleteBtn: 'delete'
   };
   Object.entries(btns).forEach(([id, cmd]) => {
@@ -335,11 +332,26 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btn) btn.addEventListener('click', () => vscode.postMessage({ command: cmd }));
   });
   
-  // Wire copy button
-  const copyBtn = document.getElementById('copySshBtn');
-  if (copyBtn) {
-    const sshText = document.getElementById('sshCmdText')?.textContent || '';
-    copyBtn.addEventListener('click', () => copyText(sshText));
+  // Wire refresh button with 30-second rate limit
+  const refreshBtn = document.getElementById('refreshBtn');
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', () => {
+      const now = Date.now();
+      const lastRefresh = window.__lastRefreshTime || 0;
+      if (now - lastRefresh < 30000) {
+        // Still within rate limit, ignore
+        return;
+      }
+      window.__lastRefreshTime = now;
+      refreshBtn.disabled = true;
+      refreshBtn.title = 'Refresh (30 sec rate limit)';
+      vscode.postMessage({ command: 'refresh' });
+      // Re-enable after 30 seconds
+      setTimeout(() => {
+        refreshBtn.disabled = false;
+        refreshBtn.title = 'Refresh (30 sec limit)';
+      }, 30000);
+    });
   }
 });
 </script>
