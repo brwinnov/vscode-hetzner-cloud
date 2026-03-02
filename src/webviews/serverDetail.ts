@@ -166,9 +166,6 @@ function renderHtml(s: HServer): string {
   const isOn = s.status === 'running';
   const isOff = s.status === 'off';
   const color = statusColor(s.status);
-  const lastRefresh = window.__lastRefreshTime || 0;
-  const canRefresh = Date.now() - lastRefresh >= 30000;
-  const refreshDisabled = !canRefresh ? 'disabled' : '';
 
   return /* html */`<!DOCTYPE html>
 <html lang="en">
@@ -249,7 +246,7 @@ function renderHtml(s: HServer): string {
 <div class="header">
   <h1>${escHtml(s.name)}</h1>
   <span class="badge">${statusLabel(s.status)}</span>
-  <button class="btn-icon" id="refreshBtn" title="Refresh (30 sec limit)" ${refreshDisabled}>↺ Refresh</button>
+  <button class="btn-icon" id="refreshBtn" title="Refresh (30 sec limit)">↺ Refresh</button>
 </div>
 
 <div id="loadingBar">⏳ Working…</div>
