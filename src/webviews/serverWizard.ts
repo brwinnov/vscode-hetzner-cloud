@@ -820,13 +820,13 @@ function getWizardHtml(data: WizardData): string {
   <nav class="sidebar">
     <h2>Create Server</h2>
     <ul class="step-nav" id="stepNav">
-      <li class="active" onclick="goToStep(0)"><span class="step-badge" id="badge0">1</span> Basics</li>
-      <li onclick="goToStep(1)"><span class="step-badge" id="badge1">2</span> Server Type</li>
-      <li onclick="goToStep(2)"><span class="step-badge" id="badge2">3</span> OS Image</li>
-      <li onclick="goToStep(3)"><span class="step-badge" id="badge3">4</span> SSH Keys</li>
-      <li onclick="goToStep(4)"><span class="step-badge" id="badge4">5</span> Network</li>
-      <li onclick="goToStep(5)"><span class="step-badge" id="badge5">6</span> Cloud-init</li>
-      <li onclick="goToStep(6)"><span class="step-badge" id="badge6">7</span> Review</li>
+      <li class="active"><span class="step-badge" id="badge0">1</span> Basics</li>
+      <li><span class="step-badge" id="badge1">2</span> Server Type</li>
+      <li><span class="step-badge" id="badge2">3</span> OS Image</li>
+      <li><span class="step-badge" id="badge3">4</span> SSH Keys</li>
+      <li><span class="step-badge" id="badge4">5</span> Network</li>
+      <li><span class="step-badge" id="badge5">6</span> Cloud-init</li>
+      <li><span class="step-badge" id="badge6">7</span> Review</li>
     </ul>
   </nav>
 
@@ -850,8 +850,8 @@ function getWizardHtml(data: WizardData): string {
       </div>
 
       <div class="actions">
-        <button class="btn-secondary" onclick="cancel()">Cancel</button>
-        <button class="btn-primary ml-auto" onclick="nextStep(0)">Next →</button>
+        <button class="btn-secondary">Cancel</button>
+        <button class="btn-primary ml-auto">Next →</button>
       </div>
     </div>
 
@@ -1094,6 +1094,40 @@ document.addEventListener('DOMContentLoaded', () => {
   renderSshKeys();
   renderNetworks();
   updateTailscaleState();
+
+  // Wire location card listeners (CSP: remove inline onclick, use addEventListener)
+  document.getElementById('locationCards').addEventListener('click', (e) => {
+    const card = e.target.closest('.card[data-location]');
+    if (!card) return;
+    const location = card.dataset.location;
+    state.location = location;
+    document.querySelectorAll('#locationCards .card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+  });
+
+  // Wire step navigation listeners (CSP: remove inline onclick, use addEventListener)
+  document.querySelectorAll('.step-nav li').forEach((li, idx) => {
+    li.addEventListener('click', () => goToStep(idx));
+  });
+
+  // Wire action button listeners (NEXT, BACK, CANCEL)
+  document.querySelectorAll('.btn-primary, .btn-secondary').forEach(btn => {
+    if (btn.textContent.includes('Next')) {
+      btn.addEventListener('click', () => {
+        const step = Array.from(document.querySelectorAll('.step-panel')).findIndex(p => p.classList.contains('active'));
+        nextStep(step);
+      });
+    } else if (btn.textContent.includes('Back')) {
+      btn.addEventListener('click', () => {
+        const step = Array.from(document.querySelectorAll('.step-panel')).findIndex(p => p.classList.contains('active'));
+        prevStep(step);
+      });
+    } else if (btn.textContent.includes('Cancel')) {
+      btn.addEventListener('click', cancel);
+    } else if (btn.textContent.includes('Create')) {
+      btn.addEventListener('click', createServer);
+    }
+  });
 });
 
 // ── Navigation ─────────────────────────────────────────────────────────────
@@ -1167,8 +1201,7 @@ function renderLocations() {
   const locationFlags = { nbg1:'🇩🇪', fsn1:'🇩🇪', hel1:'🇫🇮', ash:'🇺🇸', hil:'🇺🇸', sin:'🇸🇬' };
   container.innerHTML = LOCATIONS.map(l => \`
     <div class="card \${l.name === state.location ? 'selected' : ''}"
-         onclick="selectLocation('\${l.name}', this)"
-         data-val="\${l.name}">
+         data-location="\${l.name}">
       <div class="card-title">\${locationFlags[l.name] || '🌍'} \${l.name.toUpperCase()}</div>
       <div class="card-desc">\${l.city}, \${l.country}</div>
       <div class="card-desc" style="margin-top:4px;opacity:0.7">\${l.network_zone}</div>
@@ -1181,6 +1214,7 @@ function selectLocation(val, el) {
   document.querySelectorAll('#locationCards .card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
 }
+// Note: selectLocation is kept for backward compat but listeners are now wired via addEventListener in DOMContentLoaded
 
 // ── Step 1: Server Types ───────────────────────────────────────────────────
 function filterTypes(filter, btn) {
