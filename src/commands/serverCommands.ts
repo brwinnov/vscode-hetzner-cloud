@@ -80,6 +80,17 @@ export function registerServerCommands(
       );
       if (confirm !== 'Delete') return;
 
+      // Require user to type server name for confirmation (Hetzner UX pattern)
+      const serverName = await vscode.window.showInputBox({
+        prompt: `Type the server name "${item.server.name}" to confirm deletion`,
+        validateInput: (input: string) => {
+          if (input === item.server.name) return undefined;
+          return 'Server name does not match. Deletion cancelled.';
+        },
+      });
+
+      if (!serverName) return;
+
       const client = await tokenManager.getActiveClient();
       if (!client) return;
       await vscode.window.withProgress(
