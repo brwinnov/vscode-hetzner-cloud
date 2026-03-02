@@ -36,16 +36,25 @@ export class SetupProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
     items.push(addToken);
 
     // Task 2: SSH Key (shows as pending if no project yet, advisory if project exists)
-    const sshKey = new vscode.TreeItem('SSH Key Pair Setup');
+    const sshKey = new vscode.TreeItem('Add Public SSH Key');
     sshKey.iconPath = new vscode.ThemeIcon(
       hasProject ? 'info' : 'warning',
       new vscode.ThemeColor(hasProject ? 'charts.blue' : 'charts.orange')
     );
     sshKey.description = 'Recommended for secure access';
-    sshKey.tooltip = 'Open SSH key generation guide for Windows, macOS, WSL and Linux';
-    sshKey.command = { command: 'hcloud.sshKeyGuide', title: 'SSH Key Guide' };
-    sshKey.contextValue = 'setup-sshguide';
+    sshKey.tooltip = 'Add your public SSH key to Hetzner Cloud for secure server access. (SSH key generation guide available in sidebar.)';
+    sshKey.command = { command: 'hcloud.addSshKey', title: 'Add SSH Key' };
+    sshKey.contextValue = 'setup-sshkey';
     items.push(sshKey);
+
+    // Task 2b: SSH Key Generation Guide (learn how to generate SSH keys)
+    const sshGuide = new vscode.TreeItem('📖 SSH Key Generation Guide');
+    sshGuide.iconPath = new vscode.ThemeIcon('info', new vscode.ThemeColor('charts.blue'));
+    sshGuide.description = 'Learn how to generate keys';
+    sshGuide.tooltip = 'Open tabbed guide for Windows, macOS, WSL, Linux, and Bitvise SSH client';
+    sshGuide.command = { command: 'hcloud.sshKeyGuide', title: 'SSH Key Guide' };
+    sshGuide.contextValue = 'setup-sshguide';
+    items.push(sshGuide);
 
     // Task 3: Tailscale Key (optional but shown as advisory)
     const tailscale = new vscode.TreeItem('Tailscale Auth Key');
