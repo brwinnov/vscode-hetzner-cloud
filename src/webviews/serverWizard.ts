@@ -861,17 +861,17 @@ function getWizardHtml(data: WizardData): string {
       <p class="subtitle">Choose the CPU, RAM, and disk configuration.</p>
 
       <div class="filter-tabs" id="typeFilter">
-        <button class="filter-tab active" onclick="filterTypes('all', this)">All</button>
-        <button class="filter-tab" onclick="filterTypes('shared', this)">Shared vCPU</button>
-        <button class="filter-tab" onclick="filterTypes('dedicated', this)">Dedicated vCPU</button>
-        <button class="filter-tab" onclick="filterTypes('arm', this)">Arm64</button>
+        <button class="filter-tab active">All</button>
+        <button class="filter-tab">Shared vCPU</button>
+        <button class="filter-tab">Dedicated vCPU</button>
+        <button class="filter-tab">Arm64</button>
       </div>
 
       <div class="cards wide" id="typeCards"></div>
 
       <div class="actions">
-        <button class="btn-secondary" onclick="prevStep(1)">← Back</button>
-        <button class="btn-primary ml-auto" onclick="nextStep(1)">Next →</button>
+        <button class="btn-secondary">← Back</button>
+        <button class="btn-primary ml-auto">Next →</button>
       </div>
     </div>
 
@@ -881,14 +881,14 @@ function getWizardHtml(data: WizardData): string {
       <p class="subtitle">Select a system image, snapshot, or enter a custom image.</p>
 
       <div class="filter-tabs" id="imageFilter">
-        <button class="filter-tab active" onclick="filterImages('system', this)">System</button>
-        <button class="filter-tab" onclick="filterImages('snapshot', this)">Snapshots</button>
-        <button class="filter-tab" onclick="filterImages('custom', this)">Custom Image</button>
+        <button class="filter-tab active">System</button>
+        <button class="filter-tab">Snapshots</button>
+        <button class="filter-tab">Custom Image</button>
       </div>
 
       <div class="search-wrap" id="imageSearchWrap">
         <span class="search-icon">⌕</span>
-        <input type="text" id="imageSearch" placeholder="Search images..." oninput="renderImages()" />
+        <input type="text" id="imageSearch" placeholder="Search images..." />
       </div>
 
       <div class="cards wide" id="imageCards"></div>
@@ -902,8 +902,8 @@ function getWizardHtml(data: WizardData): string {
       </div>
 
       <div class="actions">
-        <button class="btn-secondary" onclick="prevStep(2)">← Back</button>
-        <button class="btn-primary ml-auto" onclick="nextStep(2)">Next →</button>
+        <button class="btn-secondary">← Back</button>
+        <button class="btn-primary ml-auto">Next →</button>
       </div>
     </div>
 
@@ -918,9 +918,9 @@ function getWizardHtml(data: WizardData): string {
       </div>
 
       <div class="actions">
-        <button class="btn-secondary" onclick="prevStep(3)">← Back</button>
-        <button class="btn-secondary" onclick="addSshKeyFromWizard()">+ Add SSH Key</button>
-        <button class="btn-primary ml-auto" onclick="nextStep(3)">Next →</button>
+        <button class="btn-secondary">← Back</button>
+        <button class="btn-secondary" data-action="add-ssh-key">+ Add SSH Key</button>
+        <button class="btn-primary ml-auto">Next →</button>
       </div>
     </div>
 
@@ -939,7 +939,7 @@ function getWizardHtml(data: WizardData): string {
 
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
         <label style="margin:0;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em">Private Networks</label>
-        <button class="btn-secondary" style="padding:4px 12px;font-size:12px" onclick="createNetworkFromWizard()">+ Create Network</button>
+        <button class="btn-secondary" style="padding:4px 12px;font-size:12px" data-action="create-network">+ Create Network</button>
       </div>
 
       <div id="networkCards" class="check-cards"></div>
@@ -948,8 +948,8 @@ function getWizardHtml(data: WizardData): string {
       </div>
 
       <div class="actions">
-        <button class="btn-secondary" onclick="prevStep(4)">← Back</button>
-        <button class="btn-primary ml-auto" onclick="nextStep(4)">Next →</button>
+        <button class="btn-secondary">← Back</button>
+        <button class="btn-primary ml-auto">Next →</button>
       </div>
     </div>
 
@@ -970,7 +970,7 @@ function getWizardHtml(data: WizardData): string {
       </div>
 
       <div id="tailscaleKeyBanner" class="banner info" style="display:none">
-        ⚠ No Tailscale auth key set. <a href="#" onclick="setTailscaleKey()" style="color:var(--vscode-textLink-foreground)">Set key now</a>
+        ⚠ No Tailscale auth key set. <a href="#" data-action="set-tailscale-key" style="color:var(--vscode-textLink-foreground);cursor:pointer">Set key now</a>
       </div>
 
       <div class="banner warning">
@@ -982,16 +982,16 @@ function getWizardHtml(data: WizardData): string {
         <textarea class="code" id="cloudInitInput" placeholder="#cloud-config&#10;&#10;# Your cloud-init YAML here.&#10;# Tailscale block will be appended automatically if enabled."></textarea>
         <div class="field-hint">YAML cloud-config format. Tailscale runcmd will be merged in automatically.</div>
         <div style="display:flex;gap:8px;margin-top:6px">
-          <button class="btn-secondary" style="font-size:12px;padding:4px 10px" onclick="saveCloudInitTemplate()">&#128190; Save as Template</button>
-          <button class="btn-secondary" style="font-size:12px;padding:4px 10px" onclick="loadCloudInitTemplate()">&#128194; Load Template</button>
-          <button class="btn-secondary" style="font-size:12px;padding:4px 10px" onclick="deleteCloudInitTemplate()">&#128465; Delete Template</button>
-          <button class="btn-secondary" style="font-size:12px;padding:4px 10px" onclick="requestStorageBoxMounts()">&#128230; Mount Storage Boxes</button>
+          <button class="btn-secondary" style="font-size:12px;padding:4px 10px" data-action="save-cloud-init-template">&#128190; Save as Template</button>
+          <button class="btn-secondary" style="font-size:12px;padding:4px 10px" data-action="load-cloud-init-template">&#128194; Load Template</button>
+          <button class="btn-secondary" style="font-size:12px;padding:4px 10px" data-action="delete-cloud-init-template">&#128465; Delete Template</button>
+          <button class="btn-secondary" style="font-size:12px;padding:4px 10px" data-action="request-storage-box-mounts">&#128230; Mount Storage Boxes</button>
         </div>
       </div>
 
       <div class="actions">
-        <button class="btn-secondary" onclick="prevStep(5)">← Back</button>
-        <button class="btn-primary ml-auto" onclick="nextStep(5)">Review →</button>
+        <button class="btn-secondary">← Back</button>
+        <button class="btn-primary ml-auto">Review →</button>
       </div>
     </div>
 
@@ -1005,8 +1005,8 @@ function getWizardHtml(data: WizardData): string {
       <div class="summary" id="summaryTable"></div>
 
       <div class="actions">
-        <button class="btn-secondary" onclick="prevStep(6)">← Back</button>
-        <button class="btn-primary ml-auto" id="createBtn" onclick="createServer()">⚡ Create Server</button>
+        <button class="btn-secondary">← Back</button>
+        <button class="btn-primary ml-auto" id="createBtn">⚡ Create Server</button>
       </div>
     </div>
 
@@ -1104,6 +1104,99 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('#locationCards .card').forEach(c => c.classList.remove('selected'));
     card.classList.add('selected');
   });
+
+  // Wire server type card listeners
+  document.getElementById('typeCards').addEventListener('click', (e) => {
+    const card = e.target.closest('.card[data-server-type]');
+    if (!card) return;
+    const serverType = card.dataset.serverType;
+    state.serverType = serverType;
+    document.querySelectorAll('#typeCards .card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+  });
+
+  // Wire image card listeners
+  document.getElementById('imageCards').addEventListener('click', (e) => {
+    const card = e.target.closest('.card[data-image]');
+    if (!card) return;
+    const image = card.dataset.image;
+    const imageDisplay = card.dataset.imageDisplay;
+    state.image = image;
+    state.imageDisplay = imageDisplay;
+    document.querySelectorAll('#imageCards .card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+  });
+
+  // Wire server type filter tabs
+  const typeFilterDiv = document.getElementById('typeFilter');
+  if (typeFilterDiv) {
+    typeFilterDiv.querySelectorAll('.filter-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        typeFilterDiv.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const filter = btn.textContent.toLowerCase().includes('shared') ? 'shared' : 
+                      btn.textContent.toLowerCase().includes('dedicated') ? 'dedicated' :
+                      btn.textContent.toLowerCase().includes('arm') ? 'arm' : 'all';
+        renderServerTypes(filter);
+        // Re-wire type card listeners after render
+        document.getElementById('typeCards').addEventListener('click', (e) => {
+          const card = e.target.closest('.card[data-server-type]');
+          if (!card) return;
+          state.serverType = card.dataset.serverType;
+          document.querySelectorAll('#typeCards .card').forEach(c => c.classList.remove('selected'));
+          card.classList.add('selected');
+        });
+      });
+    });
+  }
+
+  // Wire image filter tabs
+  const imageFilterDiv = document.getElementById('imageFilter');
+  if (imageFilterDiv) {
+    imageFilterDiv.querySelectorAll('.filter-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.imageFilter = btn.textContent.toLowerCase().includes('snapshot') ? 'snapshot' :
+                           btn.textContent.toLowerCase().includes('custom') ? 'custom' : 'system';
+        imageFilterDiv.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const isCustom = state.imageFilter === 'custom';
+        document.getElementById('customImagePanel').style.display = isCustom ? 'block' : 'none';
+        document.getElementById('imageCards').style.display = isCustom ? 'none' : 'grid';
+        document.getElementById('imageSearchWrap').style.display = isCustom ? 'none' : 'block';
+        state.useCustomImage = isCustom;
+        if (!isCustom) {
+          renderImages();
+          // Re-wire image card listeners after render
+          document.getElementById('imageCards').addEventListener('click', (e) => {
+            const card = e.target.closest('.card[data-image]');
+            if (!card) return;
+            state.image = card.dataset.image;
+            state.imageDisplay = card.dataset.imageDisplay;
+            document.querySelectorAll('#imageCards .card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+          });
+        }
+      });
+    });
+  }
+
+  // Wire image search input
+  const imageSearchInput = document.getElementById('imageSearch');
+  if (imageSearchInput) {
+    imageSearchInput.addEventListener('input', () => {
+      renderImages();
+      // Re-wire image card listeners after render
+      document.getElementById('imageCards').addEventListener('click', (e) => {
+        const card = e.target.closest('.card[data-image]');
+        if (!card) return;
+        state.image = card.dataset.image;
+        state.imageDisplay = card.dataset.imageDisplay;
+        document.querySelectorAll('#imageCards .card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+      });
+    });
+  }
 
   // Wire step navigation listeners (CSP: remove inline onclick, use addEventListener)
   document.querySelectorAll('.step-nav li').forEach((li, idx) => {
@@ -1235,7 +1328,7 @@ function renderServerTypes(filter) {
 
   container.innerHTML = types.map(t => \`
     <div class="card \${t.name === state.serverType ? 'selected' : ''}"
-         onclick="selectType('\${t.name}', this)">
+         data-server-type="\${t.name}">
       <div class="card-badge">\${t.cpu_type}</div>
       <div class="card-title">\${t.name}</div>
       <div class="card-desc">
@@ -1285,7 +1378,8 @@ function renderImages() {
     const iconKey = Object.keys(osIcons).find(k => label.toLowerCase().includes(k)) || 'default';
     return \`
       <div class="card \${i.name === state.image ? 'selected' : ''}"
-           onclick="selectImage(\${JSON.stringify(i.name || i.id)}, \${JSON.stringify(label)}, this)">
+           data-image="\${h(i.name || i.id)}"
+           data-image-display="\${h(label)}">
         <div class="card-badge">\${h(i.type)}</div>
         <div class="card-title">\${osIcons[iconKey]} \${h(label)}</div>
         <div class="card-desc">\${h(i.os_flavor)} \${h(i.os_version || '')}</div>
