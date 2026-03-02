@@ -6,8 +6,7 @@
 
 **Manage your Hetzner Cloud infrastructure directly from VS Code.**
 
-[![Version](https://img.shields.io/visual-studio-marketplace/v/brwinnov.vscode-hetzner-cloud?color=D50C2D&label=marketplace)](https://marketplace.visualstudio.com/items?itemName=brwinnov.vscode-hetzner-cloud)
-[![Installs](https://img.shields.io/visual-studio-marketplace/i/brwinnov.vscode-hetzner-cloud)](https://marketplace.visualstudio.com/items?itemName=brwinnov.vscode-hetzner-cloud)
+[![Version](https://img.shields.io/badge/marketplace-coming%20soon-D50C2D)](https://marketplace.visualstudio.com/items?itemName=brwinnov.vscode-hetzner-cloud)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 </div>
