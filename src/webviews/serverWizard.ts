@@ -1110,23 +1110,26 @@ document.addEventListener('DOMContentLoaded', () => {
     li.addEventListener('click', () => goToStep(idx));
   });
 
-  // Wire action button listeners (NEXT, BACK, CANCEL)
-  document.querySelectorAll('.btn-primary, .btn-secondary').forEach(btn => {
-    if (btn.textContent.includes('Next')) {
-      btn.addEventListener('click', () => {
-        const step = Array.from(document.querySelectorAll('.step-panel')).findIndex(p => p.classList.contains('active'));
-        nextStep(step);
-      });
-    } else if (btn.textContent.includes('Back')) {
-      btn.addEventListener('click', () => {
-        const step = Array.from(document.querySelectorAll('.step-panel')).findIndex(p => p.classList.contains('active'));
-        prevStep(step);
-      });
-    } else if (btn.textContent.includes('Cancel')) {
-      btn.addEventListener('click', cancel);
-    } else if (btn.textContent.includes('Create')) {
-      btn.addEventListener('click', createServer);
-    }
+  // Wire action button listeners (NEXT, BACK, CANCEL, CREATE) — target buttons in .actions divs
+  document.querySelectorAll('.actions').forEach(actionDiv => {
+    actionDiv.querySelectorAll('button').forEach(btn => {
+      const text = btn.textContent.trim();
+      if (text.startsWith('Next')) {
+        btn.addEventListener('click', () => {
+          const step = Array.from(document.querySelectorAll('.step-panel')).findIndex(p => p.classList.contains('active'));
+          nextStep(step);
+        });
+      } else if (text.startsWith('Back')) {
+        btn.addEventListener('click', () => {
+          const step = Array.from(document.querySelectorAll('.step-panel')).findIndex(p => p.classList.contains('active'));
+          prevStep(step);
+        });
+      } else if (text.startsWith('Cancel')) {
+        btn.addEventListener('click', cancel);
+      } else if (text.startsWith('Create')) {
+        btn.addEventListener('click', createServer);
+      }
+    });
   });
 });
 
