@@ -20,6 +20,7 @@ import { registerStorageBoxCommands } from './commands/storageBoxCommands';
 import { registerLoadBalancerCommands } from './commands/loadBalancerCommands';
 import { TailscaleAuthKeyManager } from './tailscale/authKeyManager';
 import { SshKeyGuidePanel } from './webviews/sshKeyGuide';
+import { WelcomePage } from './webviews/welcomePage';
 import { cleanupLegacyKeys } from './utils/secretStorage';
 
 export async function activate(context: vscode.ExtensionContext) {
@@ -113,6 +114,14 @@ export async function activate(context: vscode.ExtensionContext) {
   };
 
   await refreshStatusBar();
+
+  // Welcome page command (also shown automatically on first install)
+  context.subscriptions.push(
+    vscode.commands.registerCommand('hcloud.welcome', () => {
+      WelcomePage.open(context);
+    })
+  );
+  WelcomePage.openOnFirstInstall(context);
 
   // SSH Key Guide command
   context.subscriptions.push(

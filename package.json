@@ -37,6 +37,11 @@
   "contributes": {
     "commands": [
       {
+        "command": "hcloud.welcome",
+        "title": "Hetzner Cloud: Open Welcome Page",
+        "icon": "$(home)"
+      },
+      {
         "command": "hcloud.addToken",
         "title": "Hetzner Cloud: Add API Token",
         "icon": "$(add)"
@@ -277,14 +282,14 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "Hetzner Cloud Toolkit",
+          "id": "hetzner-cloud-toolkit",
           "title": "Hetzner Cloud Toolkit",
           "icon": "resources/hcloud.svg"
         }
       ]
     },
     "views": {
-      "Hetzner Cloud Toolkit": [
+      "hetzner-cloud-toolkit": [
         {
           "id": "hcloud.setup",
           "name": "Setup",

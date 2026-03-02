@@ -224,12 +224,13 @@ function getGuideHtml(): string {
 </div>
 
 <div class="tabs">
-  <div class="tab active" onclick="showTab('windows', event)"><span class="tab-icon">🪟</span> Windows</div>
-  <div class="tab" onclick="showTab('macos', event)"><span class="tab-icon">🍎</span> macOS</div>
-  <div class="tab" onclick="showTab('wsl', event)"><span class="tab-icon">🐧</span> WSL</div>
-  <div class="tab" onclick="showTab('linux', event)"><span class="tab-icon">🎩</span> Linux / RHEL</div>
-  <div class="tab" onclick="showTab('whynot', event)"><span class="tab-icon">❓</span> Why SSH Keys?</div>
-  <div class="tab" onclick="showTab('whyed25519', event)"><span class="tab-icon">🔬</span> Why Ed25519?</div>
+  <div class="tab active" data-tab="windows"><span class="tab-icon">🪟</span> Windows</div>
+  <div class="tab" data-tab="macos"><span class="tab-icon">🍎</span> macOS</div>
+  <div class="tab" data-tab="wsl"><span class="tab-icon">🐧</span> WSL</div>
+  <div class="tab" data-tab="linux"><span class="tab-icon">🎩</span> Linux / RHEL</div>
+  <div class="tab" data-tab="bitvise"><span class="tab-icon">🛡️</span> Bitvise Client</div>
+  <div class="tab" data-tab="whynot"><span class="tab-icon">❓</span> Why SSH Keys?</div>
+  <div class="tab" data-tab="whyed25519"><span class="tab-icon">🔬</span> Why Ed25519?</div>
 </div>
 
 <div class="content">
@@ -249,7 +250,7 @@ function getGuideHtml(): string {
     </ol>
 
     <div class="code-block">
-      <button class="copy-btn" onclick="copy(this)">Copy</button>
+      <button class="copy-btn">Copy</button>
       <pre><code>ssh-keygen -t ed25519 -C "your-email@example.com"</code></pre>
     </div>
 
@@ -261,7 +262,7 @@ function getGuideHtml(): string {
     </ol>
 
     <div class="code-block">
-      <button class="copy-btn" onclick="copy(this)">Copy</button>
+      <button class="copy-btn">Copy</button>
       <pre><code>cat $env:USERPROFILE\\.ssh\\id_ed25519.pub</code></pre>
     </div>
 
@@ -274,7 +275,7 @@ function getGuideHtml(): string {
 
     <h2>Test your connection</h2>
     <div class="code-block">
-      <button class="copy-btn" onclick="copy(this)">Copy</button>
+      <button class="copy-btn">Copy</button>
       <pre><code>ssh -i $env:USERPROFILE\\.ssh\\id_ed25519 root@YOUR_SERVER_IP</code></pre>
     </div>
 
@@ -309,7 +310,7 @@ function getGuideHtml(): string {
     </ol>
 
     <div class="code-block">
-      <button class="copy-btn" onclick="copy(this)">Copy</button>
+      <button class="copy-btn">Copy</button>
       <pre><code>ssh-keygen -t ed25519 -C "your-email@example.com"</code></pre>
     </div>
 
@@ -320,7 +321,7 @@ function getGuideHtml(): string {
     </ol>
 
     <div class="code-block">
-      <button class="copy-btn" onclick="copy(this)">Copy</button>
+      <button class="copy-btn">Copy</button>
       <pre><code>ssh-add --apple-use-keychain ~/.ssh/id_ed25519</code></pre>
     </div>
 
@@ -329,7 +330,7 @@ function getGuideHtml(): string {
     </ol>
 
     <div class="code-block">
-      <button class="copy-btn" onclick="copy(this)">Copy</button>
+      <button class="copy-btn">Copy</button>
       <pre><code>pbcopy &lt; ~/.ssh/id_ed25519.pub</code></pre>
     </div>
 
@@ -342,7 +343,7 @@ function getGuideHtml(): string {
     <h2>Configure SSH for Hetzner</h2>
     <p>Add this to <code>~/.ssh/config</code> for convenience:</p>
     <div class="code-block">
-      <button class="copy-btn" onclick="copy(this)">Copy</button>
+      <button class="copy-btn">Copy</button>
       <pre><code>Host hetzner-*
   User root
   IdentityFile ~/.ssh/id_ed25519
@@ -352,7 +353,7 @@ function getGuideHtml(): string {
 
     <h2>Test your connection</h2>
     <div class="code-block">
-      <button class="copy-btn" onclick="copy(this)">Copy</button>
+      <button class="copy-btn">Copy</button>
       <pre><code>ssh root@YOUR_SERVER_IP</code></pre>
     </div>
   </div>
@@ -373,7 +374,7 @@ function getGuideHtml(): string {
     </ol>
 
     <div class="code-block">
-      <button class="copy-btn" onclick="copy(this)">Copy</button>
+      <button class="copy-btn">Copy</button>
       <pre><code>ssh-keygen -t ed25519 -C "your-email@example.com"</code></pre>
     </div>
 
@@ -383,7 +384,7 @@ function getGuideHtml(): string {
     </ol>
 
     <div class="code-block">
-      <button class="copy-btn" onclick="copy(this)">Copy</button>
+      <button class="copy-btn">Copy</button>
       <pre><code>cat ~/.ssh/id_ed25519.pub</code></pre>
     </div>
 
@@ -391,7 +392,7 @@ function getGuideHtml(): string {
     <h3>Share an existing Windows key with WSL</h3>
     <p>If you already generated a key in Windows PowerShell, copy it into WSL:</p>
     <div class="code-block">
-      <button class="copy-btn" onclick="copy(this)">Copy</button>
+      <button class="copy-btn">Copy</button>
       <pre><code># Copy Windows keys into WSL (run inside WSL)
 cp /mnt/c/Users/your-windows-username/.ssh/id_ed25519 ~/.ssh/
 cp /mnt/c/Users/your-windows-username/.ssh/id_ed25519.pub ~/.ssh/
@@ -405,14 +406,14 @@ chmod 644 ~/.ssh/id_ed25519.pub</code></pre>
     <hr>
     <h3>Start the SSH agent in WSL</h3>
     <div class="code-block">
-      <button class="copy-btn" onclick="copy(this)">Copy</button>
+      <button class="copy-btn">Copy</button>
       <pre><code>eval "$(ssh-agent -s)"
 ssh-add ~/.ssh/id_ed25519</code></pre>
     </div>
 
     <p>To auto-start the agent, add these lines to your <code>~/.bashrc</code> or <code>~/.zshrc</code>:</p>
     <div class="code-block">
-      <button class="copy-btn" onclick="copy(this)">Copy</button>
+      <button class="copy-btn">Copy</button>
       <pre><code>if [ -z "$SSH_AUTH_SOCK" ]; then
   eval "$(ssh-agent -s)" &gt; /dev/null
   ssh-add ~/.ssh/id_ed25519 2&gt;/dev/null
@@ -421,7 +422,7 @@ fi</code></pre>
 
     <h2>Test your connection</h2>
     <div class="code-block">
-      <button class="copy-btn" onclick="copy(this)">Copy</button>
+      <button class="copy-btn">Copy</button>
       <pre><code>ssh -i ~/.ssh/id_ed25519 root@YOUR_SERVER_IP</code></pre>
     </div>
   </div>
@@ -437,7 +438,7 @@ fi</code></pre>
 
     <h3>Install OpenSSH client (if needed)</h3>
     <div class="code-block">
-      <button class="copy-btn" onclick="copy(this)">Copy</button>
+      <button class="copy-btn">Copy</button>
       <pre><code># RHEL / Rocky / AlmaLinux / CentOS / Fedora
 sudo dnf install openssh-clients -y
 
@@ -447,7 +448,7 @@ sudo apt install openssh-client -y</code></pre>
 
     <h3>Generate the key pair</h3>
     <div class="code-block">
-      <button class="copy-btn" onclick="copy(this)">Copy</button>
+      <button class="copy-btn">Copy</button>
       <pre><code>ssh-keygen -t ed25519 -C "your-email@example.com"</code></pre>
     </div>
 
@@ -458,13 +459,13 @@ sudo apt install openssh-client -y</code></pre>
     </ol>
 
     <div class="code-block">
-      <button class="copy-btn" onclick="copy(this)">Copy</button>
+      <button class="copy-btn">Copy</button>
       <pre><code>cat ~/.ssh/id_ed25519.pub</code></pre>
     </div>
 
     <h3>Fix permissions (important!)</h3>
     <div class="code-block">
-      <button class="copy-btn" onclick="copy(this)">Copy</button>
+      <button class="copy-btn">Copy</button>
       <pre><code>chmod 700 ~/.ssh
 chmod 600 ~/.ssh/id_ed25519
 chmod 644 ~/.ssh/id_ed25519.pub</code></pre>
@@ -478,14 +479,14 @@ chmod 644 ~/.ssh/id_ed25519.pub</code></pre>
 
     <h3>Add to SSH agent</h3>
     <div class="code-block">
-      <button class="copy-btn" onclick="copy(this)">Copy</button>
+      <button class="copy-btn">Copy</button>
       <pre><code>eval "$(ssh-agent -s)"
 ssh-add ~/.ssh/id_ed25519</code></pre>
     </div>
 
     <h3>Configure SSH for Hetzner</h3>
     <div class="code-block">
-      <button class="copy-btn" onclick="copy(this)">Copy</button>
+      <button class="copy-btn">Copy</button>
       <pre><code>cat >> ~/.ssh/config &lt;&lt; 'EOF'
 Host hetzner-*
   User root
@@ -496,7 +497,7 @@ EOF</code></pre>
 
     <h2>Test your connection</h2>
     <div class="code-block">
-      <button class="copy-btn" onclick="copy(this)">Copy</button>
+      <button class="copy-btn">Copy</button>
       <pre><code>ssh -i ~/.ssh/id_ed25519 root@YOUR_SERVER_IP</code></pre>
     </div>
 
@@ -717,13 +718,13 @@ EOF</code></pre>
     <h3>Which should I use?</h3>
 
     <div class="code-block">
-      <button class="copy-btn" onclick="copy(this)">Copy</button>
+      <button class="copy-btn">Copy</button>
       <pre><code># Modern — recommended for terminal / VS Code / Linux workflows
 ssh-keygen -t ed25519 -C "your-email@example.com"</code></pre>
     </div>
 
     <div class="code-block">
-      <button class="copy-btn" onclick="copy(this)">Copy</button>
+      <button class="copy-btn">Copy</button>
       <pre><code># Legacy — use if you work heavily with PuTTY/WinSCP or enterprise systems
 # Also import this into PuTTYgen (File → Load) to get a .ppk for PuTTY/WinSCP
 ssh-keygen -t rsa -b 4096 -C "your-email@example.com"</code></pre>
@@ -737,24 +738,194 @@ ssh-keygen -t rsa -b 4096 -C "your-email@example.com"</code></pre>
     </div>
   </div>
 
+  <!-- ── Bitvise Client ── -->
+  <div class="tab-panel" id="tab-bitvise">
+    <h2>Bitvise SSH Client — The Windows Swiss Army Knife</h2>
+
+    <div class="success-box">
+      <div class="box-title">✓ One app to replace PuTTY + PuTTYgen + WinSCP — and then some</div>
+      Bitvise SSH Client is a free, feature-rich Windows application that combines a terminal emulator, SFTP file browser,
+      SSH tunnelling manager, and a built-in key pair generator &amp; manager — all in a single polished GUI.
+      If you prefer clicking over typing, this is the definitive SSH client for Windows.
+    </div>
+
+    <h3>Why Bitvise over the alternatives?</h3>
+    <table style="width:100%;border-collapse:collapse;font-size:12px;margin:12px 0">
+      <thead>
+        <tr style="border-bottom:1px solid var(--vscode-panel-border)">
+          <th style="text-align:left;padding:8px;color:var(--vscode-descriptionForeground)">Feature</th>
+          <th style="text-align:center;padding:8px;color:var(--vscode-descriptionForeground)">PuTTY</th>
+          <th style="text-align:center;padding:8px;color:var(--vscode-descriptionForeground)">WinSCP</th>
+          <th style="text-align:center;padding:8px;color:var(--vscode-descriptionForeground)">PuTTYgen</th>
+          <th style="text-align:center;padding:8px;color:var(--vscode-descriptionForeground)">Bitvise</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid var(--vscode-panel-border)">
+          <td style="padding:8px">SSH terminal emulator</td>
+          <td style="text-align:center;padding:8px">✅</td>
+          <td style="text-align:center;padding:8px">⚠ Basic</td>
+          <td style="text-align:center;padding:8px">❌</td>
+          <td style="text-align:center;padding:8px">✅</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--vscode-panel-border)">
+          <td style="padding:8px">SFTP file browser (GUI)</td>
+          <td style="text-align:center;padding:8px">❌</td>
+          <td style="text-align:center;padding:8px">✅</td>
+          <td style="text-align:center;padding:8px">❌</td>
+          <td style="text-align:center;padding:8px">✅</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--vscode-panel-border)">
+          <td style="padding:8px">Key pair generator</td>
+          <td style="text-align:center;padding:8px">❌</td>
+          <td style="text-align:center;padding:8px">❌</td>
+          <td style="text-align:center;padding:8px">✅</td>
+          <td style="text-align:center;padding:8px">✅</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--vscode-panel-border)">
+          <td style="padding:8px">Ed25519 support</td>
+          <td style="text-align:center;padding:8px">✅</td>
+          <td style="text-align:center;padding:8px">✅</td>
+          <td style="text-align:center;padding:8px">✅ v0.68+</td>
+          <td style="text-align:center;padding:8px">✅</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--vscode-panel-border)">
+          <td style="padding:8px">SSH tunnel / port forwarding</td>
+          <td style="text-align:center;padding:8px">✅</td>
+          <td style="text-align:center;padding:8px">⚠ Limited</td>
+          <td style="text-align:center;padding:8px">❌</td>
+          <td style="text-align:center;padding:8px">✅ Full GUI</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--vscode-panel-border)">
+          <td style="padding:8px">Export public key (OpenSSH format)</td>
+          <td style="text-align:center;padding:8px">❌</td>
+          <td style="text-align:center;padding:8px">❌</td>
+          <td style="text-align:center;padding:8px">✅</td>
+          <td style="text-align:center;padding:8px">✅ One click</td>
+        </tr>
+        <tr>
+          <td style="padding:8px">Price</td>
+          <td style="text-align:center;padding:8px">Free</td>
+          <td style="text-align:center;padding:8px">Free</td>
+          <td style="text-align:center;padding:8px">Free (bundled)</td>
+          <td style="text-align:center;padding:8px">✅ Free</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="info-box">
+      <div class="box-title">⬇ Download Bitvise SSH Client (free for personal and business use)</div>
+      Official download page: <a href="https://www.bitvise.com/ssh-client-download" target="_blank">https://www.bitvise.com/ssh-client-download</a><br>
+      Direct installer: <strong>BvSshClient-Inst.exe</strong> (~25 MB, no dependencies, works on Windows 8.1 through 11)<br><br>
+      Bitvise is developed and maintained by Bitvise Limited. It has been continuously updated since 2001 and is
+      widely used in both home and enterprise environments.
+    </div>
+
+    <hr>
+
+    <h2>Generating a key pair with the built-in Key Manager</h2>
+
+    <p>Bitvise includes its own key pair manager — no need to open a separate tool like PuTTYgen.</p>
+
+    <ol class="steps">
+      <li>Open Bitvise SSH Client. On the <strong>Login</strong> tab, locate the <strong>Client key manager</strong> button in the
+        <em>Authentication</em> section (bottom-left area) and click it.</li>
+      <li>In the Client Key Manager window, click <strong>Generate new</strong>.</li>
+      <li>In the <em>Key generation</em> dialog:
+        <ul style="margin-top:6px;margin-left:20px;font-size:13px;line-height:1.8">
+          <li>Set <strong>Key algorithm</strong> to <code>Ed25519</code> (recommended) or <code>RSA</code> if you need maximum compatibility</li>
+          <li>For RSA, set <strong>Key size</strong> to <code>4096</code> bits</li>
+          <li>Add a <strong>Comment</strong> (e.g. your email address) — this is optional but useful for identifying the key later</li>
+          <li>Set a <strong>Passphrase</strong> to protect the private key (strongly recommended)</li>
+        </ul>
+      </li>
+      <li>Click <strong>Generate</strong>. Bitvise generates the key pair immediately — no mouse wiggling required.</li>
+      <li>The new key appears in the key list. Click it once to select it.</li>
+    </ol>
+
+    <div class="warn-box">
+      <div class="box-title">⚠ Save your key pair now</div>
+      Bitvise stores keys in its own internal profile. To back up the private key or use it in other tools,
+      click <strong>Export</strong> in the Client Key Manager and save it as an OpenSSH key file (<code>.pem</code>).
+      Store this file somewhere safe — you cannot recover it if lost.
+    </div>
+
+    <hr>
+
+    <h2>Exporting the public key for Hetzner</h2>
+
+    <p>Hetzner requires the public key in <strong>OpenSSH wire format</strong> — a single line starting with
+    <code>ssh-ed25519</code> or <code>ssh-rsa</code>. Here is how to get it from Bitvise:</p>
+
+    <ol class="steps">
+      <li>In the <strong>Client Key Manager</strong>, select your key in the list.</li>
+      <li>Click <strong>Export</strong>.</li>
+      <li>In the export dialog, set <strong>Export format</strong> to <code>OpenSSH</code> and choose <strong>Public key only</strong>.</li>
+      <li>Save the file as <code>id_ed25519.pub</code> (or any name ending in <code>.pub</code>).</li>
+      <li>Open the file in Notepad — it is a single line of text. Copy the entire line.</li>
+      <li>Paste it into the <strong>+ Add SSH Key</strong> dialog in this extension.</li>
+    </ol>
+
+    <div class="success-box">
+      <div class="box-title">✓ Alternative — copy directly from Bitvise without saving a file</div>
+      In the <strong>Client Key Manager</strong>, select your key and click <strong>Export</strong>.
+      In the export dialog choose <strong>Copy to clipboard</strong> → <strong>OpenSSH public key</strong>.
+      Then paste directly into the extension's Add SSH Key dialog. No file needed.
+    </div>
+
+    <hr>
+
+    <h2>Using your Bitvise key to connect to Hetzner servers</h2>
+
+    <ol class="steps">
+      <li>After uploading the public key to Hetzner and creating a server with that key selected,
+        open Bitvise SSH Client.</li>
+      <li>On the <strong>Login</strong> tab:
+        <ul style="margin-top:6px;margin-left:20px;font-size:13px;line-height:1.8">
+          <li><strong>Host:</strong> your server IP address</li>
+          <li><strong>Port:</strong> <code>22</code></li>
+          <li><strong>Username:</strong> <code>root</code></li>
+          <li><strong>Initial method:</strong> <code>publickey</code></li>
+          <li><strong>Client key:</strong> select the key you just generated from the dropdown</li>
+        </ul>
+      </li>
+      <li>Click <strong>Log in</strong>. Bitvise opens both an SSH terminal tab and an SFTP file browser tab simultaneously.</li>
+    </ol>
+
+    <div class="info-box">
+      <div class="box-title">💡 Save your session as a profile</div>
+      Go to <strong>File → Save profile as…</strong> to save this connection as a named profile.
+      Next time, just open Bitvise and double-click the profile — username, host, port, and key are all pre-filled.
+    </div>
+  </div>
+
 </div><!-- /content -->
 
 <script nonce="${nonce}">
-function showTab(name, event) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('tab-' + name).classList.add('active');
-  event.target.closest('.tab').classList.add('active');
-}
-
-function copy(btn) {
-  const code = btn.nextElementSibling.textContent.trim();
-  navigator.clipboard.writeText(code).then(() => {
-    const orig = btn.textContent;
-    btn.textContent = 'Copied!';
-    setTimeout(() => btn.textContent = orig, 1800);
+(function () {
+  // Tab switching
+  document.querySelectorAll('.tab').forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      var name = tab.dataset.tab;
+      document.querySelectorAll('.tab').forEach(function (t) { t.classList.remove('active'); });
+      document.querySelectorAll('.tab-panel').forEach(function (p) { p.classList.remove('active'); });
+      document.getElementById('tab-' + name).classList.add('active');
+      tab.classList.add('active');
+    });
   });
-}
+
+  // Copy buttons
+  document.querySelectorAll('.copy-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var code = btn.nextElementSibling.textContent.trim();
+      navigator.clipboard.writeText(code).then(function () {
+        var orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(function () { btn.textContent = orig; }, 1800);
+      });
+    });
+  });
+})();
 </script>
 </body>
 </html>`;
