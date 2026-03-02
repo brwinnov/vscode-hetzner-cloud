@@ -1469,7 +1469,7 @@ function selectLocation(val, el) {
   document.querySelectorAll('#locationCards .card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
 }
-// Note: selectLocation is kept for backward compat but listeners are now wired via addEventListener in DOMContentLoaded
+// Note: selectLocation kept for backward compat; location selection now wired via addEventListener in DOMContentLoaded
 
 // ── Step 1: Server Types ───────────────────────────────────────────────────
 function filterTypes(filter, btn) {
@@ -1483,6 +1483,10 @@ function renderServerTypes(filter) {
   if (!container) { console.error('typeCards container not found'); return; }
   
   let types = SERVER_TYPES;
+  
+  // Apply CPU/architecture filters only
+  // Note: Location-based filtering removed (Hetzner API doesn't reliably include location availability)
+  // API will validate location+type combination at creation time
   if (filter === 'shared') types = types.filter(t => t.cpu_type === 'shared');
   if (filter === 'dedicated') types = types.filter(t => t.cpu_type === 'dedicated');
   if (filter === 'arm') types = types.filter(t => t.architecture === 'arm');

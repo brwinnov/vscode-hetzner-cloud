@@ -247,34 +247,28 @@ function renderHtml(s: HServer): string {
 <div class="header">
   <h1>${escHtml(s.name)}</h1>
   <span class="badge">${statusLabel(s.status)}</span>
-  <button class="btn-icon" onclick="send('refresh')" title="Refresh">↺ Refresh</button>
+  <button class="btn-icon" id="refreshBtn" title="Refresh">↺ Refresh</button>
 </div>
 
 <div id="loadingBar">⏳ Working…</div>
 
 <div class="actions">
-  <button class="btn btn-primary" onclick="send('start')"   ${isOn  ? 'disabled' : ''}>▶ Start</button>
-  <button class="btn btn-secondary" onclick="send('stop')"  ${isOff ? 'disabled' : ''}>■ Stop</button>
-  <button class="btn btn-secondary" onclick="send('reboot')"${isOff ? 'disabled' : ''}>↺ Reboot</button>
-  <button class="btn btn-secondary" onclick="send('ssh')"   ${ipv4 === '—' && ipv6 === '—' ? 'disabled' : ''}>⌨ Open SSH Terminal</button>
-  <button class="btn btn-danger"    onclick="send('delete')">✕ Delete</button>
+  <button class="btn btn-primary" id="startBtn"   ${isOn  ? 'disabled' : ''}>▶ Start</button>
+  <button class="btn btn-secondary" id="stopBtn"  ${isOff ? 'disabled' : ''}>■ Stop</button>
+  <button class="btn btn-secondary" id="rebootBtn"${isOff ? 'disabled' : ''}>↺ Reboot</button>
+  <button class="btn btn-secondary" id="sshBtn"   ${ipv4 === '—' && ipv6 === '—' ? 'disabled' : ''}>⌨ Open SSH Terminal</button>
+  <button class="btn btn-danger" id="deleteBtn">✕ Delete</button>
 </div>
 
 <div class="section">
   <div class="section-title">Network</div>
   <table>
-    ${row('IPv4', `<span>${ipv4}</span>`)}
-    ${row('IPv6', `<span>${ipv6}</span>`)}
-  </table>
-</div>
-
+    ${row('IPv4', ipv4)}
+    ${row('IPv6', ipv6)}
 <div class="section">
   <div class="section-title">SSH Command</div>
   <div class="code">
-    <span>${sshCmd}</span>
-    <button class="copy-btn" onclick="copyText('${sshCmd}')">Copy</button>
-  </div>
-</div>
+    <span id="sshCmdText">${sshCmd}</span>
 
 <div class="section">
   <div class="section-title">Specification</div>
@@ -323,6 +317,29 @@ window.addEventListener('message', e => {
   if (e.data.command === 'clearLoading') {
     document.getElementById('loadingBar').style.display = 'none';
     document.querySelectorAll('.btn').forEach(b => b.disabled = false);
+  }
+});
+
+// Wire button event listeners (CSP-compliant)
+document.addEventListener('DOMContentLoaded', () => {
+  const btns = {
+    refreshBtn: 'refresh',
+    startBtn: 'start',
+    stopBtn: 'stop',
+    rebootBtn: 'reboot',
+    sshBtn: 'ssh',
+    deleteBtn: 'delete'
+  };
+  Object.entries(btns).forEach(([id, cmd]) => {
+    const btn = document.getElementById(id);
+    if (btn) btn.addEventListener('click', () => vscode.postMessage({ command: cmd }));
+  });
+  
+  // Wire copy button
+  const copyBtn = document.getElementById('copySshBtn');
+  if (copyBtn) {
+    const sshText = document.getElementById('sshCmdText')?.textContent || '';
+    copyBtn.addEventListener('click', () => copyText(sshText));
   }
 });
 </script>
