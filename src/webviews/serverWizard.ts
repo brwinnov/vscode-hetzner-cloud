@@ -1669,12 +1669,9 @@ function createNetworkFromWizard() {
 function createSubnetFromWizard(btn) {
   const networkId = parseInt(btn.dataset.networkId, 10);
   const networkZone = btn.dataset.networkZone || 'eu-central';
-  // Prompt for subnet CIDR
-  const cidr = prompt('Enter subnet CIDR range (e.g. 10.0.1.0/24):', '10.0.1.0/24');
-  if (!cidr) return;
   vscode.postMessage({ 
     command: 'createSubnet', 
-    payload: { networkId, ipRange: cidr, networkZone } 
+    payload: { networkId, networkZone } 
   });
 }
 
