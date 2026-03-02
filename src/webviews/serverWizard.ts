@@ -80,7 +80,6 @@ export class ServerWizardPanel {
 
     try {
       const cfg = vscode.workspace.getConfiguration('hcloud');
-      const tailscaleCfg = vscode.workspace.getConfiguration('hcloud.tailscale');
 
       const [locations, serverTypes, systemImages, snapshots, sshKeys, networks] =
         await Promise.all([
@@ -98,11 +97,18 @@ export class ServerWizardPanel {
         images: [...systemImages, ...snapshots],
         sshKeys,
         networks,
-        tailscaleEnabled: tailscaleCfg.get<boolean>('enableByDefault', true),
+        tailscaleEnabled: false,  // Default disabled; only enable if token exists
         defaultRegion: cfg.get<string>('defaultRegion', 'nbg1'),
       };
 
       this.panel.webview.html = getWizardHtml(data);
+      
+      // Check if Tailscale key exists and send initial state to webview
+      const tsKey = await this.tailscaleKeyManager.getAuthKey();
+      this.panel.webview.postMessage({ 
+        command: 'tailscaleTokenExists',
+        hasToken: !!tsKey
+      });
     } catch (err: unknown) {
       this.panel.webview.html = getErrorHtml((err as Error).message);
     }
@@ -232,6 +238,30 @@ export class ServerWizardPanel {
         vscode.window.showInformationMessage(
           `Storage Box mount config injected into cloud-init (${mounts.length} box${mounts.length > 1 ? 'es' : ''}).`
         );
+        break;
+      }
+      case 'createSubnet': {
+        const payload = msg.payload as { networkId: number; ipRange: string; networkZone: string };
+        const name = await vscode.window.showInputBox({
+          title: 'Create Subnet',
+          prompt: 'Enter the subnet CIDR range (must be within parent network)',
+          placeHolder: '10.0.1.0/24',
+          validateInput: (v) => {
+            if (!v?.trim()) return 'Subnet CIDR cannot be empty';
+            if (!/^\d+\.\d+\.\d+\.\d+\/\d+$/.test(v.trim())) return 'Must be a valid CIDR range';
+            return undefined;
+          },
+        });
+        if (!name) break;
+        
+        try {
+          await this.client.addSubnet(payload.networkId, name.trim(), payload.networkZone);
+          const updatedNetworks = await this.client.getNetworks();
+          this.panel.webview.postMessage({ command: 'networksUpdated', networks: updatedNetworks });
+          vscode.window.showInformationMessage(`Subnet "${name}" created.`);
+        } catch (err: unknown) {
+          vscode.window.showErrorMessage(`Failed to create subnet: ${(err as Error).message}`);
+        }
         break;
       }
     }
@@ -800,10 +830,19 @@ function getWizardHtml(data: WizardData): string {
     color: #fff;
   }
 
+  .network-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
   .empty-state {
-    text-align: center;
-    padding: 32px;
+    text-align: left;
+    padding: 16px;
     color: var(--vscode-descriptionForeground);
+    background: rgba(128,128,128,0.08);
+    border-radius: 6px;
+    border-left: 3px solid var(--vscode-panelBorder);
     font-size: 13px;
   }
 </style>
@@ -927,7 +966,7 @@ function getWizardHtml(data: WizardData): string {
     <!-- ── Step 4: Network ── -->
     <div class="step-panel" id="step4">
       <h1>Network</h1>
-      <p class="subtitle">Attach private networks (optional). The server always gets a public IPv4 address.</p>
+      <p class="subtitle">Each server always gets a public IPv4. Optionally attach it to one or more private networks for internal communication.</p>
 
       <div class="toggle-row" style="margin-bottom:16px">
         <div>
@@ -937,14 +976,28 @@ function getWizardHtml(data: WizardData): string {
         <span style="font-size:11px;padding:2px 8px;border-radius:10px;background:var(--vscode-testing-iconPassed,#73c991);color:#000">Always on</span>
       </div>
 
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-        <label style="margin:0;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em">Private Networks</label>
-        <button class="btn-secondary" style="padding:4px 12px;font-size:12px" data-action="create-network">+ Create Network</button>
+      <div style="background:rgba(0,100,200,0.1);padding:12px;border-radius:8px;border-left:3px solid var(--vscode-focusBorder);margin-bottom:16px;font-size:12px;line-height:1.5">
+        <strong>💡 Network Best Practice:</strong><br/>
+        • <strong>One network per project:</strong> Complete isolation (recommended)<br/>
+        • <strong>Multiple subnets:</strong> For environments or regions within one network<br/>
+        • Servers in the same network can communicate privately<br/>
+        • Consider zone-specific subnets for multi-region setups
       </div>
 
-      <div id="networkCards" class="check-cards"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <label style="margin:0;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em">Private Networks (Optional)</label>
+        <button class="btn-secondary" style="padding:4px 12px;font-size:12px" data-action="create-network">+ Create New Network</button>
+      </div>
+
+      <div id="networkCards" class="network-list"></div>
       <div id="noNetworksMsg" class="empty-state" style="display:none">
-        No private networks yet. Click "+ Create Network" to add one, or continue with public IP only.
+        <p><strong>No private networks created yet.</strong></p>
+        <p>Options:</p>
+        <ul style="margin:8px 0;padding-left:24px">
+          <li>Create a new network now with "+ Create New Network"</li>
+          <li>Continue with public IP only (no private network)</li>
+          <li>Attach to a network later via the Networks tree view</li>
+        </ul>
       </div>
 
       <div class="actions">
@@ -964,7 +1017,7 @@ function getWizardHtml(data: WizardData): string {
           <div class="toggle-sub">Installs Tailscale and activates it on first boot</div>
         </div>
         <label class="toggle">
-          <input type="checkbox" id="tailscaleToggle" ${data.tailscaleEnabled ? 'checked' : ''} onchange="updateTailscaleState()"/>
+          <input type="checkbox" id="tailscaleToggle" disabled title="Tailscale auth key not configured. Click 'Set Tailscale Key' to enable." />
           <span class="toggle-slider"></span>
         </label>
       </div>
@@ -1049,8 +1102,26 @@ window.addEventListener('message', (e) => {
   const msg = e.data;
   if (msg.command === 'setLoading') showLoading(msg.message);
   if (msg.command === 'error') { hideLoading(); showError(msg.message); }
+  if (msg.command === 'tailscaleTokenExists') {
+    const toggle = document.getElementById('tailscaleToggle');
+    const banner = document.getElementById('tailscaleKeyBanner');
+    if (msg.hasToken) {
+      // Token exists: enable toggle, hide banner
+      toggle.disabled = false;
+      toggle.title = 'Enable Tailscale auto-install on this server';
+      banner.style.display = 'none';
+    } else {
+      // No token: disable toggle, show banner with hint
+      toggle.disabled = true;
+      toggle.checked = false;
+      toggle.title = 'Tailscale auth key not configured. Click "Set Tailscale Key" to configure.';
+      banner.style.display = 'block';
+    }
+  }
   if (msg.command === 'tailscaleKeySet') {
     document.getElementById('tailscaleKeyBanner').style.display = 'none';
+    document.getElementById('tailscaleToggle').disabled = false;
+    document.getElementById('tailscaleToggle').title = 'Enable Tailscale auto-install on this server';
   }
   if (msg.command === 'sshKeysUpdated') {
     SSH_KEYS = msg.keys;
@@ -1096,36 +1167,45 @@ document.addEventListener('DOMContentLoaded', () => {
   updateTailscaleState();
 
   // Wire location card listeners (CSP: remove inline onclick, use addEventListener)
-  document.getElementById('locationCards').addEventListener('click', (e) => {
-    const card = e.target.closest('.card[data-location]');
-    if (!card) return;
-    const location = card.dataset.location;
-    state.location = location;
-    document.querySelectorAll('#locationCards .card').forEach(c => c.classList.remove('selected'));
-    card.classList.add('selected');
-  });
+  const locationCardsDiv = document.getElementById('locationCards');
+  if (locationCardsDiv) {
+    locationCardsDiv.addEventListener('click', (e) => {
+      const card = e.target.closest('.card[data-location]');
+      if (!card) return;
+      const location = card.dataset.location;
+      state.location = location;
+      document.querySelectorAll('#locationCards .card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+    });
+  }
 
   // Wire server type card listeners
-  document.getElementById('typeCards').addEventListener('click', (e) => {
-    const card = e.target.closest('.card[data-server-type]');
-    if (!card) return;
-    const serverType = card.dataset.serverType;
-    state.serverType = serverType;
-    document.querySelectorAll('#typeCards .card').forEach(c => c.classList.remove('selected'));
-    card.classList.add('selected');
-  });
+  const typeCardsDiv = document.getElementById('typeCards');
+  if (typeCardsDiv) {
+    typeCardsDiv.addEventListener('click', (e) => {
+      const card = e.target.closest('.card[data-server-type]');
+      if (!card) return;
+      const serverType = card.dataset.serverType;
+      state.serverType = serverType;
+      document.querySelectorAll('#typeCards .card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+    });
+  }
 
   // Wire image card listeners
-  document.getElementById('imageCards').addEventListener('click', (e) => {
-    const card = e.target.closest('.card[data-image]');
-    if (!card) return;
-    const image = card.dataset.image;
-    const imageDisplay = card.dataset.imageDisplay;
-    state.image = image;
-    state.imageDisplay = imageDisplay;
-    document.querySelectorAll('#imageCards .card').forEach(c => c.classList.remove('selected'));
-    card.classList.add('selected');
-  });
+  const imageCardsDiv = document.getElementById('imageCards');
+  if (imageCardsDiv) {
+    imageCardsDiv.addEventListener('click', (e) => {
+      const card = e.target.closest('.card[data-image]');
+      if (!card) return;
+      const image = card.dataset.image;
+      const imageDisplay = card.dataset.imageDisplay;
+      state.image = image;
+      state.imageDisplay = imageDisplay;
+      document.querySelectorAll('#imageCards .card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+    });
+  }
 
   // Wire server type filter tabs
   const typeFilterDiv = document.getElementById('typeFilter');
@@ -1207,7 +1287,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.actions').forEach(actionDiv => {
     actionDiv.querySelectorAll('button').forEach(btn => {
       const text = btn.textContent.trim();
-      if (text.startsWith('Next')) {
+      if (text.startsWith('Next') || text.startsWith('Review')) {
         btn.addEventListener('click', () => {
           const step = Array.from(document.querySelectorAll('.step-panel')).findIndex(p => p.classList.contains('active'));
           nextStep(step);
@@ -1219,10 +1299,82 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       } else if (text.startsWith('Cancel')) {
         btn.addEventListener('click', cancel);
-      } else if (text.startsWith('Create')) {
-        btn.addEventListener('click', createServer);
       }
     });
+  });
+
+  // Wire Create Server button by ID (special handling since button text starts with emoji)
+  const createBtn = document.getElementById('createBtn');
+  if (createBtn) {
+    createBtn.addEventListener('click', createServer);
+  }
+
+  // Wire Tailscale toggle listener
+  const tailscaleToggle = document.getElementById('tailscaleToggle');
+  if (tailscaleToggle) {
+    tailscaleToggle.addEventListener('change', updateTailscaleState);
+  }
+
+  // Wire SSH key card listeners (CSP: use event delegation)
+  const sshKeyCardsDiv = document.getElementById('sshKeyCards');
+  if (sshKeyCardsDiv) {
+    sshKeyCardsDiv.addEventListener('click', (e) => {
+      const card = e.target.closest('.check-card[data-key-name]');
+      if (!card) return;
+      const keyName = card.dataset.keyName;
+      if (state.sshKeys.includes(keyName)) {
+        state.sshKeys = state.sshKeys.filter(k => k !== keyName);
+        card.classList.remove('selected');
+        card.querySelector('.check-icon').textContent = '';
+      } else {
+        state.sshKeys.push(keyName);
+        card.classList.add('selected');
+        card.querySelector('.check-icon').textContent = '✓';
+      }
+    });
+  }
+
+  // Wire network card listeners (CSP: use event delegation)
+  const networkCardsDiv = document.getElementById('networkCards');
+  if (networkCardsDiv) {
+    networkCardsDiv.addEventListener('click', (e) => {
+      const card = e.target.closest('.check-card[data-network-id]');
+      if (!card) return;
+      const networkId = parseInt(card.dataset.networkId, 10);
+      if (state.networks.includes(networkId)) {
+        state.networks = state.networks.filter(n => n !== networkId);
+        card.classList.remove('selected');
+        card.querySelector('.check-icon').textContent = '';
+      } else {
+        state.networks.push(networkId);
+        card.classList.add('selected');
+        card.querySelector('.check-icon').textContent = '✓';
+      }
+    });
+  }
+
+  // Wire data-action button listeners (CSP: delegate all action buttons)
+  document.addEventListener('click', (e) => {
+    const actionEl = e.target.closest('[data-action]');
+    if (!actionEl) return;
+    const action = actionEl.dataset.action;
+    if (action === 'add-ssh-key') {
+      addSshKeyFromWizard();
+    } else if (action === 'create-network') {
+      createNetworkFromWizard();
+    } else if (action === 'create-subnet') {
+      createSubnetFromWizard(actionEl);
+    } else if (action === 'set-tailscale-key') {
+      setTailscaleKey();
+    } else if (action === 'save-cloud-init-template') {
+      saveCloudInitTemplate();
+    } else if (action === 'load-cloud-init-template') {
+      loadCloudInitTemplate();
+    } else if (action === 'delete-cloud-init-template') {
+      deleteCloudInitTemplate();
+    } else if (action === 'request-storage-box-mounts') {
+      requestStorageBoxMounts();
+    }
   });
 });
 
@@ -1294,7 +1446,14 @@ function validateStep(step) {
 // ── Step 0: Locations ──────────────────────────────────────────────────────
 function renderLocations() {
   const container = document.getElementById('locationCards');
+  if (!container) { console.error('locationCards container not found'); return; }
+  
   const locationFlags = { nbg1:'🇩🇪', fsn1:'🇩🇪', hel1:'🇫🇮', ash:'🇺🇸', hil:'🇺🇸', sin:'🇸🇬' };
+  if (LOCATIONS.length === 0) {
+    container.innerHTML = '<div class="empty-state">No locations available.</div>';
+    return;
+  }
+  
   container.innerHTML = LOCATIONS.map(l => \`
     <div class="card \${l.name === state.location ? 'selected' : ''}"
          data-location="\${l.name}">
@@ -1321,10 +1480,17 @@ function filterTypes(filter, btn) {
 
 function renderServerTypes(filter) {
   const container = document.getElementById('typeCards');
+  if (!container) { console.error('typeCards container not found'); return; }
+  
   let types = SERVER_TYPES;
   if (filter === 'shared') types = types.filter(t => t.cpu_type === 'shared');
   if (filter === 'dedicated') types = types.filter(t => t.cpu_type === 'dedicated');
   if (filter === 'arm') types = types.filter(t => t.architecture === 'arm');
+
+  if (types.length === 0) {
+    container.innerHTML = '<div class="empty-state">No server types found.</div>';
+    return;
+  }
 
   container.innerHTML = types.map(t => \`
     <div class="card \${t.name === state.serverType ? 'selected' : ''}"
@@ -1362,6 +1528,8 @@ function filterImages(filter, btn) {
 
 function renderImages() {
   const container = document.getElementById('imageCards');
+  if (!container) { console.error('imageCards container not found'); return; }
+  
   const search = (document.getElementById('imageSearch').value || '').toLowerCase();
   const osIcons = { ubuntu:'🟠', debian:'🔴', fedora:'💙', centos:'🟣', rocky:'🟢', alma:'🔵', default:'📦' };
 
@@ -1398,14 +1566,21 @@ function selectImage(val, display, el) {
 // ── Step 3: SSH Keys ───────────────────────────────────────────────────────
 function renderSshKeys() {
   const container = document.getElementById('sshKeyCards');
+  if (!container) { console.error('sshKeyCards container not found'); return; }
+  
   if (SSH_KEYS.length === 0) {
-    document.getElementById('noSshKeysMsg').style.display = 'block';
+    const noMsg = document.getElementById('noSshKeysMsg');
+    if (noMsg) noMsg.style.display = 'block';
     container.style.display = 'none';
     return;
   }
+  const noMsg = document.getElementById('noSshKeysMsg');
+  if (noMsg) noMsg.style.display = 'none';
+  container.style.display = 'block';
+  
   container.innerHTML = SSH_KEYS.map(k => \`
     <label class="check-card \${state.sshKeys.includes(k.name) ? 'selected' : ''}"
-           onclick="toggleSshKey(\${JSON.stringify(k.name)}, this)">
+           data-key-name="\${h(k.name)}">
       <div class="check-icon">\${state.sshKeys.includes(k.name) ? '✓' : ''}</div>
       <div>
         <div style="font-size:13px;font-weight:600">\${h(k.name)}</div>
@@ -1430,20 +1605,44 @@ function toggleSshKey(name, el) {
 // ── Step 4: Networks ───────────────────────────────────────────────────────
 function renderNetworks() {
   const container = document.getElementById('networkCards');
+  if (!container) { console.error('networkCards container not found'); return; }
+  
   if (NETWORKS.length === 0) {
-    document.getElementById('noNetworksMsg').style.display = 'block';
+    const noMsg = document.getElementById('noNetworksMsg');
+    if (noMsg) noMsg.style.display = 'block';
     container.style.display = 'none';
     return;
   }
+  container.style.display = 'block';
+  const noMsg = document.getElementById('noNetworksMsg');
+  if (noMsg) noMsg.style.display = 'none';
+  
   container.innerHTML = NETWORKS.map(n => \`
-    <label class="check-card \${state.networks.includes(n.id) ? 'selected' : ''}"
-           onclick="toggleNetwork(\${n.id}, this)">
-      <div class="check-icon">\${state.networks.includes(n.id) ? '✓' : ''}</div>
-      <div>
-        <div style="font-size:13px;font-weight:600">\${h(n.name)}</div>
-        <div style="font-size:11px;color:var(--vscode-descriptionForeground)">\${h(n.ip_range)}</div>
+    <div style="margin-bottom:12px;border:1px solid var(--vscode-panel-border);border-radius:6px;overflow:hidden">
+      <label class="check-card \${state.networks.includes(n.id) ? 'selected' : ''}"
+             data-network-id="\${n.id}"
+             style="border-radius:0;margin:0;border-bottom:1px solid var(--vscode-panel-border)">
+        <div class="check-icon">\${state.networks.includes(n.id) ? '✓' : ''}</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:600">\${h(n.name)}</div>
+          <div style="font-size:11px;color:var(--vscode-descriptionForeground)">Network: \${h(n.ip_range)}</div>
+        </div>
+      </label>
+      <div style="background:rgba(128,128,128,0.1);padding:8px;border-radius:0">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <div style="font-size:10px;font-weight:600;color:var(--vscode-descriptionForeground);text-transform:uppercase">Subnets (\${n.subnets?.length || 0})</div>
+          <button class="btn-secondary" style="padding:2px 8px;font-size:10px" data-action="create-subnet" data-network-id="\${n.id}" data-network-zone="\${h(n.network_zone || 'eu-central')}">+ Add Subnet</button>
+        </div>
+        \${n.subnets && n.subnets.length > 0 
+          ? n.subnets.map(s => \`
+              <div style="font-size:10px;padding:4px 0;color:var(--vscode-foreground)">
+                📍 \${h(s.ip_range)} · Zone: <strong>\${h(s.network_zone)}</strong>
+              </div>
+            \`).join('')
+          : '<div style="font-size:10px;color:var(--vscode-descriptionForeground);font-style:italic">No subnets yet</div>'
+        }
       </div>
-    </label>
+    </div>
   \`).join('');
 }
 
@@ -1467,6 +1666,18 @@ function createNetworkFromWizard() {
   vscode.postMessage({ command: 'createNetwork' });
 }
 
+function createSubnetFromWizard(btn) {
+  const networkId = parseInt(btn.dataset.networkId, 10);
+  const networkZone = btn.dataset.networkZone || 'eu-central';
+  // Prompt for subnet CIDR
+  const cidr = prompt('Enter subnet CIDR range (e.g. 10.0.1.0/24):', '10.0.1.0/24');
+  if (!cidr) return;
+  vscode.postMessage({ 
+    command: 'createSubnet', 
+    payload: { networkId, ipRange: cidr, networkZone } 
+  });
+}
+
 // ── Step 5: Cloud-init / Tailscale ─────────────────────────────────────────
 function updateTailscaleState() {
   state.tailscaleEnabled = document.getElementById('tailscaleToggle').checked;
@@ -1485,7 +1696,7 @@ function renderSummary() {
     ['Server Type', state.serverType],
     ['OS Image', state.imageDisplay || state.image],
     ['SSH Keys', state.sshKeys.length ? state.sshKeys.join(', ') : 'None'],
-    ['Networks', state.networks.length ? state.networks.length + ' network(s)' : 'Public only'],
+    ['Networks', state.networks.length ? state.networks.length + ' network(s)' : 'None (public IP only)'],
     ['Tailscale', state.tailscaleEnabled ? '✓ Auto-install enabled' : '✗ Disabled'],
     ['Cloud-init', state.cloudInit.trim() ? '✓ Custom script provided' : 'None'],
   ];
