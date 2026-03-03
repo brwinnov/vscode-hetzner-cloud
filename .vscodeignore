@@ -8,6 +8,10 @@ esbuild.js
 codereview
 PLAN.md
 overview.md
+verdict01.md
 .gitignore
 .vscode
 dist/extension.js.map
+.venv
+**/.venv/**
+.cache_ggshield
