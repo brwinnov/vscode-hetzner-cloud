@@ -12,14 +12,13 @@
 
 </div>
 
----
-
 ## Install / Download
 
-- **[VS Marketplace (recommended)](https://marketplace.visualstudio.com/items?itemName=brwinnov.vscode-hetzner-cloud)**
-- **[GitHub Releases](https://github.com/brwinnov/vscode-hetzner-cloud/releases)**
-- **[Direct VSIX download](https://github.com/brwinnov/vscode-hetzner-cloud/releases/latest/download/vscode-hetzner-cloud.vsix)**
-	- If the direct link returns 404, download the `.vsix` asset from the latest release page above.
+**[VS Marketplace (recommended)](https://marketplace.visualstudio.com/items?itemName=brwinnov.vscode-hetzner-cloud)**
+
+**[GitHub Releases](https://github.com/brwinnov/vscode-hetzner-cloud/releases)**
+
+**[Direct VSIX download](https://github.com/brwinnov/vscode-hetzner-cloud/releases/latest/download/vscode-hetzner-cloud.vsix)** — If the direct link returns 404, download the `.vsix` asset from the latest release page above.
 
 ---
 
