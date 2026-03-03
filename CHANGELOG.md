@@ -6,6 +6,36 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.1.1] - 2026-03-03
+
+### Fixed
+- README formatting: left-aligned install links with hidden URLs for cleaner presentation
+- Improved .vscodeignore to exclude development files from package
+
+### Added
+- Welcome page link in Setup section for easy re-access
+- Cloud Console placeholder (Coming Soon) in Setup section
+- Future feature ideas for API token management
+
+---
+
+## [0.1.0] - 2026-03-02
+
+### Initial Release
+- Core server management (CRUD, power controls, details panel)
+- Multi-project support with secure token storage
+- Network and subnet management
+- SSH key management with generation guide
+- Firewall rules and management
+- Volume management (create, attach, detach, resize)
+- Load balancer management
+- Storage box mounting via Robot API
+- Tailscale integration with auto-install
+- Cloud-init template library
+- Welcome page and comprehensive onboarding
+
+---
+
 ## [Unreleased]
 
 ### Planned
