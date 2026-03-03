@@ -129,9 +129,10 @@ gantt
 
 | # | Feature | Notes |
 |---|---------|-------|
-| 12 | **Multiple API tokens per project** | Support adding multiple tokens for same project (token rotation, different access levels). Current: 1 token = 1 project. Note: Hetzner Cloud API tokens are per-project only (no global account token exists). |
-| 13 | **Token metadata & labels** | Label tokens by purpose (e.g. "Production Read-Only", "Staging Full Access") for better organization |
-| 14 | **API token health check** | Periodic validation to detect expired/revoked tokens; show warning icon in Projects tree |
+| 12 | **Custom Cloud Console WebView** | Embedded Hetzner Cloud Console inside VS Code with custom design/skin/layout. Would show login page → custom dashboard. Coming Soon placeholder added to Setup section. |
+| 13 | **Multiple API tokens per project** | Support adding multiple tokens for same project (token rotation, different access levels). Current: 1 token = 1 project. Note: Hetzner Cloud API tokens are per-project only (no global account token exists). |
+| 14 | **Token metadata & labels** | Label tokens by purpose (e.g. "Production Read-Only", "Staging Full Access") for better organization |
+| 15 | **API token health check** | Periodic validation to detect expired/revoked tokens; show warning icon in Projects tree |
 
 ---
 

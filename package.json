@@ -42,6 +42,11 @@
         "icon": "$(home)"
       },
       {
+        "command": "hcloud.cloudConsole",
+        "title": "Hetzner Cloud: Cloud Console (Coming Soon)",
+        "icon": "$(globe)"
+      },
+      {
         "command": "hcloud.addToken",
         "title": "Hetzner Cloud: Add API Token",
         "icon": "$(add)"
