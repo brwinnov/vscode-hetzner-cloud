@@ -699,9 +699,9 @@ function getWizardHtml(data: WizardData): string {
   .actions {
     display: flex;
     gap: 10px;
-    margin-top: 32px;
-    padding-top: 20px;
-    border-top: 1px solid var(--vscode-panel-border);
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--vscode-panel-border);
   }
 
   button {
@@ -877,6 +877,11 @@ function getWizardHtml(data: WizardData): string {
       <h1>Basics</h1>
       <p class="subtitle">Name your server and choose a datacenter location.</p>
 
+      <div class="actions">
+        <button class="btn-secondary">Cancel</button>
+        <button class="btn-primary ml-auto">Next →</button>
+      </div>
+
       <div class="field">
         <label>Server Name</label>
         <input type="text" id="serverName" placeholder="e.g. web-01" autocomplete="off" />
@@ -887,17 +892,17 @@ function getWizardHtml(data: WizardData): string {
         <label>Datacenter Location</label>
         <div class="cards wide" id="locationCards"></div>
       </div>
-
-      <div class="actions">
-        <button class="btn-secondary">Cancel</button>
-        <button class="btn-primary ml-auto">Next →</button>
-      </div>
     </div>
 
     <!-- ── Step 1: Server Type ── -->
     <div class="step-panel" id="step1">
       <h1>Server Type</h1>
       <p class="subtitle">Choose the CPU, RAM, and disk configuration.</p>
+
+      <div class="actions">
+        <button class="btn-secondary">← Back</button>
+        <button class="btn-primary ml-auto">Next →</button>
+      </div>
 
       <div class="filter-tabs" id="typeFilter">
         <button class="filter-tab active">All</button>
@@ -907,17 +912,17 @@ function getWizardHtml(data: WizardData): string {
       </div>
 
       <div class="cards wide" id="typeCards"></div>
-
-      <div class="actions">
-        <button class="btn-secondary">← Back</button>
-        <button class="btn-primary ml-auto">Next →</button>
-      </div>
     </div>
 
     <!-- ── Step 2: OS Image ── -->
     <div class="step-panel" id="step2">
       <h1>OS Image</h1>
       <p class="subtitle">Select a system image, snapshot, or enter a custom image.</p>
+
+      <div class="actions">
+        <button class="btn-secondary">← Back</button>
+        <button class="btn-primary ml-auto">Next →</button>
+      </div>
 
       <div class="filter-tabs" id="imageFilter">
         <button class="filter-tab active">System</button>
@@ -939,11 +944,6 @@ function getWizardHtml(data: WizardData): string {
           <div class="field-hint">Enter a Hetzner image ID, snapshot ID, or ISO name not listed in the catalog.</div>
         </div>
       </div>
-
-      <div class="actions">
-        <button class="btn-secondary">← Back</button>
-        <button class="btn-primary ml-auto">Next →</button>
-      </div>
     </div>
 
     <!-- ── Step 3: SSH Keys ── -->
@@ -951,15 +951,15 @@ function getWizardHtml(data: WizardData): string {
       <h1>SSH Keys</h1>
       <p class="subtitle">Select which SSH keys to authorize on this server. Multiple allowed.</p>
 
-      <div id="sshKeyCards" class="check-cards"></div>
-      <div id="noSshKeysMsg" class="empty-state" style="display:none">
-        No SSH keys found. Proceeding without one will generate a root password shown after creation.
-      </div>
-
       <div class="actions">
         <button class="btn-secondary">← Back</button>
         <button class="btn-secondary" data-action="add-ssh-key">+ Add SSH Key</button>
         <button class="btn-primary ml-auto">Next →</button>
+      </div>
+
+      <div id="sshKeyCards" class="check-cards"></div>
+      <div id="noSshKeysMsg" class="empty-state" style="display:none">
+        No SSH keys found. Proceeding without one will generate a root password shown after creation.
       </div>
     </div>
 
@@ -967,6 +967,11 @@ function getWizardHtml(data: WizardData): string {
     <div class="step-panel" id="step4">
       <h1>Network</h1>
       <p class="subtitle">Each server always gets a public IPv4. Optionally attach it to one or more private networks for internal communication.</p>
+
+      <div class="actions">
+        <button class="btn-secondary">← Back</button>
+        <button class="btn-primary ml-auto">Next →</button>
+      </div>
 
       <div class="toggle-row" style="margin-bottom:16px">
         <div>
@@ -999,17 +1004,17 @@ function getWizardHtml(data: WizardData): string {
           <li>Attach to a network later via the Networks tree view</li>
         </ul>
       </div>
-
-      <div class="actions">
-        <button class="btn-secondary">← Back</button>
-        <button class="btn-primary ml-auto">Next →</button>
-      </div>
     </div>
 
     <!-- ── Step 5: Cloud-init ── -->
     <div class="step-panel" id="step5">
       <h1>Cloud-init &amp; Tailscale</h1>
       <p class="subtitle">Customize startup scripts. Tailscale is injected automatically when enabled.</p>
+
+      <div class="actions">
+        <button class="btn-secondary">← Back</button>
+        <button class="btn-primary ml-auto">Review →</button>
+      </div>
 
       <div class="toggle-row">
         <div>
@@ -1041,11 +1046,6 @@ function getWizardHtml(data: WizardData): string {
           <button class="btn-secondary" style="font-size:12px;padding:4px 10px" data-action="request-storage-box-mounts">&#128230; Mount Storage Boxes</button>
         </div>
       </div>
-
-      <div class="actions">
-        <button class="btn-secondary">← Back</button>
-        <button class="btn-primary ml-auto">Review →</button>
-      </div>
     </div>
 
     <!-- ── Step 6: Review ── -->
@@ -1053,14 +1053,14 @@ function getWizardHtml(data: WizardData): string {
       <h1>Review &amp; Create</h1>
       <p class="subtitle">Confirm your configuration before creating the server.</p>
 
-      <div id="errorBanner" class="banner"></div>
-
-      <div class="summary" id="summaryTable"></div>
-
       <div class="actions">
         <button class="btn-secondary">← Back</button>
         <button class="btn-primary ml-auto" id="createBtn">⚡ Create Server</button>
       </div>
+
+      <div id="errorBanner" class="banner"></div>
+
+      <div class="summary" id="summaryTable"></div>
     </div>
 
   </div><!-- /main -->

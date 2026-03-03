@@ -22,6 +22,15 @@ export class SetupProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
     const hasProject = projects.length > 0;
     const items: vscode.TreeItem[] = [];
 
+    // Welcome Page
+    const welcome = new vscode.TreeItem('🏠 Welcome');
+    welcome.iconPath = new vscode.ThemeIcon('home');
+    welcome.description = 'Open welcome page';
+    welcome.tooltip = 'Open the Hetzner Cloud Toolkit welcome page';
+    welcome.command = { command: 'hcloud.welcome', title: 'Open Welcome Page' };
+    welcome.contextValue = 'setup-welcome';
+    items.push(welcome);
+
     // Task 1: Add API Key
     const addToken = new vscode.TreeItem('Add Hetzner Project API Key');
     addToken.iconPath = hasProject
