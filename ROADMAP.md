@@ -125,6 +125,14 @@ gantt
 | 10 | **Load balancers** | Basic CRUD |
 | 11 | **Marketplace publish** | `vsce package` + `vsce publish` — assets already ready |
 
+### Future Ideas
+
+| # | Feature | Notes |
+|---|---------|-------|
+| 12 | **Multiple API tokens per project** | Support adding multiple tokens for same project (token rotation, different access levels). Current: 1 token = 1 project. Note: Hetzner Cloud API tokens are per-project only (no global account token exists). |
+| 13 | **Token metadata & labels** | Label tokens by purpose (e.g. "Production Read-Only", "Staging Full Access") for better organization |
+| 14 | **API token health check** | Periodic validation to detect expired/revoked tokens; show warning icon in Projects tree |
+
 ---
 
 ## Contributing
