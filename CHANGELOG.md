@@ -21,42 +21,24 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [0.1.0] - 2026-03-02
 
-### Initial Release
-- Core server management (CRUD, power controls, details panel)
-- Multi-project support with secure token storage
-- Network and subnet management
-- SSH key management with generation guide
-- Firewall rules and management
-- Volume management (create, attach, detach, resize)
-- Load balancer management
-- Storage box mounting via Robot API
-- Tailscale integration with auto-install
-- Cloud-init template library
-- Welcome page and comprehensive onboarding
-
----
-
-## [Unreleased]
-
-### Planned
-- Server detail WebView (IPs, specs, console link)
-- Cloud-init template library (save/load named templates)
-- Server status polling during initialisation
-- Network subnet add/remove
-- Firewall rules CRUD
-- Volumes (block storage)
-- Load balancers
-
----
-
-## [0.1.0] — 2026-03-01
-
-Initial release.
+## [0.2.0] - 2026-03-09
 
 ### Added
-- **Multi-project token management** — add, switch, and remove Hetzner Cloud projects; tokens stored in VS Code SecretStorage
-- **SETUP panel** — onboarding task list (API key, SSH key guide, Tailscale key)
-- **PROJECTS panel** — lists all configured projects; active project shown first with indicator; click to switch
+- Enhanced Networks tree view: subnet count, improved tooltips, inline actions
+- New 'Add Subnet to Network' command with network picker
+- Network Detail WebView panel: view/edit subnets, attached servers, delete actions
+- 'Show Network Details' command for quick access
+- Updated package.json with new commands and contributions
+
+### Changed
+- Version bump to 0.2.0 for new feature release
+
+### Fixed
+- None
+
+---
+
+## [0.1.1] - 2026-03-03
 - **SERVERS panel** — live server list with status icons; power on / off / reboot / delete context menu actions
 - **NETWORKS panel** — private network list; create and delete networks
 - **IMAGES panel** — browse available OS images for the active project/region

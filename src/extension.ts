@@ -13,6 +13,7 @@ import { LoadBalancersProvider } from './providers/loadBalancersProvider';
 import { registerTokenCommands } from './commands/manageTokens';
 import { registerServerCommands } from './commands/serverCommands';
 import { registerNetworkCommands } from './commands/networkCommands';
+import { registerNetworkDetailCommand } from './webviews/networkDetail';
 import { registerSshKeyCommands } from './commands/sshKeyCommands';
 import { registerFirewallCommands } from './commands/firewallCommands';
 import { registerVolumeCommands } from './commands/volumeCommands';
@@ -168,6 +169,7 @@ export async function activate(context: vscode.ExtensionContext) {
   );
   registerServerCommands(context, tokenManager, serversProvider, tailscaleKeyManager, robotCredManager, boxPwdManager);
   registerNetworkCommands(context, tokenManager, networksProvider);
+  registerNetworkDetailCommand(context);
   registerSshKeyCommands(context, tokenManager, sshKeysProvider);
   registerFirewallCommands(context, tokenManager, tailscaleKeyManager, firewallsProvider);
   registerVolumeCommands(context, tokenManager, volumesProvider);

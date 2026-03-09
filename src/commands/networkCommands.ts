@@ -69,16 +69,27 @@ export function registerNetworkCommands(
     })
   );
 
-  // ── Subnet commands ────────────────────────────────────────────────────────
 
+  // Add Subnet to Network (with network picker)
   context.subscriptions.push(
-    vscode.commands.registerCommand('hcloud.addSubnet', async (item: NetworkItem) => {
+    vscode.commands.registerCommand('hcloud.addSubnetToNetwork', async () => {
       const client = await tokenManager.getActiveClient();
       if (!client) {
         vscode.window.showErrorMessage('No active Hetzner project.');
         return;
       }
-
+      const networks = await client.getNetworks();
+      if (!networks.length) {
+        vscode.window.showErrorMessage('No networks found.');
+        return;
+      }
+      const selected = await vscode.window.showQuickPick(
+        networks.map(n => ({ label: n.name, description: n.ip_range, network: n })),
+        { title: 'Select Network to Add Subnet', placeHolder: 'Choose a network' }
+      );
+      if (!selected) return;
+      const item = new NetworkItem(selected.network);
+      // Reuse existing addSubnet logic
       const ipRange = await vscode.window.showInputBox({
         title: `Add Subnet to "${item.network.name}"`,
         prompt: 'Enter subnet CIDR range (must be within the network range)',
@@ -90,13 +101,11 @@ export function registerNetworkCommands(
         },
       });
       if (!ipRange) return;
-
       const zone = await vscode.window.showQuickPick(NETWORK_ZONES, {
         title: 'Network Zone',
         placeHolder: 'Select the network zone for this subnet',
       });
       if (!zone) return;
-
       try {
         await vscode.window.withProgress(
           { location: vscode.ProgressLocation.Notification, title: `Adding subnet ${ipRange}...` },

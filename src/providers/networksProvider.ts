@@ -5,10 +5,16 @@ import { TokenManager } from '../utils/secretStorage';
 export class NetworkItem extends vscode.TreeItem {
   constructor(public readonly network: HNetwork) {
     super(network.name, vscode.TreeItemCollapsibleState.Collapsed);
-    this.description = network.ip_range;
-    this.tooltip = `Network: ${network.name}\nRange: ${network.ip_range}\nServers: ${network.servers.length}`;
+    const subnetCount = network.subnets?.length ?? 0;
+    this.description = `${network.ip_range} · ${subnetCount} subnet${subnetCount === 1 ? '' : 's'}`;
+    this.tooltip = `Network: ${network.name}\nRange: ${network.ip_range}\nSubnets: ${subnetCount}\nServers: ${network.servers.length}\n\nSubnets:\n${network.subnets.map(s => `- ${s.ip_range} (${s.network_zone}, ${s.type})`).join('\n')}`;
     this.iconPath = new vscode.ThemeIcon('cloud');
     this.contextValue = 'network';
+    this.command = {
+      command: 'hcloud.showNetworkDetail',
+      arguments: [this],
+      title: 'Show Network Details'
+    };
   }
 }
 

@@ -4,6 +4,7 @@ out/
 .vscode-test/
 *.vsix
 .env
+.npmrc
 
 # Internal AI dev notes — not for public repo
 PLAN.md

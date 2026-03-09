@@ -1,8 +1,8 @@
 {
-  "name": "vscode-hetzner-cloud",
+  "name": "@brwinnov/vscode-hetzner-cloud",
   "displayName": "Hetzner Cloud Toolkit",
   "description": "Manage Hetzner Cloud infrastructure directly from VS Code — servers, networks, SSH keys, Tailscale and more",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "publisher": "brwinnov",
   "engines": {
     "vscode": "^1.85.0"
@@ -23,10 +23,13 @@
   "homepage": "https://github.com/brwinnov/vscode-hetzner-cloud#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/brwinnov/vscode-hetzner-cloud.git"
+    "url": "git+https://github.com/brwinnov/vscode-hetzner-cloud.git"
   },
   "bugs": {
     "url": "https://github.com/brwinnov/vscode-hetzner-cloud/issues"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
   },
   "galleryBanner": {
     "color": "#D50C2D",
@@ -153,6 +156,16 @@
         "title": "Hetzner Cloud: Add Subnet",
         "icon": "$(add)"
       },
+        {
+          "command": "hcloud.addSubnetToNetwork",
+          "title": "Hetzner Cloud: Add Subnet to Network",
+          "icon": "$(add)"
+        },
+        {
+          "command": "hcloud.showNetworkDetail",
+          "title": "Hetzner Cloud: Show Network Details",
+          "icon": "$(info)"
+        },
       {
         "command": "hcloud.deleteSubnet",
         "title": "Hetzner Cloud: Remove Subnet",
@@ -371,6 +384,11 @@
         },
         {
           "command": "hcloud.refreshNetworks",
+          "when": "view == hcloud.networks",
+          "group": "navigation"
+        },
+        {
+          "command": "hcloud.addSubnetToNetwork",
           "when": "view == hcloud.networks",
           "group": "navigation"
         },
