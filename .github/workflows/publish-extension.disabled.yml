@@ -1,0 +1,30 @@
+name: Publish VS Code Extension to Marketplace
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'        # ← was 18, must be 20+
+
+      - name: Install vsce
+        run: npm install -g @vscode/vsce   # ← was vsce, must be @vscode/vsce
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build extension
+        run: npm run build
+
+      - name: Publish to VS Code Marketplace
+        run: vsce publish -p ${{ secrets.VSCE_PAT }}  # ← no --publisher flag
