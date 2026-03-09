@@ -178,10 +178,26 @@ export class HetznerClient {
     });
 
     if (!res.ok) {
-      const err = await res.json().catch(() => ({ error: { message: res.statusText } }));
+      // Try to parse error response, but handle empty body gracefully
+      let err;
+      try {
+        err = await res.json();
+      } catch {
+        err = { error: { message: res.statusText } };
+      }
       throw new Error(`Hetzner API error ${res.status}: ${(err as any).error?.message ?? res.statusText}`);
     }
 
+    // For DELETE requests, Hetzner API may return empty body
+    if (method === 'DELETE') {
+      const text = await res.text();
+      if (!text) return undefined as unknown as T;
+      try {
+        return JSON.parse(text) as T;
+      } catch {
+        return undefined as unknown as T;
+      }
+    }
     return res.json() as Promise<T>;
   }
 
