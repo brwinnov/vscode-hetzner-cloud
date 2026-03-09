@@ -10,24 +10,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'        # ← was 18, must be 20+
 
       - name: Install vsce
-        run: npm install -g vsce
+        run: npm install -g @vscode/vsce   # ← was vsce, must be @vscode/vsce
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Build extension
         run: npm run build
 
       - name: Publish to VS Code Marketplace
-        env:
-          VSCE_PAT: ${{ secrets.VSCE_PAT }}
-        run: |
-          vsce publish --pat $VSCE_PAT --publisher brwinnov.vsce
+        run: vsce publish -p ${{ secrets.VSCE_PAT }}  # ← no --publisher flag
