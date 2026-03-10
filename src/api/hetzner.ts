@@ -211,7 +211,7 @@ export class HetznerClient {
     let page: number | null = 1;
     const sep = basePath.includes('?') ? '&' : '?';
     while (page !== null) {
-      const data = await this.request<HetznerPage>('GET', `${basePath}${sep}per_page=50&page=${page}`);
+      const data: HetznerPage = await this.request<HetznerPage>('GET', `${basePath}${sep}per_page=50&page=${page}`);
       const items = data[arrayKey] as T[] | undefined;
       if (Array.isArray(items)) {
         results.push(...items);

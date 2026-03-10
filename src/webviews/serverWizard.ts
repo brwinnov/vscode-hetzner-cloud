@@ -117,7 +117,7 @@ export class ServerWizardPanel {
   private async handleMessage(msg: { command: string; payload?: Record<string, unknown> }) {
     switch (msg.command) {
       case 'createServer':
-        await this.handleCreateServer(msg.payload as CreateServerPayload);
+        await this.handleCreateServer(msg.payload as unknown as CreateServerPayload);
         break;
       case 'cancel':
         this.panel.dispose();

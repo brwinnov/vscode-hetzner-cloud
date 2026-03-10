@@ -128,7 +128,7 @@ export class RobotCredentialManager {
   async getClient(): Promise<import('../api/robot').RobotClient | undefined> {
     const creds = await this.getCredentials();
     if (!creds) return undefined;
-    const { RobotClient } = await import('../api/robot');
+    const { RobotClient } = await import('../api/robot.js');
     return new RobotClient(creds.username, creds.password);
   }
 }
