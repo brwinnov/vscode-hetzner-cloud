@@ -140,12 +140,18 @@ export function registerLoadBalancerCommands(
         return;
       }
 
+      const lbLocation = item.lb.location.name;
       const serverPick = await vscode.window.showQuickPick(
-        available.map((s) => ({
-          label: s.name,
-          description: `${s.status} · ${s.datacenter.location.name} · ${s.public_net.ipv4?.ip ?? 'no ip'}`,
-          id: s.id,
-        })),
+        available.map((s) => {
+          const sameLocation = s.datacenter.location.name === lbLocation;
+          return {
+            label: s.name,
+            description: sameLocation
+              ? `${s.status} · ${s.datacenter.location.name} · ${s.public_net.ipv4?.ip ?? 'no ip'}`
+              : `⚠ different location (${s.datacenter.location.name}) — requires shared private network`,
+            id: s.id,
+          };
+        }),
         { title: `Add Target — ${item.lb.name}`, placeHolder: 'Select a server to add as target' }
       );
       if (!serverPick) return;
@@ -170,8 +176,18 @@ export function registerLoadBalancerCommands(
       const client = await tokenManager.getActiveClient();
       if (!client) return;
 
+      // Resolve a human-readable server name for the confirmation dialog
+      let srvLabel = `#${item.target.server!.id}`;
+      try {
+        const servers = await client.getServers();
+        const found = servers.find((s) => s.id === item.target.server!.id);
+        if (found) srvLabel = found.name;
+      } catch {
+        // best-effort — fall back to ID
+      }
+
       const confirm = await vscode.window.showWarningMessage(
-        `Remove Server #${item.target.server!.id} from load balancer "${item.lbName}"?`,
+        `Remove server "${srvLabel}" from load balancer "${item.lbName}"?`,
         { modal: true },
         'Remove'
       );

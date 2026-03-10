@@ -95,8 +95,8 @@ export class ServerDetailPanel {
           );
           this.serversProvider.refresh();
           this.panel.dispose();
-        } catch (err: any) {
-          vscode.window.showErrorMessage(`Delete failed: ${err?.message ?? err}`);
+        } catch (err: unknown) {
+          vscode.window.showErrorMessage(`Delete failed: ${(err as Error).message}`);
         }
         break;
       }
@@ -108,8 +108,8 @@ export class ServerDetailPanel {
       this.server = await this.client.getServer(this.server.id);
       this.panel.webview.html = renderHtml(this.server);
       this.serversProvider.refresh();
-    } catch (err: any) {
-      vscode.window.showErrorMessage(`Failed to refresh server: ${err?.message ?? err}`);
+    } catch (err: unknown) {
+      vscode.window.showErrorMessage(`Failed to refresh server: ${(err as Error).message}`);
     }
   }
 
@@ -118,9 +118,9 @@ export class ServerDetailPanel {
     try {
       await action();
       await this.doRefresh();
-    } catch (err: any) {
+    } catch (err: unknown) {
       this.panel.webview.postMessage({ command: 'clearLoading' });
-      vscode.window.showErrorMessage(`Action "${label}" failed: ${err?.message ?? err}`);
+      vscode.window.showErrorMessage(`Action "${label}" failed: ${(err as Error).message}`);
     }
   }
 }
@@ -218,9 +218,12 @@ function renderHtml(s: HServer): string {
   .btn-secondary { background: var(--vscode-button-secondaryBackground);
     color: var(--vscode-button-secondaryForeground); }
   .btn-secondary:hover { background: var(--vscode-button-secondaryHoverBackground); }
-  .btn-danger { background: rgba(244,67,54,.15); color: #f44336;
-    border: 1px solid rgba(244,67,54,.4); }
-  .btn-danger:hover { background: rgba(244,67,54,.25); }
+  .btn-danger {
+    background: color-mix(in srgb, var(--vscode-errorForeground) 12%, transparent);
+    color: var(--vscode-errorForeground);
+    border: 1px solid color-mix(in srgb, var(--vscode-errorForeground) 35%, transparent);
+  }
+  .btn-danger:hover { background: color-mix(in srgb, var(--vscode-errorForeground) 22%, transparent); }
   .btn:disabled { opacity: 0.4; cursor: not-allowed; }
   .code {
     font-family: var(--vscode-editor-font-family, monospace);

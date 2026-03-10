@@ -2,7 +2,7 @@
   "name": "vscode-hetzner-cloud",
   "displayName": "Hetzner Cloud Toolkit",
   "description": "Manage Hetzner Cloud infrastructure directly from VS Code — servers, networks, SSH keys, Tailscale and more",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "publisher": "brwinnovvsce",
   "engines": {
     "vscode": "^1.85.0"
