@@ -23,6 +23,10 @@ import { TailscaleAuthKeyManager } from './tailscale/authKeyManager';
 import { SshKeyGuidePanel } from './webviews/sshKeyGuide';
 import { WelcomePage } from './webviews/welcomePage';
 import { RobotApiGuide } from './webviews/robotApiGuide';
+import { NetworkGuide } from './webviews/networkGuide';
+import { FirewallGuide } from './webviews/firewallGuide';
+import { VolumeGuide } from './webviews/volumeGuide';
+import { ImageGuide } from './webviews/imageGuide';
 import { cleanupLegacyKeys } from './utils/secretStorage';
 
 export async function activate(context: vscode.ExtensionContext) {
@@ -150,6 +154,34 @@ export async function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand('hcloud.robotApiGuide', () => {
       RobotApiGuide.open(context);
+    })
+  );
+
+  // Network Guide command
+  context.subscriptions.push(
+    vscode.commands.registerCommand('hcloud.networkGuide', () => {
+      NetworkGuide.open(context);
+    })
+  );
+
+  // Firewall Guide command
+  context.subscriptions.push(
+    vscode.commands.registerCommand('hcloud.firewallGuide', () => {
+      FirewallGuide.open(context);
+    })
+  );
+
+  // Volume Guide command
+  context.subscriptions.push(
+    vscode.commands.registerCommand('hcloud.volumeGuide', () => {
+      VolumeGuide.open(context);
+    })
+  );
+
+  // Image Guide command
+  context.subscriptions.push(
+    vscode.commands.registerCommand('hcloud.imageGuide', () => {
+      ImageGuide.open(context);
     })
   );
 

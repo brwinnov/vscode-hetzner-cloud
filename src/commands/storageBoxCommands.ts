@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { TokenManager, RobotCredentialManager, StorageBoxPasswordManager } from '../utils/secretStorage';
 import { StorageBoxProvider, StorageBoxItem } from '../providers/storageBoxProvider';
 import { generateMountScript, StorageBoxMount } from '../utils/storageBoxInjector';
-import { RobotClient } from '../api/robot';
+import { RobotCredentialsPanel } from '../webviews/robotCredentialsPanel';
 
 export function registerStorageBoxCommands(
   context: vscode.ExtensionContext,
@@ -14,37 +14,7 @@ export function registerStorageBoxCommands(
   // ── Set Robot API credentials ────────────────────────────────────────────
   context.subscriptions.push(
     vscode.commands.registerCommand('hcloud.setRobotCredentials', async () => {
-      const username = await vscode.window.showInputBox({
-        title: 'Hetzner Robot API — Username',
-        prompt: 'Enter your Robot API username (Settings → Webservice & API at robot.hetzner.com)',
-        placeHolder: '#ws+xxxxx',
-        validateInput: (v) => (!v?.trim() ? 'Username cannot be empty' : undefined),
-      });
-      if (!username) return;
-
-      const password = await vscode.window.showInputBox({
-        title: 'Hetzner Robot API — Password',
-        prompt: 'Enter your Robot API password',
-        password: true,
-        validateInput: (v) => (!v?.trim() ? 'Password cannot be empty' : undefined),
-      });
-      if (!password) return;
-
-      // Validate by fetching storage boxes
-      try {
-        await vscode.window.withProgress(
-          { location: vscode.ProgressLocation.Notification, title: 'Validating Robot API credentials...' },
-          async () => {
-            const client = new RobotClient(username.trim(), password.trim());
-            await client.getStorageBoxes(); // throws on bad credentials
-          }
-        );
-        await robotCredManager.setCredentials(username.trim(), password.trim());
-        storageBoxProvider.refresh();
-        vscode.window.showInformationMessage('Robot API credentials saved. Storage Boxes loaded.');
-      } catch (err: unknown) {
-        vscode.window.showErrorMessage(`Invalid Robot API credentials: ${(err as Error).message}`);
-      }
+      await RobotCredentialsPanel.open(context, robotCredManager, storageBoxProvider);
     })
   );
 

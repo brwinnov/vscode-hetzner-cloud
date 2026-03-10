@@ -2,7 +2,7 @@
   "name": "vscode-hetzner-cloud",
   "displayName": "Hetzner Cloud Toolkit",
   "description": "Manage Hetzner Cloud infrastructure directly from VS Code — servers, networks, SSH keys, Tailscale and more",
-  "version": "0.2.9",
+  "version": "0.3.0",
   "publisher": "brwinnovvsce",
   "engines": {
     "vscode": "^1.85.0"
@@ -247,6 +247,26 @@
         "icon": "$(arrow-up)"
       },
       {
+        "command": "hcloud.imageGuide",
+        "title": "Hetzner Cloud: Images Guide",
+        "icon": "$(info)"
+      },
+      {
+        "command": "hcloud.networkGuide",
+        "title": "Hetzner Cloud: Networks Setup Guide",
+        "icon": "$(info)"
+      },
+      {
+        "command": "hcloud.firewallGuide",
+        "title": "Hetzner Cloud: Firewalls Guide",
+        "icon": "$(info)"
+      },
+      {
+        "command": "hcloud.volumeGuide",
+        "title": "Hetzner Cloud: Volumes Guide",
+        "icon": "$(info)"
+      },
+      {
         "command": "hcloud.robotApiGuide",
         "title": "Hetzner Cloud: About Storage Boxes & Robot API",
         "icon": "$(info)"
@@ -383,12 +403,12 @@
           "group": "navigation"
         },
         {
-          "command": "hcloud.createNetwork",
+          "command": "hcloud.networkGuide",
           "when": "view == hcloud.networks",
           "group": "navigation"
         },
         {
-          "command": "hcloud.refreshNetworks",
+          "command": "hcloud.createNetwork",
           "when": "view == hcloud.networks",
           "group": "navigation"
         },
@@ -398,12 +418,17 @@
           "group": "navigation"
         },
         {
-          "command": "hcloud.addSshKey",
-          "when": "view == hcloud.sshKeys",
+          "command": "hcloud.refreshNetworks",
+          "when": "view == hcloud.networks",
           "group": "navigation"
         },
         {
           "command": "hcloud.sshKeyGuide",
+          "when": "view == hcloud.sshKeys",
+          "group": "navigation"
+        },
+        {
+          "command": "hcloud.addSshKey",
           "when": "view == hcloud.sshKeys",
           "group": "navigation"
         },
@@ -413,8 +438,18 @@
           "group": "navigation"
         },
         {
+          "command": "hcloud.imageGuide",
+          "when": "view == hcloud.images",
+          "group": "navigation"
+        },
+        {
           "command": "hcloud.refreshImages",
           "when": "view == hcloud.images",
+          "group": "navigation"
+        },
+        {
+          "command": "hcloud.firewallGuide",
+          "when": "view == hcloud.firewalls",
           "group": "navigation"
         },
         {
@@ -425,6 +460,11 @@
         {
           "command": "hcloud.refreshFirewalls",
           "when": "view == hcloud.firewalls",
+          "group": "navigation"
+        },
+        {
+          "command": "hcloud.volumeGuide",
+          "when": "view == hcloud.volumes",
           "group": "navigation"
         },
         {

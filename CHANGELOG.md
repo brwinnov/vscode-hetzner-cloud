@@ -10,6 +10,21 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.3.0] - 2026-03-10
+
+### Added
+- **Networks guide WebView** — $(info) toolbar button opens a guide covering private network concepts, order of operations (network → subnet → attach server), and four real-world subnet layout examples
+- **Firewalls guide WebView** — covers rule directions, protocols (TCP/UDP/ICMP/ESP/GRE), port syntax, default rule set, and five use-case rule tables (web server, private DB, game/UDP, Tailscale, locked-down egress)
+- **Volumes guide WebView** — overview cards (size range, formats, location constraint), all five actions explained (create/attach/detach/resize/delete), filesystem resize commands, and five use cases
+- **Images guide WebView** — tabbed page: Overview tab lists all four image types and available system OS images; Custom Images tab has a seven-step snapshot workflow guide plus cloud-init alternative and best-practice callouts
+- **Robot API credentials WebView form** — replaces sequential `showInputBox` prompts with a persistent two-field form (username + password) that stays open while switching to a password manager; shows inline spinner and validation status without closing
+
+### Changed
+- `hcloud.setRobotCredentials` command now opens a WebView credentials form instead of VS Code input boxes
+- Toolbar icon order standardised across all panels: **info → add → refresh**; fixed SSH Keys (was add → info → refresh) and Networks (refresh was before addSubnet)
+
+---
+
 ## [0.2.9] - 2026-03-10
 
 ### Fixed
@@ -137,7 +152,8 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 - **Status bar item** — shows active project name; click to switch
 - **First-use onboarding** — SSH key guide prompt on first project add; Welcome page on install
 
-[Unreleased]: https://github.com/brwinnov/vscode-hetzner-cloud/compare/v0.2.9...HEAD
+[Unreleased]: https://github.com/brwinnov/vscode-hetzner-cloud/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/brwinnov/vscode-hetzner-cloud/compare/v0.2.9...v0.3.0
 [0.2.9]: https://github.com/brwinnov/vscode-hetzner-cloud/compare/v0.2.8...v0.2.9
 [0.2.8]: https://github.com/brwinnov/vscode-hetzner-cloud/compare/v0.2.7...v0.2.8
 [0.2.7]: https://github.com/brwinnov/vscode-hetzner-cloud/compare/v0.2.6...v0.2.7
