@@ -332,9 +332,11 @@ export class HetznerClient {
 
   // ── Validate token ─────────────────────────────────────────────────────────
 
-  async validateToken(): Promise<{ id: number; description: string }> {
-    const data = await this.request<{ token: { id: number; description: string } }>('GET', '/');
-    return data.token;
+  async validateToken(): Promise<void> {
+    // Validate by fetching the servers list (per_page=1 to minimise data transfer).
+    // The /servers endpoint reliably returns 200 for a valid token and 401 for an
+    // invalid one — more stable than the root / endpoint whose shape can vary.
+    await this.request<unknown>('GET', '/servers?per_page=1');
   }
 
   // ── Firewalls ──────────────────────────────────────────────────────────────
