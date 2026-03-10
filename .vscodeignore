@@ -14,3 +14,5 @@ PLAN-*.md
 .claude
 dist/extension.js.map
 .cache_ggshield
+wiki-repo
+setup-npm-auth.ps1

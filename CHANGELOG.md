@@ -10,6 +10,21 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.2.9] - 2026-03-10
+
+### Fixed
+- README: corrected marketplace publisher ID from `brwinnov` to `brwinnovvsce` in all badge and install URLs
+- README: added all features missing since v0.2.1 (Firewalls, Volumes, Load Balancers, Storage Boxes, Server Detail panel, status polling, cloud-init library)
+- `package.json`: corrected repository URL format for vsce image resolution
+- `tsconfig.json`: replaced stale `codereview` exclude with `scripts`
+- TypeScript: fixed three pre-existing strict-mode errors (`hetzner.ts` TS7022, `secretStorage.ts` TS2835, `serverWizard.ts` TS2352)
+
+### Changed
+- Repo housekeeping: removed stale tracked files (`.aivory`, `verdict01.md`, `wiki/`, dangling `wiki-repo` submodule)
+- `.gitignore` / `.vscodeignore`: updated to reflect current project structure
+
+---
+
 ## [0.2.8] - 2026-03-10
 
 ### Fixed
@@ -122,7 +137,8 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 - **Status bar item** — shows active project name; click to switch
 - **First-use onboarding** — SSH key guide prompt on first project add; Welcome page on install
 
-[Unreleased]: https://github.com/brwinnov/vscode-hetzner-cloud/compare/v0.2.8...HEAD
+[Unreleased]: https://github.com/brwinnov/vscode-hetzner-cloud/compare/v0.2.9...HEAD
+[0.2.9]: https://github.com/brwinnov/vscode-hetzner-cloud/compare/v0.2.8...v0.2.9
 [0.2.8]: https://github.com/brwinnov/vscode-hetzner-cloud/compare/v0.2.7...v0.2.8
 [0.2.7]: https://github.com/brwinnov/vscode-hetzner-cloud/compare/v0.2.6...v0.2.7
 [0.2.6]: https://github.com/brwinnov/vscode-hetzner-cloud/compare/v0.2.5...v0.2.6
