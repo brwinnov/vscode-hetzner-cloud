@@ -6,12 +6,11 @@ out
 tsconfig.json
 esbuild.js
 codereview
+scripts
 PLAN.md
-overview.md
-verdict01.md
+PLAN-*.md
 .gitignore
 .vscode
+.claude
 dist/extension.js.map
-.venv
-**/.venv/**
 .cache_ggshield

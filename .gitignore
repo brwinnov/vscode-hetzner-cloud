@@ -8,8 +8,13 @@ out/
 
 # Internal AI dev notes — not for public repo
 PLAN.md
-overview.md
+PLAN-*.md
+scripts/
 codereview/
+
+# Local tool settings
+.claude/
+wiki-repo/
 
 # Added by ggshield
 .cache_ggshield
