@@ -247,6 +247,11 @@
         "icon": "$(arrow-up)"
       },
       {
+        "command": "hcloud.robotApiGuide",
+        "title": "Hetzner Cloud: About Storage Boxes & Robot API",
+        "icon": "$(info)"
+      },
+      {
         "command": "hcloud.setRobotCredentials",
         "title": "Hetzner Cloud: Set Robot API Credentials",
         "icon": "$(key)"
@@ -430,6 +435,11 @@
         {
           "command": "hcloud.refreshVolumes",
           "when": "view == hcloud.volumes",
+          "group": "navigation"
+        },
+        {
+          "command": "hcloud.robotApiGuide",
+          "when": "view == hcloud.storageBoxes",
           "group": "navigation"
         },
         {

@@ -22,6 +22,7 @@ import { registerLoadBalancerCommands } from './commands/loadBalancerCommands';
 import { TailscaleAuthKeyManager } from './tailscale/authKeyManager';
 import { SshKeyGuidePanel } from './webviews/sshKeyGuide';
 import { WelcomePage } from './webviews/welcomePage';
+import { RobotApiGuide } from './webviews/robotApiGuide';
 import { cleanupLegacyKeys } from './utils/secretStorage';
 
 export async function activate(context: vscode.ExtensionContext) {
@@ -142,6 +143,13 @@ export async function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand('hcloud.sshKeyGuide', () => {
       SshKeyGuidePanel.create(context);
+    })
+  );
+
+  // Robot API Guide command
+  context.subscriptions.push(
+    vscode.commands.registerCommand('hcloud.robotApiGuide', () => {
+      RobotApiGuide.open(context);
     })
   );
 
