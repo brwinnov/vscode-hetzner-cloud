@@ -23,7 +23,7 @@
   "homepage": "https://github.com/brwinnov/vscode-hetzner-cloud#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/brwinnov/vscode-hetzner-cloud.git"
+    "url": "https://github.com/brwinnov/vscode-hetzner-cloud"
   },
   "bugs": {
     "url": "https://github.com/brwinnov/vscode-hetzner-cloud/issues"
