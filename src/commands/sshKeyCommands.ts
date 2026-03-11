@@ -98,8 +98,8 @@ export function registerSshKeyCommands(
           () => client.deleteSshKey(item.key.id)
         );
         sshKeysProvider.refresh();
-      } catch (err: any) {
-        vscode.window.showErrorMessage(`Failed to remove SSH key: ${err?.message ?? err}`);
+      } catch (err: unknown) {
+        vscode.window.showErrorMessage(`Failed to remove SSH key: ${(err as Error).message}`);
       }
     })
   );

@@ -8,6 +8,8 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -15,16 +17,13 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'        # ← was 18, must be 20+
+          node-version: '20'
 
       - name: Install vsce
-        run: npm install -g @vscode/vsce   # ← was vsce, must be @vscode/vsce
+        run: npm install -g @vscode/vsce
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Build extension
-        run: npm run build
-
       - name: Publish to VS Code Marketplace
-        run: vsce publish -p ${{ secrets.VSCE_PAT }}  # ← no --publisher flag
+        run: vsce publish -p ${{ secrets.VSCE_PAT }}

@@ -113,8 +113,8 @@ export function registerNetworkCommands(
         );
         networksProvider.refresh();
         vscode.window.showInformationMessage(`Subnet ${ipRange} added to "${item.network.name}".`);
-      } catch (err: any) {
-        vscode.window.showErrorMessage(`Failed to add subnet: ${err?.message ?? err}`);
+      } catch (err: unknown) {
+        vscode.window.showErrorMessage(`Failed to add subnet: ${(err as Error).message}`);
       }
     })
   );
@@ -137,8 +137,8 @@ export function registerNetworkCommands(
           () => client.deleteSubnet(item.networkId, item.subnet.ip_range)
         );
         networksProvider.refresh();
-      } catch (err: any) {
-        vscode.window.showErrorMessage(`Failed to remove subnet: ${err?.message ?? err}`);
+      } catch (err: unknown) {
+        vscode.window.showErrorMessage(`Failed to remove subnet: ${(err as Error).message}`);
       }
     })
   );
