@@ -345,6 +345,14 @@ function getRobotCredentialsHtml(nonce: string, existingUsername: string): strin
     });
   });
 
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
   window.addEventListener('message', function (event) {
     var msg = event.data;
     switch (msg.command) {
@@ -359,7 +367,7 @@ function getRobotCredentialsHtml(nonce: string, existingUsername: string): strin
         break;
       case 'error':
         setWorking(false);
-        setStatus('status-err', '✖ ' + msg.message);
+        setStatus('status-err', '✖ ' + escapeHtml(msg.message));
         break;
     }
   });
