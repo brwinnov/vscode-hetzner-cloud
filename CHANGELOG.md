@@ -10,6 +10,13 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.3.1] - 2026-03-12
+
+### Fixed
+- Security: escape Robot API error messages before rendering in `robotCredentialsPanel` WebView to prevent DOM-based XSS via malicious or MitM'd API responses
+
+---
+
 ## [0.3.0] - 2026-03-10
 
 ### Added
@@ -152,7 +159,8 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 - **Status bar item** — shows active project name; click to switch
 - **First-use onboarding** — SSH key guide prompt on first project add; Welcome page on install
 
-[Unreleased]: https://github.com/brwinnov/vscode-hetzner-cloud/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/brwinnov/vscode-hetzner-cloud/compare/v0.3.1...HEAD
+[0.3.1]: https://github.com/brwinnov/vscode-hetzner-cloud/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/brwinnov/vscode-hetzner-cloud/compare/v0.2.9...v0.3.0
 [0.2.9]: https://github.com/brwinnov/vscode-hetzner-cloud/compare/v0.2.8...v0.2.9
 [0.2.8]: https://github.com/brwinnov/vscode-hetzner-cloud/compare/v0.2.7...v0.2.8
