@@ -36,7 +36,7 @@ export function registerNetworkCommands(
         value: '10.0.0.0/8',
         validateInput: (v) => {
           if (!v?.trim()) return 'IP range cannot be empty';
-          if (!/^\d+\.\d+\.\d+\.\d+\/\d+$/.test(v.trim())) return 'Must be a valid CIDR range';
+          if (!/^(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}\/(3[0-2]|[12]?\d)$/.test(v.trim())) return 'Must be a valid CIDR range';
           return undefined;
         },
       });
@@ -96,7 +96,7 @@ export function registerNetworkCommands(
         placeHolder: 'e.g. 10.0.1.0/24',
         validateInput: (v) => {
           if (!v?.trim()) return 'IP range cannot be empty';
-          if (!/^\d+\.\d+\.\d+\.\d+\/\d+$/.test(v.trim())) return 'Must be a valid CIDR range';
+          if (!/^(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}\/(3[0-2]|[12]?\d)$/.test(v.trim())) return 'Must be a valid CIDR range';
           return undefined;
         },
       });
@@ -113,8 +113,8 @@ export function registerNetworkCommands(
         );
         networksProvider.refresh();
         vscode.window.showInformationMessage(`Subnet ${ipRange} added to "${item.network.name}".`);
-      } catch (err: any) {
-        vscode.window.showErrorMessage(`Failed to add subnet: ${err?.message ?? err}`);
+      } catch (err: unknown) {
+        vscode.window.showErrorMessage(`Failed to add subnet: ${err instanceof Error ? err.message : String(err)}`);
       }
     })
   );
@@ -137,8 +137,8 @@ export function registerNetworkCommands(
           () => client.deleteSubnet(item.networkId, item.subnet.ip_range)
         );
         networksProvider.refresh();
-      } catch (err: any) {
-        vscode.window.showErrorMessage(`Failed to remove subnet: ${err?.message ?? err}`);
+      } catch (err: unknown) {
+        vscode.window.showErrorMessage(`Failed to remove subnet: ${err instanceof Error ? err.message : String(err)}`);
       }
     })
   );

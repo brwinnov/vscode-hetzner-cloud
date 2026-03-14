@@ -329,7 +329,7 @@ function getWelcomeHtml(nonce: string): string {
     <h1>Hetzner <span>Cloud</span> Toolkit</h1>
     <p class="subtitle">
       Manage your entire Hetzner Cloud infrastructure directly from VS Code —
-      servers, networks, firewalls, volumes, load balancers, and more.
+      servers, networks, firewalls, volumes, and more.
       No browser tab needed.
     </p>
     <div class="hero-actions">
@@ -358,7 +358,7 @@ function getWelcomeHtml(nonce: string): string {
     </div>
     <div class="info-item">
       <div class="info-item-label">API</div>
-      <div class="info-item-value">Hetzner Cloud + Robot</div>
+      <div class="info-item-value">Hetzner Cloud API</div>
     </div>
   </div>
 </div>
@@ -416,24 +416,6 @@ function getWelcomeHtml(nonce: string): string {
     </div>
 
     <div class="feature-card">
-      <div class="feature-icon">⚖️</div>
-      <div class="feature-title">Load Balancers</div>
-      <div class="feature-desc">
-        Create load balancers with algorithm selection (Round Robin / Least Connections),
-        add and remove server targets. View services and targets in the tree.
-      </div>
-    </div>
-
-    <div class="feature-card">
-      <div class="feature-icon">📦</div>
-      <div class="feature-title">Storage Boxes</div>
-      <div class="feature-desc">
-        Browse Hetzner Robot storage boxes. Generate CIFS mount cloud-init scripts
-        and inject them into new server configurations — credentials stored securely.
-      </div>
-    </div>
-
-    <div class="feature-card">
       <div class="feature-icon">🔑</div>
       <div class="feature-title">SSH Keys</div>
       <div class="feature-desc">
@@ -474,7 +456,7 @@ function getWelcomeHtml(nonce: string): string {
       <div class="feature-icon">🔒</div>
       <div class="feature-title">Secure by Design</div>
       <div class="feature-desc">
-        All API tokens, robot credentials, SSH passwords, and Tailscale keys are stored
+        All API tokens, SSH keys, and Tailscale keys are stored
         in VS Code's OS-encrypted SecretStorage. Zero hardcoded credentials. HTTPS only.
       </div>
     </div>
@@ -561,7 +543,6 @@ function getWelcomeHtml(nonce: string): string {
   <a href="https://github.com/brwinnov/vscode-hetzner-cloud" target="_blank">GitHub Repository</a>
   <a href="https://github.com/brwinnov/vscode-hetzner-cloud/issues" target="_blank">Report an Issue</a>
   <a href="https://docs.hetzner.cloud" target="_blank">Hetzner Cloud API Docs</a>
-  <a href="https://robot.hetzner.com" target="_blank">Hetzner Robot</a>
   <a href="https://tailscale.com" target="_blank">Tailscale</a>
   <span style="margin-left:auto;color:var(--vscode-descriptionForeground)">Hetzner Cloud Toolkit v0.1.0 — Not affiliated with Hetzner Online GmbH</span>
 </div>

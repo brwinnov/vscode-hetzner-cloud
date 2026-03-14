@@ -2,7 +2,7 @@
   "name": "vscode-hetzner-cloud",
   "displayName": "Hetzner Cloud Toolkit",
   "description": "Manage Hetzner Cloud infrastructure directly from VS Code — servers, networks, SSH keys, Tailscale and more",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "publisher": "brwinnovvsce",
   "engines": {
     "vscode": "^1.85.0"
@@ -159,7 +159,7 @@
       {
         "command": "hcloud.addSubnetToNetwork",
         "title": "Hetzner Cloud: Add Subnet to Network",
-        "icon": "$(add)"
+        "icon": "$(type-hierarchy-sub)"
       },
       {
         "command": "hcloud.showNetworkDetail",

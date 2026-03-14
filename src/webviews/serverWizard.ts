@@ -151,7 +151,7 @@ export class ServerWizardPanel {
           prompt: 'CIDR notation',
           placeHolder: '10.0.0.0/8',
           value: '10.0.0.0/8',
-          validateInput: (v) => (!v?.trim() || !/^\d+\.\d+\.\d+\.\d+\/\d+$/.test(v.trim()) ? 'Must be a valid CIDR range' : undefined),
+          validateInput: (v) => (!v?.trim() || !/^(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}\/(3[0-2]|[12]?\d)$/.test(v.trim()) ? 'Must be a valid CIDR range' : undefined),
         });
         if (!ipRange) break;
         try {
@@ -229,7 +229,7 @@ export class ServerWizardPanel {
           placeHolder: '10.0.1.0/24',
           validateInput: (v) => {
             if (!v?.trim()) return 'Subnet CIDR cannot be empty';
-            if (!/^\d+\.\d+\.\d+\.\d+\/\d+$/.test(v.trim())) return 'Must be a valid CIDR range';
+            if (!/^(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}\/(3[0-2]|[12]?\d)$/.test(v.trim())) return 'Must be a valid CIDR range';
             return undefined;
           },
         });
