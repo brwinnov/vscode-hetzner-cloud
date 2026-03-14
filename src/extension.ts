@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { TokenManager, RobotCredentialManager, StorageBoxPasswordManager } from './utils/secretStorage';
+import { TokenManager } from './utils/secretStorage';
 import { ServersProvider } from './providers/serversProvider';
 import { NetworksProvider } from './providers/networksProvider';
 import { ImagesProvider } from './providers/imagesProvider';
@@ -8,8 +8,6 @@ import { SetupProvider } from './providers/setupProvider';
 import { ProjectsProvider } from './providers/projectsProvider';
 import { FirewallsProvider } from './providers/firewallsProvider';
 import { VolumesProvider } from './providers/volumesProvider';
-import { StorageBoxProvider } from './providers/storageBoxProvider';
-import { LoadBalancersProvider } from './providers/loadBalancersProvider';
 import { registerTokenCommands } from './commands/manageTokens';
 import { registerServerCommands } from './commands/serverCommands';
 import { registerNetworkCommands } from './commands/networkCommands';
@@ -17,12 +15,9 @@ import { registerNetworkDetailCommand } from './webviews/networkDetail';
 import { registerSshKeyCommands } from './commands/sshKeyCommands';
 import { registerFirewallCommands } from './commands/firewallCommands';
 import { registerVolumeCommands } from './commands/volumeCommands';
-import { registerStorageBoxCommands } from './commands/storageBoxCommands';
-import { registerLoadBalancerCommands } from './commands/loadBalancerCommands';
 import { TailscaleAuthKeyManager } from './tailscale/authKeyManager';
 import { SshKeyGuidePanel } from './webviews/sshKeyGuide';
 import { WelcomePage } from './webviews/welcomePage';
-import { RobotApiGuide } from './webviews/robotApiGuide';
 import { NetworkGuide } from './webviews/networkGuide';
 import { FirewallGuide } from './webviews/firewallGuide';
 import { VolumeGuide } from './webviews/volumeGuide';
@@ -43,8 +38,6 @@ export async function activate(context: vscode.ExtensionContext) {
 
   const tokenManager = new TokenManager(context.secrets);
   const tailscaleKeyManager = new TailscaleAuthKeyManager(context.secrets);
-  const robotCredManager = new RobotCredentialManager(context.secrets);
-  const boxPwdManager = new StorageBoxPasswordManager(context.secrets);
 
   // Tree data providers
   const setupProvider = new SetupProvider(tokenManager);
@@ -56,8 +49,6 @@ export async function activate(context: vscode.ExtensionContext) {
   const sshKeysProvider = new SshKeysProvider(tokenManager);
   const firewallsProvider = new FirewallsProvider(tokenManager);
   const volumesProvider = new VolumesProvider(tokenManager);
-  const storageBoxProvider = new StorageBoxProvider(robotCredManager);
-  const loadBalancersProvider = new LoadBalancersProvider(tokenManager);
 
   // Register tree views
   vscode.window.createTreeView('hcloud.setup', {
@@ -90,14 +81,6 @@ export async function activate(context: vscode.ExtensionContext) {
   });
   vscode.window.createTreeView('hcloud.volumes', {
     treeDataProvider: volumesProvider,
-    showCollapseAll: false,
-  });
-  vscode.window.createTreeView('hcloud.storageBoxes', {
-    treeDataProvider: storageBoxProvider,
-    showCollapseAll: false,
-  });
-  vscode.window.createTreeView('hcloud.loadBalancers', {
-    treeDataProvider: loadBalancersProvider,
     showCollapseAll: false,
   });
 
@@ -150,13 +133,6 @@ export async function activate(context: vscode.ExtensionContext) {
     })
   );
 
-  // Robot API Guide command
-  context.subscriptions.push(
-    vscode.commands.registerCommand('hcloud.robotApiGuide', () => {
-      RobotApiGuide.open(context);
-    })
-  );
-
   // Network Guide command
   context.subscriptions.push(
     vscode.commands.registerCommand('hcloud.networkGuide', () => {
@@ -204,17 +180,14 @@ export async function activate(context: vscode.ExtensionContext) {
     imagesProvider,
     sshKeysProvider,
     firewallsProvider,
-    volumesProvider,
-    loadBalancersProvider
+    volumesProvider
   );
-  registerServerCommands(context, tokenManager, serversProvider, tailscaleKeyManager, robotCredManager, boxPwdManager);
+  registerServerCommands(context, tokenManager, serversProvider, tailscaleKeyManager);
   registerNetworkCommands(context, tokenManager, networksProvider);
   registerNetworkDetailCommand(context);
   registerSshKeyCommands(context, tokenManager, sshKeysProvider);
   registerFirewallCommands(context, tokenManager, tailscaleKeyManager, firewallsProvider);
   registerVolumeCommands(context, tokenManager, volumesProvider);
-  registerStorageBoxCommands(context, tokenManager, robotCredManager, boxPwdManager, storageBoxProvider);
-  registerLoadBalancerCommands(context, tokenManager, loadBalancersProvider);
 }
 
 export function deactivate() {

@@ -18,7 +18,7 @@
 
 ---
 
-Hetzner Cloud Toolkit brings the Hetzner Cloud control panel into your editor. Create servers, manage networks, configure firewalls, attach volumes, balance load — all without leaving VS Code.
+Hetzner Cloud Toolkit brings the Hetzner Cloud control panel into your editor. Create servers, manage networks, configure firewalls, and attach volumes — all without leaving VS Code.
 
 ## Features
 
@@ -54,16 +54,6 @@ Hetzner Cloud Toolkit brings the Hetzner Cloud control panel into your editor. C
 - Attach and detach volumes from servers
 - Resize volumes
 - Delete with confirmation
-
-### ⚖️ Load Balancers
-- Create load balancers (type, location, algorithm selection)
-- Add and remove server targets — cross-location servers annotated with a warning
-- Delete load balancers with confirmation
-
-### 📦 Storage Boxes (Hetzner Robot)
-- List storage boxes from your Hetzner Robot account
-- Mount to servers via cloud-init injection
-- Copy CIFS mount commands to clipboard
 
 ### ☁️ Cloud-init Template Library
 - Save, load, and delete named cloud-init templates
@@ -131,7 +121,7 @@ Hetzner Cloud Toolkit brings the Hetzner Cloud control panel into your editor. C
 ## Privacy & Security
 
 - API tokens are stored using VS Code's built-in `SecretStorage` API (OS-level encrypted keychain — Windows Credential Manager, macOS Keychain, libsecret on Linux)
-- No data is sent anywhere except directly to `api.hetzner.cloud` and `robot-ws.your-server.de` (Robot API)
+- No data is sent anywhere except directly to `api.hetzner.cloud`
 - The extension makes no telemetry calls
 
 ---

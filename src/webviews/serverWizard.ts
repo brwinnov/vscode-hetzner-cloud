@@ -1,11 +1,9 @@
 import * as vscode from 'vscode';
-import { TokenManager, CloudInitLibrary, RobotCredentialManager, StorageBoxPasswordManager } from '../utils/secretStorage';
+import { TokenManager, CloudInitLibrary } from '../utils/secretStorage';
 import { ServersProvider } from '../providers/serversProvider';
 import { TailscaleAuthKeyManager } from '../tailscale/authKeyManager';
 import { injectTailscale } from '../tailscale/cloudInitInjector';
 import { HetznerClient, HLocation, HServerType, HImage, HSshKey, HNetwork } from '../api/hetzner';
-import { injectStorageBoxMounts } from '../utils/storageBoxInjector';
-import { promptStorageBoxMounts } from '../commands/storageBoxCommands';
 
 interface WizardData {
   locations: HLocation[];
@@ -26,9 +24,7 @@ export class ServerWizardPanel {
     private readonly client: HetznerClient,
     private readonly tailscaleKeyManager: TailscaleAuthKeyManager,
     private readonly serversProvider: ServersProvider,
-    private readonly library: CloudInitLibrary,
-    private readonly robotCredManager: RobotCredentialManager,
-    private readonly boxPwdManager: StorageBoxPasswordManager
+    private readonly library: CloudInitLibrary
   ) {
     this.panel = panel;
     this.panel.onDidDispose(() => this.dispose(), null, this.disposables);
@@ -43,9 +39,7 @@ export class ServerWizardPanel {
     context: vscode.ExtensionContext,
     tokenManager: TokenManager,
     tailscaleKeyManager: TailscaleAuthKeyManager,
-    serversProvider: ServersProvider,
-    robotCredManager: RobotCredentialManager,
-    boxPwdManager: StorageBoxPasswordManager
+    serversProvider: ServersProvider
   ): Promise<void> {
     const client = await tokenManager.getActiveClient();
     if (!client) {
@@ -68,9 +62,7 @@ export class ServerWizardPanel {
       client,
       tailscaleKeyManager,
       serversProvider,
-      new CloudInitLibrary(context.globalState),
-      robotCredManager,
-      boxPwdManager
+      new CloudInitLibrary(context.globalState)
     );
     await wizard.loadAndRender();
   }
@@ -227,17 +219,6 @@ export class ServerWizardPanel {
         if (confirmDel !== 'Delete') break;
         await this.library.deleteTemplate(pickedDel.label);
         vscode.window.showInformationMessage(`Template "${pickedDel.label}" deleted.`);
-        break;
-      }
-      case 'requestStorageBoxMounts': {
-        const existingCloudInit = ((msg.payload as { existingCloudInit?: string }) ?? {}).existingCloudInit ?? '';
-        const mounts = await promptStorageBoxMounts(this.robotCredManager, this.boxPwdManager);
-        if (!mounts || mounts.length === 0) break;
-        const injected = injectStorageBoxMounts(existingCloudInit, mounts);
-        this.panel.webview.postMessage({ command: 'cloudInitTemplateLoaded', content: injected });
-        vscode.window.showInformationMessage(
-          `Storage Box mount config injected into cloud-init (${mounts.length} box${mounts.length > 1 ? 'es' : ''}).`
-        );
         break;
       }
       case 'createSubnet': {
@@ -1043,7 +1024,6 @@ function getWizardHtml(data: WizardData): string {
           <button class="btn-secondary" style="font-size:12px;padding:4px 10px" data-action="save-cloud-init-template">&#128190; Save as Template</button>
           <button class="btn-secondary" style="font-size:12px;padding:4px 10px" data-action="load-cloud-init-template">&#128194; Load Template</button>
           <button class="btn-secondary" style="font-size:12px;padding:4px 10px" data-action="delete-cloud-init-template">&#128465; Delete Template</button>
-          <button class="btn-secondary" style="font-size:12px;padding:4px 10px" data-action="request-storage-box-mounts">&#128230; Mount Storage Boxes</button>
         </div>
       </div>
     </div>
@@ -1150,10 +1130,6 @@ function loadCloudInitTemplate() {
 function deleteCloudInitTemplate() {
   vscode.postMessage({ command: 'deleteCloudInitTemplate' });
 }
-function requestStorageBoxMounts() {
-  vscode.postMessage({ command: 'requestStorageBoxMounts', payload: { existingCloudInit: document.getElementById('cloudInitInput').value } });
-}
-
 function acquireVsCodeInstance() {
   try { return acquireVsCodeApi(); } catch(e) { return { postMessage: console.log }; }
 }
@@ -1372,8 +1348,6 @@ document.addEventListener('DOMContentLoaded', () => {
       loadCloudInitTemplate();
     } else if (action === 'delete-cloud-init-template') {
       deleteCloudInitTemplate();
-    } else if (action === 'request-storage-box-mounts') {
-      requestStorageBoxMounts();
     }
   });
 });

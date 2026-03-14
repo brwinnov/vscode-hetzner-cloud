@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { TokenManager, RobotCredentialManager, StorageBoxPasswordManager } from '../utils/secretStorage';
+import { TokenManager } from '../utils/secretStorage';
 import { ServersProvider, ServerItem } from '../providers/serversProvider';
 import { TailscaleAuthKeyManager } from '../tailscale/authKeyManager';
 import { ServerWizardPanel } from '../webviews/serverWizard';
@@ -9,9 +9,7 @@ export function registerServerCommands(
   context: vscode.ExtensionContext,
   tokenManager: TokenManager,
   serversProvider: ServersProvider,
-  tailscaleKeyManager: TailscaleAuthKeyManager,
-  robotCredManager: RobotCredentialManager,
-  boxPwdManager: StorageBoxPasswordManager
+  tailscaleKeyManager: TailscaleAuthKeyManager
 ) {  // Refresh
   context.subscriptions.push(
     vscode.commands.registerCommand('hcloud.refreshServers', () => serversProvider.refresh())
@@ -118,7 +116,7 @@ export function registerServerCommands(
   // Create Server — opens WebView wizard
   context.subscriptions.push(
     vscode.commands.registerCommand('hcloud.createServer', async () => {
-      await ServerWizardPanel.create(context, tokenManager, tailscaleKeyManager, serversProvider, robotCredManager, boxPwdManager);
+      await ServerWizardPanel.create(context, tokenManager, tailscaleKeyManager, serversProvider);
     })
   );
 

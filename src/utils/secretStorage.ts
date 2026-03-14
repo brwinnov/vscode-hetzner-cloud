@@ -101,59 +101,6 @@ export class TokenManager {
   }
 }
 
-// ── Robot API Credentials ─────────────────────────────────────────────────
-// Robot credentials (for Storage Boxes) are separate from Cloud API tokens.
-// They are set at https://robot.hetzner.com → Settings → Webservice & API.
-
-export class RobotCredentialManager {
-  constructor(private readonly secrets: vscode.SecretStorage) {}
-
-  async setCredentials(username: string, password: string): Promise<void> {
-    await this.secrets.store('hcloud.robot.username', username);
-    await this.secrets.store('hcloud.robot.password', password);
-  }
-
-  async getCredentials(): Promise<{ username: string; password: string } | undefined> {
-    const username = await this.secrets.get('hcloud.robot.username');
-    const password = await this.secrets.get('hcloud.robot.password');
-    if (!username || !password) return undefined;
-    return { username, password };
-  }
-
-  async clearCredentials(): Promise<void> {
-    await this.secrets.delete('hcloud.robot.username');
-    await this.secrets.delete('hcloud.robot.password');
-  }
-
-  async getClient(): Promise<import('../api/robot').RobotClient | undefined> {
-    const creds = await this.getCredentials();
-    if (!creds) return undefined;
-    const { RobotClient } = await import('../api/robot.js');
-    return new RobotClient(creds.username, creds.password);
-  }
-}
-
-// ── Storage Box Password Store ────────────────────────────────────────────
-// Per-box CIFS passwords are stored keyed by box login (e.g. "u123456").
-
-const BOX_PWD_PREFIX = 'hcloud.storagebox.pwd.';
-
-export class StorageBoxPasswordManager {
-  constructor(private readonly secrets: vscode.SecretStorage) {}
-
-  async setPassword(login: string, password: string): Promise<void> {
-    await this.secrets.store(`${BOX_PWD_PREFIX}${login}`, password);
-  }
-
-  async getPassword(login: string): Promise<string | undefined> {
-    return this.secrets.get(`${BOX_PWD_PREFIX}${login}`);
-  }
-
-  async clearPassword(login: string): Promise<void> {
-    await this.secrets.delete(`${BOX_PWD_PREFIX}${login}`);
-  }
-}
-
 // ── Cloud-init Template Library ───────────────────────────────────────────
 
 const TEMPLATE_INDEX_KEY = 'hcloud.cloudInit.index';
