@@ -111,20 +111,6 @@ export async function activate(context: vscode.ExtensionContext) {
   );
   WelcomePage.openOnFirstInstall(context);
 
-  // Cloud Console command (Coming Soon placeholder)
-  context.subscriptions.push(
-    vscode.commands.registerCommand('hcloud.cloudConsole', () => {
-      vscode.window.showInformationMessage(
-        '☁️ Cloud Console - Coming Soon! This will provide a custom-designed Hetzner Cloud Console view inside VS Code.',
-        'Learn More'
-      ).then(selection => {
-        if (selection === 'Learn More') {
-          vscode.env.openExternal(vscode.Uri.parse('https://github.com/brwinnov/vscode-hetzner-cloud/issues'));
-        }
-      });
-    })
-  );
-
   // SSH Key Guide command
   context.subscriptions.push(
     vscode.commands.registerCommand('hcloud.sshKeyGuide', () => {

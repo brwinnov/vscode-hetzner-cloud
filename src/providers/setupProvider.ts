@@ -31,15 +31,6 @@ export class SetupProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
     welcome.contextValue = 'setup-welcome';
     items.push(welcome);
 
-    // Cloud Console (Coming Soon)
-    const cloudConsole = new vscode.TreeItem('☁️ Cloud Console');
-    cloudConsole.iconPath = new vscode.ThemeIcon('globe', new vscode.ThemeColor('charts.blue'));
-    cloudConsole.description = 'Coming Soon';
-    cloudConsole.tooltip = 'Custom Hetzner Cloud Console view (Coming Soon)';
-    cloudConsole.command = { command: 'hcloud.cloudConsole', title: 'Cloud Console' };
-    cloudConsole.contextValue = 'setup-cloudconsole';
-    items.push(cloudConsole);
-
     // Task 1: Add API Key
     const addToken = new vscode.TreeItem('Add Hetzner Project API Key');
     addToken.iconPath = hasProject
