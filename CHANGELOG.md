@@ -10,6 +10,13 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.4.4] - 2026-03-14
+
+### Changed
+- Release packaging: published next VSIX build after security hardening and audit-gate updates
+
+---
+
 ## [0.4.3] - 2026-03-14
 
 ### Fixed
