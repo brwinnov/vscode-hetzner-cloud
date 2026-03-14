@@ -234,7 +234,7 @@ export class ServerWizardPanel {
     this.panel.webview.postMessage({ command: 'setLoading', message: 'Creating server...' });
 
     try {
-      let cloudInit = payload.cloudInit || '';
+      const cloudInit = payload.cloudInit || '';
 
       const { root_password } = await this.client.createServer({
         name: payload.name,
@@ -312,11 +312,11 @@ function getErrorHtml(msg: string): string {
 
 function getWizardHtml(data: WizardData): string {
   const nonce = generateNonce();
-  const locationsJson = JSON.stringify(data.locations);
-  const serverTypesJson = JSON.stringify(data.serverTypes);
-  const imagesJson = JSON.stringify(data.images);
-  const sshKeysJson = JSON.stringify(data.sshKeys);
-  const networksJson = JSON.stringify(data.networks);
+  const locationsB64 = Buffer.from(JSON.stringify(data.locations), 'utf8').toString('base64');
+  const serverTypesB64 = Buffer.from(JSON.stringify(data.serverTypes), 'utf8').toString('base64');
+  const imagesB64 = Buffer.from(JSON.stringify(data.images), 'utf8').toString('base64');
+  const sshKeysB64 = Buffer.from(JSON.stringify(data.sshKeys), 'utf8').toString('base64');
+  const networksB64 = Buffer.from(JSON.stringify(data.networks), 'utf8').toString('base64');
 
   return /* html */ `<!DOCTYPE html>
 <html lang="en">
@@ -998,11 +998,16 @@ function getWizardHtml(data: WizardData): string {
 
 <script nonce="${nonce}">
 const vscode = acquireVsCodeInstance();
-const LOCATIONS = ${locationsJson};
-const SERVER_TYPES = ${serverTypesJson};
-const IMAGES = ${imagesJson};
-let SSH_KEYS = ${sshKeysJson};
-let NETWORKS = ${networksJson};
+function decodeB64Json(b64) {
+  const binary = atob(b64);
+  const bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
+  return JSON.parse(new TextDecoder().decode(bytes));
+}
+const LOCATIONS = decodeB64Json('${locationsB64}');
+const SERVER_TYPES = decodeB64Json('${serverTypesB64}');
+const IMAGES = decodeB64Json('${imagesB64}');
+let SSH_KEYS = decodeB64Json('${sshKeysB64}');
+let NETWORKS = decodeB64Json('${networksB64}');
 
 // HTML-escape helper — used in all innerHTML renders
 function h(s) {

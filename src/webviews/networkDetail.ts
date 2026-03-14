@@ -145,8 +145,11 @@ export class NetworkDetailPanel {
 // Command registration helper
 export function registerNetworkDetailCommand(context: vscode.ExtensionContext) {
   context.subscriptions.push(
-    vscode.commands.registerCommand('hcloud.showNetworkDetail', async (item: any) => {
-      const network = item.network || item;
+    vscode.commands.registerCommand('hcloud.showNetworkDetail', async (item: HNetwork | { network: HNetwork } | undefined) => {
+      if (!item) {
+        return;
+      }
+      const network = 'network' in item ? item.network : item;
       NetworkDetailPanel.open(network);
     })
   );

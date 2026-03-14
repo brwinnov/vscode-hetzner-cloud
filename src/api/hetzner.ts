@@ -179,13 +179,13 @@ export class HetznerClient {
 
     if (!res.ok) {
       // Try to parse error response, but handle empty body gracefully
-      let err;
+      let err: { error?: { message?: string } };
       try {
-        err = await res.json();
+        err = (await res.json()) as { error?: { message?: string } };
       } catch {
         err = { error: { message: res.statusText } };
       }
-      throw new Error(`Hetzner API error ${res.status}: ${(err as any).error?.message ?? res.statusText}`);
+      throw new Error(`Hetzner API error ${res.status}: ${err.error?.message ?? res.statusText}`);
     }
 
     // For DELETE requests, Hetzner API may return empty body

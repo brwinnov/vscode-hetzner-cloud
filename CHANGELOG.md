@@ -10,6 +10,19 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.4.3] - 2026-03-14
+
+### Fixed
+- Security: hardened `serverWizard` WebView bootstrap data transport to avoid script-break injection from untrusted API values by decoding base64 JSON at runtime
+- Security: upgraded and pinned vulnerable dependencies to remove all high-severity `npm audit` findings (remaining advisories are moderate in packaging toolchain)
+- Lint and type-safety cleanup across API and WebViews (`any` reductions, const usage, and minor regex cleanup)
+
+### Added
+- Security governance: `SECURITY.md` policy with documented temporary exception for `@vscode/vsce -> yauzl` moderate advisory (no upstream fix available)
+- CI guardrail: GitHub Actions workflow `security-audit.yml` to fail on high/critical vulnerabilities only
+
+---
+
 ## [0.3.1] - 2026-03-12
 
 ### Fixed

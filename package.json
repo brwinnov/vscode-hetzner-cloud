@@ -2,7 +2,7 @@
   "name": "vscode-hetzner-cloud",
   "displayName": "Hetzner Cloud Toolkit",
   "description": "Manage Hetzner Cloud infrastructure directly from VS Code — servers, networks, SSH keys, Tailscale and more",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "publisher": "brwinnovvsce",
   "engines": {
     "vscode": "^1.85.0"
@@ -546,19 +546,26 @@
     "watch": "node esbuild.js --watch",
     "package": "npx vsce package",
     "lint": "eslint src --ext ts",
-    "test": "vscode-test"
+    "test": "vscode-test",
+    "audit:high": "npm audit --audit-level=high"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",
     "@types/vscode": "^1.85.0",
-    "@typescript-eslint/eslint-plugin": "^6.0.0",
-    "@typescript-eslint/parser": "^6.0.0",
-    "@vscode/test-cli": "^0.0.6",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "@vscode/test-cli": "^0.0.12",
     "@vscode/test-electron": "^2.3.8",
     "@vscode/vsce": "^3.7.1",
-    "esbuild": "^0.20.0",
+    "esbuild": "^0.27.4",
     "eslint": "^8.56.0",
     "prettier": "^3.2.0",
     "typescript": "^5.3.0"
+  },
+  "overrides": {
+    "flatted": "^3.4.0",
+    "undici": "^7.24.0",
+    "serialize-javascript": "^7.0.4",
+    "diff": "^8.0.3"
   }
 }

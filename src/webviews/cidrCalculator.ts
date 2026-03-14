@@ -633,7 +633,7 @@ function getCidrCalculatorHtml(nonce: string): string {
   inputEl.addEventListener('input', function() {
     errorEl.classList.remove('visible');
     var val = inputEl.value.trim();
-    if (/^[\d.]+\/\d+$/.test(val)) doCalculate();
+    if (/^[0-9.]+[/][0-9]+$/.test(val)) doCalculate();
   });
 })();
 </script>

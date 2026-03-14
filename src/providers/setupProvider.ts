@@ -1,8 +1,6 @@
 import * as vscode from 'vscode';
 import { TokenManager } from '../utils/secretStorage';
 
-type SetupItem = vscode.TreeItem & { itemType: string };
-
 export class SetupProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
   private _onDidChangeTreeData = new vscode.EventEmitter<vscode.TreeItem | undefined | void>();
   readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
