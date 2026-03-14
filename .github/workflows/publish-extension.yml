@@ -1,0 +1,86 @@
+name: Publish VS Code Extension
+
+# Triggered by pushing a version tag, e.g. git tag v0.4.5 && git push --tags
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  publish:
+    name: Build, Release & Publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # needed to create GitHub Releases and upload assets
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Production build
+        run: npm run build:prod
+
+      - name: Package extension (.vsix)
+        run: npx vsce package --no-dependencies
+        # --no-dependencies skips the npm install bundling check since we
+        # bundle everything with esbuild into dist/extension.js
+
+      - name: Determine VSIX filename
+        id: vsix
+        run: |
+          FILE=$(ls *.vsix | head -n1)
+          echo "path=$FILE" >> "$GITHUB_OUTPUT"
+          echo "name=$(basename $FILE)" >> "$GITHUB_OUTPUT"
+
+      # ── 1. GitHub Release (always runs — uses built-in GITHUB_TOKEN) ────────
+      - name: Create GitHub Release and upload VSIX
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ steps.vsix.outputs.path }}
+          generate_release_notes: true
+
+      # ── 2. VS Marketplace (runs only when VSCE_PAT secret is set) ───────────
+      #
+      #  How to obtain a VSCE_PAT:
+      #    1. Log into https://dev.azure.com with the Microsoft account that
+      #       owns the 'brwinnovvsce' publisher (account B / personal account).
+      #    2. User settings → Personal Access Tokens → New Token.
+      #       Scope: Marketplace → Publish (custom scope).
+      #       Organisation: "All accessible organisations".
+      #    3. Copy the token and save it as a GitHub secret named VSCE_PAT
+      #       (repo Settings → Secrets and variables → Actions → New secret).
+      #
+      - name: Publish to VS Marketplace
+        if: secrets.VSCE_PAT != ''
+        run: npx vsce publish --no-dependencies -p "$VSCE_PAT"
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+
+      # ── 3. Open VSX Registry (runs only when OVSX_PAT secret is set) ────────
+      #
+      #  Open VSX is a vendor-neutral alternative to the VS Marketplace.
+      #  It works with VS Codium and many other editors, and does NOT require
+      #  an Azure DevOps account — only a free account at https://open-vsx.org.
+      #
+      #  How to obtain an OVSX_PAT:
+      #    1. Sign up / log in at https://open-vsx.org (GitHub OAuth is fine).
+      #    2. Go to your user settings → Generate Access Token.
+      #    3. Save it as a GitHub secret named OVSX_PAT.
+      #
+      - name: Publish to Open VSX Registry
+        if: secrets.OVSX_PAT != ''
+        run: npx ovsx publish "${{ steps.vsix.outputs.path }}" -p "$OVSX_PAT"
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
