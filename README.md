@@ -94,11 +94,6 @@ Hetzner Cloud Toolkit brings the Hetzner Cloud control panel into your editor. C
 
 ---
 
-## Extension Settings
-
-| Setting | Default | Description |
-|---|---|---|
-
 ---
 
 ## Requirements

@@ -31,9 +31,6 @@ mindmap
       Key generation guide
     Images
       List system + snapshots
-    Tailscale
-      Auth key store
-      Cloud-init injection
     Onboarding
       SETUP panel task list
       SSH Key Guide WebView
@@ -60,9 +57,6 @@ graph TD
     A --> K[PROJECTS Panel]
 
     H --> C
-    B --> L[TailscaleAuthKeyManager<br/>SecretStorage]
-    L --> M[CloudInitInjector]
-    M --> H
 ```
 
 ---
@@ -84,9 +78,8 @@ gantt
     Network subnets              :2026-03, 1w
 
     section v0.3.0
-    Cloud-init template library  :2026-04, 2w
-    Server status polling        :2026-04, 1w
-    Tailscale wizard integration :2026-04, 1w
+    Cloud-init template library  :done, 2026-04, 2w
+    Server status polling        :done, 2026-04, 1w
 
     section v1.0.0
     Firewall CRUD                :2026-05, 3w
@@ -114,7 +107,6 @@ gantt
 |---|---------|-------|
 | 5 | **Cloud-init template library** | Save/load named templates via SecretStorage |
 | 6 | **Server status polling** | Poll while `initializing`, update tree icon live |
-| 7 | **Tailscale key linked into wizard** | Warn/prompt if Tailscale toggled on but no key stored |
 
 ### v1.0.0 — Full Coverage
 
@@ -129,7 +121,8 @@ gantt
 
 | # | Feature | Notes |
 |---|---------|-------|
-| 12 | **Custom Cloud Console WebView** | Embedded Hetzner Cloud Console inside VS Code with custom design/skin/layout. Would show login page → custom dashboard. Coming Soon placeholder added to Setup section. |
+| 12 | **Tailscale integration** | Parked — store auth key, auto-inject into cloud-init on server creation |
+| 13 | **Custom Cloud Console WebView** | Embedded Hetzner Cloud Console inside VS Code with custom design/skin/layout. |
 | 13 | **Multiple API tokens per project** | Support adding multiple tokens for same project (token rotation, different access levels). Current: 1 token = 1 project. Note: Hetzner Cloud API tokens are per-project only (no global account token exists). |
 | 14 | **Token metadata & labels** | Label tokens by purpose (e.g. "Production Read-Only", "Staging Full Access") for better organization |
 | 15 | **API token health check** | Periodic validation to detect expired/revoked tokens; show warning icon in Projects tree |
