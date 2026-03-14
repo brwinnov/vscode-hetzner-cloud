@@ -15,10 +15,10 @@ import { registerNetworkDetailCommand } from './webviews/networkDetail';
 import { registerSshKeyCommands } from './commands/sshKeyCommands';
 import { registerFirewallCommands } from './commands/firewallCommands';
 import { registerVolumeCommands } from './commands/volumeCommands';
-import { TailscaleAuthKeyManager } from './tailscale/authKeyManager';
 import { SshKeyGuidePanel } from './webviews/sshKeyGuide';
 import { WelcomePage } from './webviews/welcomePage';
 import { NetworkGuide } from './webviews/networkGuide';
+import { CidrCalculator } from './webviews/cidrCalculator';
 import { FirewallGuide } from './webviews/firewallGuide';
 import { VolumeGuide } from './webviews/volumeGuide';
 import { ImageGuide } from './webviews/imageGuide';
@@ -37,7 +37,6 @@ export async function activate(context: vscode.ExtensionContext) {
   }
 
   const tokenManager = new TokenManager(context.secrets);
-  const tailscaleKeyManager = new TailscaleAuthKeyManager(context.secrets);
 
   // Tree data providers
   const setupProvider = new SetupProvider(tokenManager);
@@ -140,6 +139,13 @@ export async function activate(context: vscode.ExtensionContext) {
     })
   );
 
+  // CIDR Calculator command
+  context.subscriptions.push(
+    vscode.commands.registerCommand('hcloud.cidrCalculator', () => {
+      CidrCalculator.open(context);
+    })
+  );
+
   // Firewall Guide command
   context.subscriptions.push(
     vscode.commands.registerCommand('hcloud.firewallGuide', () => {
@@ -161,13 +167,6 @@ export async function activate(context: vscode.ExtensionContext) {
     })
   );
 
-  // Tailscale key command
-  context.subscriptions.push(
-    vscode.commands.registerCommand('hcloud.setTailscaleKey', async () => {
-      await tailscaleKeyManager.promptAndSave();
-    })
-  );
-
   // Register all commands
   registerTokenCommands(
     context,
@@ -182,11 +181,11 @@ export async function activate(context: vscode.ExtensionContext) {
     firewallsProvider,
     volumesProvider
   );
-  registerServerCommands(context, tokenManager, serversProvider, tailscaleKeyManager);
+  registerServerCommands(context, tokenManager, serversProvider);
   registerNetworkCommands(context, tokenManager, networksProvider);
   registerNetworkDetailCommand(context);
   registerSshKeyCommands(context, tokenManager, sshKeysProvider);
-  registerFirewallCommands(context, tokenManager, tailscaleKeyManager, firewallsProvider);
+  registerFirewallCommands(context, tokenManager, firewallsProvider);
   registerVolumeCommands(context, tokenManager, volumesProvider);
 }
 

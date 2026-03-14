@@ -35,6 +35,9 @@ export class NetworkGuide {
         case 'openDocs':
           vscode.env.openExternal(vscode.Uri.parse('https://docs.hetzner.cloud/#networks'));
           break;
+        case 'cidrCalculator':
+          await vscode.commands.executeCommand('hcloud.cidrCalculator');
+          break;
       }
     }, undefined, context.subscriptions);
   }
@@ -223,6 +226,7 @@ function getNetworkGuideHtml(nonce: string): string {
 
 <button class="btn btn-primary" id="btn-create-network">+ Create Network</button>
 <button class="btn btn-secondary" id="btn-add-subnet">+ Add Subnet</button>
+<button class="btn btn-secondary" id="btn-cidr-calc">🔢 CIDR Calculator</button>
 <button class="btn btn-secondary" id="btn-open-docs">📖 Hetzner Networks Docs</button>
 
 <hr class="divider">
@@ -330,17 +334,6 @@ function getNetworkGuideHtml(nonce: string): string {
     <p class="tip">Network range: <code>10.20.0.0/16</code> — one subnet per Hetzner zone</p>
   </div>
 
-  <div class="use-case">
-    <div class="use-case-title">🔒 Tailscale + private network</div>
-    <div class="use-case-desc">
-      Tailscale provides encrypted mesh VPN between all nodes (even across regions). The Hetzner private network handles high-throughput internal traffic (storage replication, DB sync) without consuming Tailscale bandwidth.
-    </div>
-    <ul class="subnet-list">
-      <li><span class="subnet-tag">10.30.1.0/24</span><span class="subnet-label">All servers — high-speed internal LAN</span></li>
-      <li><span class="subnet-tag">100.64.x.x</span><span class="subnet-label">Tailscale mesh overlay (automatic, no subnet needed)</span></li>
-    </ul>
-    <p class="tip">Enable Tailscale in the server wizard to auto-inject the auth key into cloud-init.</p>
-  </div>
 
 </div>
 
@@ -355,6 +348,7 @@ function getNetworkGuideHtml(nonce: string): string {
   }
   wire('btn-create-network', 'createNetwork');
   wire('btn-add-subnet',     'addSubnet');
+  wire('btn-cidr-calc',      'cidrCalculator');
   wire('btn-open-docs',      'openDocs');
 })();
 </script>

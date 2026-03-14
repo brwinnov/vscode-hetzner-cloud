@@ -435,15 +435,6 @@ function getWelcomeHtml(nonce: string): string {
     </div>
 
     <div class="feature-card">
-      <div class="feature-icon">🐉</div>
-      <div class="feature-title">Tailscale Integration</div>
-      <div class="feature-desc">
-        Store a Tailscale auth key and inject it automatically into the cloud-init
-        configuration when creating a new server — new servers join your Tailnet on first boot.
-      </div>
-    </div>
-
-    <div class="feature-card">
       <div class="feature-icon">📝</div>
       <div class="feature-title">Cloud-Init Library</div>
       <div class="feature-desc">
@@ -456,7 +447,7 @@ function getWelcomeHtml(nonce: string): string {
       <div class="feature-icon">🔒</div>
       <div class="feature-title">Secure by Design</div>
       <div class="feature-desc">
-        All API tokens, SSH keys, and Tailscale keys are stored
+        All API tokens and SSH keys are stored
         in VS Code's OS-encrypted SecretStorage. Zero hardcoded credentials. HTTPS only.
       </div>
     </div>
@@ -543,7 +534,6 @@ function getWelcomeHtml(nonce: string): string {
   <a href="https://github.com/brwinnov/vscode-hetzner-cloud" target="_blank">GitHub Repository</a>
   <a href="https://github.com/brwinnov/vscode-hetzner-cloud/issues" target="_blank">Report an Issue</a>
   <a href="https://docs.hetzner.cloud" target="_blank">Hetzner Cloud API Docs</a>
-  <a href="https://tailscale.com" target="_blank">Tailscale</a>
   <span style="margin-left:auto;color:var(--vscode-descriptionForeground)">Hetzner Cloud Toolkit v0.1.0 — Not affiliated with Hetzner Online GmbH</span>
 </div>
 

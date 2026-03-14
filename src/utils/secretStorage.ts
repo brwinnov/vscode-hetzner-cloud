@@ -22,7 +22,7 @@ export async function cleanupLegacyKeys(secrets: vscode.SecretStorage): Promise<
   }
 
   // Delete remaining known legacy keys regardless of index
-  for (const key of ['hetznet.activeProject', 'hetznet.tailscale.authkey']) {
+  for (const key of ['hetznet.activeProject']) {
     await secrets.delete(key);
   }
 

@@ -74,15 +74,6 @@ export class SetupProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
     sshGuide.contextValue = 'setup-sshguide';
     items.push(sshGuide);
 
-    // Task 3: Tailscale Key (optional but shown as advisory)
-    const tailscale = new vscode.TreeItem('Tailscale Auth Key');
-    tailscale.iconPath = new vscode.ThemeIcon('lock', new vscode.ThemeColor('charts.purple'));
-    tailscale.description = 'Optional — auto-install on every server';
-    tailscale.tooltip = 'Set a Tailscale auth key to auto-provision servers into your Tailnet';
-    tailscale.command = { command: 'hcloud.setTailscaleKey', title: 'Set Tailscale Key' };
-    tailscale.contextValue = 'setup-tailscale';
-    items.push(tailscale);
-
     return items;
   }
 }

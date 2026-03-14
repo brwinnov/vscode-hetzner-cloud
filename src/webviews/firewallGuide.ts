@@ -268,7 +268,7 @@ function getFirewallGuideHtml(nonce: string): string {
     <div class="label">Protocol</div>
     <div class="title">TCP · UDP · ICMP · ESP · GRE</div>
     <p><strong>TCP</strong> — web, SSH, databases, most services.<br><br>
-       <strong>UDP</strong> — DNS, VPNs (WireGuard/Tailscale UDP 41641), game servers.<br><br>
+       <strong>UDP</strong> — DNS, VPNs (WireGuard, game servers), custom services.<br><br>
        <strong>ICMP</strong> — ping / traceroute. No port field.<br><br>
        <strong>ESP / GRE</strong> — IPsec and GRE tunnel encapsulation. No port field.</p>
   </div>
@@ -318,22 +318,6 @@ function getFirewallGuideHtml(nonce: string): string {
     <tr>
       <td><span class="badge badge-in">in</span></td>
       <td>ICMP</td><td>—</td><td><code>0.0.0.0/0, ::/0</code></td><td>Ping / Traceroute</td>
-    </tr>
-  </tbody>
-</table>
-
-<p>If a <strong>Tailscale auth key</strong> is configured in the extension, you will also be offered:</p>
-
-<table class="rule-table">
-  <thead>
-    <tr>
-      <th>Direction</th><th>Protocol</th><th>Port</th><th>Source</th><th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><span class="badge badge-in">in</span></td>
-      <td>UDP</td><td><code>41641</code></td><td><code>0.0.0.0/0, ::/0</code></td><td>Tailscale WireGuard</td>
     </tr>
   </tbody>
 </table>
@@ -389,23 +373,6 @@ function getFirewallGuideHtml(nonce: string): string {
         <tr><td><span class="badge badge-in">in</span></td><td>ICMP</td><td>—</td><td><code>0.0.0.0/0, ::/0</code></td><td>Ping</td></tr>
       </tbody>
     </table>
-  </div>
-
-  <div class="use-case">
-    <div class="use-case-title">🔒 Tailscale-managed server (no public SSH)</div>
-    <div class="use-case-desc">
-      All admin access is via Tailscale mesh VPN. SSH is blocked from the public internet entirely.
-      Only the WireGuard handshake port needs to be open.
-    </div>
-    <table class="rule-table">
-      <thead><tr><th>Dir</th><th>Protocol</th><th>Port</th><th>Source</th><th>Note</th></tr></thead>
-      <tbody>
-        <tr><td><span class="badge badge-in">in</span></td><td>UDP</td><td><code>41641</code></td><td><code>0.0.0.0/0, ::/0</code></td><td>Tailscale WireGuard handshake</td></tr>
-        <tr><td><span class="badge badge-in">in</span></td><td>TCP</td><td><code>443</code></td><td><code>0.0.0.0/0, ::/0</code></td><td>HTTPS — if serving web traffic</td></tr>
-        <tr><td><span class="badge badge-in">in</span></td><td>ICMP</td><td>—</td><td><code>0.0.0.0/0, ::/0</code></td><td>Ping</td></tr>
-      </tbody>
-    </table>
-    <p class="tip">SSH (port 22) is intentionally absent — you connect via <code>ssh user@100.x.x.x</code> over the Tailscale IP.</p>
   </div>
 
   <div class="use-case">

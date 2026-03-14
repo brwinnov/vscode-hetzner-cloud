@@ -1,7 +1,6 @@
 import * as vscode from 'vscode';
 import { HFirewallRule } from '../api/hetzner';
 import { TokenManager } from '../utils/secretStorage';
-import { TailscaleAuthKeyManager } from '../tailscale/authKeyManager';
 import { FirewallsProvider, FirewallItem, RuleItem } from '../providers/firewallsProvider';
 
 // ── Default rule sets ──────────────────────────────────────────────────────
@@ -29,18 +28,11 @@ const DEFAULT_RULES: HFirewallRule[] = [
   },
 ];
 
-const TAILSCALE_RULE: HFirewallRule = {
-  direction: 'in', protocol: 'udp', port: '41641',
-  source_ips: ['0.0.0.0/0', '::/0'], destination_ips: [],
-  description: 'Tailscale WireGuard',
-};
-
 // ── Command registration ───────────────────────────────────────────────────
 
 export function registerFirewallCommands(
   context: vscode.ExtensionContext,
   tokenManager: TokenManager,
-  tailscaleKeyManager: TailscaleAuthKeyManager,
   firewallsProvider: FirewallsProvider
 ) {
   // Refresh
@@ -77,20 +69,6 @@ export function registerFirewallCommands(
       let rules: HFirewallRule[] = [];
       if (ruleChoice.value === 'default') {
         rules = [...DEFAULT_RULES];
-        // Offer to include Tailscale rule if a key is configured
-        const tsKey = await tailscaleKeyManager.getAuthKey();
-        if (tsKey) {
-          const includeTailscale = await vscode.window.showQuickPick(
-            [
-              { label: '$(check) Yes — include Tailscale UDP 41641', value: true },
-              { label: '$(close) No', value: false },
-            ],
-            { title: 'Include Tailscale WireGuard rule?', placeHolder: 'Tailscale auth key is set' }
-          );
-          if (includeTailscale?.value) {
-            rules.push(TAILSCALE_RULE);
-          }
-        }
       }
 
       try {

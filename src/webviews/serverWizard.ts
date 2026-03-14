@@ -1,8 +1,6 @@
 import * as vscode from 'vscode';
 import { TokenManager, CloudInitLibrary } from '../utils/secretStorage';
 import { ServersProvider } from '../providers/serversProvider';
-import { TailscaleAuthKeyManager } from '../tailscale/authKeyManager';
-import { injectTailscale } from '../tailscale/cloudInitInjector';
 import { HetznerClient, HLocation, HServerType, HImage, HSshKey, HNetwork } from '../api/hetzner';
 
 interface WizardData {
@@ -11,7 +9,6 @@ interface WizardData {
   images: HImage[];
   sshKeys: HSshKey[];
   networks: HNetwork[];
-  tailscaleEnabled: boolean;
   defaultRegion: string;
 }
 
@@ -22,7 +19,6 @@ export class ServerWizardPanel {
   private constructor(
     panel: vscode.WebviewPanel,
     private readonly client: HetznerClient,
-    private readonly tailscaleKeyManager: TailscaleAuthKeyManager,
     private readonly serversProvider: ServersProvider,
     private readonly library: CloudInitLibrary
   ) {
@@ -38,7 +34,6 @@ export class ServerWizardPanel {
   static async create(
     context: vscode.ExtensionContext,
     tokenManager: TokenManager,
-    tailscaleKeyManager: TailscaleAuthKeyManager,
     serversProvider: ServersProvider
   ): Promise<void> {
     const client = await tokenManager.getActiveClient();
@@ -60,7 +55,6 @@ export class ServerWizardPanel {
     const wizard = new ServerWizardPanel(
       panel,
       client,
-      tailscaleKeyManager,
       serversProvider,
       new CloudInitLibrary(context.globalState)
     );
@@ -89,18 +83,10 @@ export class ServerWizardPanel {
         images: [...systemImages, ...snapshots],
         sshKeys,
         networks,
-        tailscaleEnabled: false,  // Default disabled; only enable if token exists
         defaultRegion: cfg.get<string>('defaultRegion', 'nbg1'),
       };
 
       this.panel.webview.html = getWizardHtml(data);
-      
-      // Check if Tailscale key exists and send initial state to webview
-      const tsKey = await this.tailscaleKeyManager.getAuthKey();
-      this.panel.webview.postMessage({ 
-        command: 'tailscaleTokenExists',
-        hasToken: !!tsKey
-      });
     } catch (err: unknown) {
       this.panel.webview.html = getErrorHtml((err as Error).message);
     }
@@ -113,10 +99,6 @@ export class ServerWizardPanel {
         break;
       case 'cancel':
         this.panel.dispose();
-        break;
-      case 'setTailscaleKey':
-        await this.tailscaleKeyManager.promptAndSave();
-        this.panel.webview.postMessage({ command: 'tailscaleKeySet' });
         break;
       case 'addSshKey': {
         // Snapshot existing keys so we can detect what was newly added
@@ -254,18 +236,6 @@ export class ServerWizardPanel {
     try {
       let cloudInit = payload.cloudInit || '';
 
-      if (payload.tailscaleEnabled) {
-        const tsKey = await this.tailscaleKeyManager.getAuthKey();
-        if (!tsKey) {
-          this.panel.webview.postMessage({
-            command: 'error',
-            message: 'Tailscale is enabled but no auth key is set. Click "Set Tailscale Key" in the wizard.',
-          });
-          return;
-        }
-        cloudInit = injectTailscale(cloudInit, tsKey);
-      }
-
       const { root_password } = await this.client.createServer({
         name: payload.name,
         server_type: payload.serverType,
@@ -317,7 +287,6 @@ interface CreateServerPayload {
   sshKeys: string[];
   networks: number[];
   cloudInit: string;
-  tailscaleEnabled: boolean;
 }
 
 /** Cryptographically-adequate nonce for CSP inline script allowlisting. */
@@ -989,37 +958,18 @@ function getWizardHtml(data: WizardData): string {
 
     <!-- ── Step 5: Cloud-init ── -->
     <div class="step-panel" id="step5">
-      <h1>Cloud-init &amp; Tailscale</h1>
-      <p class="subtitle">Customize startup scripts. Tailscale is injected automatically when enabled.</p>
+      <h1>Cloud-init</h1>
+      <p class="subtitle">Customize startup scripts that run on first boot.</p>
 
       <div class="actions">
         <button class="btn-secondary">← Back</button>
         <button class="btn-primary ml-auto">Review →</button>
       </div>
 
-      <div class="toggle-row">
-        <div>
-          <div class="toggle-label">🔒 Tailscale Auto-install</div>
-          <div class="toggle-sub">Installs Tailscale and activates it on first boot</div>
-        </div>
-        <label class="toggle">
-          <input type="checkbox" id="tailscaleToggle" disabled title="Tailscale auth key not configured. Click 'Set Tailscale Key' to enable." />
-          <span class="toggle-slider"></span>
-        </label>
-      </div>
-
-      <div id="tailscaleKeyBanner" class="banner info" style="display:none">
-        ⚠ No Tailscale auth key set. <a href="#" data-action="set-tailscale-key" style="color:var(--vscode-textLink-foreground);cursor:pointer">Set key now</a>
-      </div>
-
-      <div class="banner warning">
-        🔒 <strong>Security notice:</strong> The Tailscale auth key is embedded as plaintext in cloud-init user-data and is readable via the Hetzner API by anyone with API access. Use a <strong>short-lived ephemeral key</strong> to minimise exposure.
-      </div>
-
       <div class="field">
         <label>Cloud-init Script <span style="font-weight:400;text-transform:none">(optional)</span></label>
-        <textarea class="code" id="cloudInitInput" placeholder="#cloud-config&#10;&#10;# Your cloud-init YAML here.&#10;# Tailscale block will be appended automatically if enabled."></textarea>
-        <div class="field-hint">YAML cloud-config format. Tailscale runcmd will be merged in automatically.</div>
+        <textarea class="code" id="cloudInitInput" placeholder="#cloud-config&#10;&#10;# Your cloud-init YAML here."></textarea>
+        <div class="field-hint">YAML cloud-config format.</div>
         <div style="display:flex;gap:8px;margin-top:6px">
           <button class="btn-secondary" style="font-size:12px;padding:4px 10px" data-action="save-cloud-init-template">&#128190; Save as Template</button>
           <button class="btn-secondary" style="font-size:12px;padding:4px 10px" data-action="load-cloud-init-template">&#128194; Load Template</button>
@@ -1073,7 +1023,6 @@ const state = {
   sshKeys: [],
   networks: [],
   cloudInit: '',
-  tailscaleEnabled: ${data.tailscaleEnabled},
   imageFilter: 'system',
 };
 
@@ -1082,27 +1031,6 @@ window.addEventListener('message', (e) => {
   const msg = e.data;
   if (msg.command === 'setLoading') showLoading(msg.message);
   if (msg.command === 'error') { hideLoading(); showError(msg.message); }
-  if (msg.command === 'tailscaleTokenExists') {
-    const toggle = document.getElementById('tailscaleToggle');
-    const banner = document.getElementById('tailscaleKeyBanner');
-    if (msg.hasToken) {
-      // Token exists: enable toggle, hide banner
-      toggle.disabled = false;
-      toggle.title = 'Enable Tailscale auto-install on this server';
-      banner.style.display = 'none';
-    } else {
-      // No token: disable toggle, show banner with hint
-      toggle.disabled = true;
-      toggle.checked = false;
-      toggle.title = 'Tailscale auth key not configured. Click "Set Tailscale Key" to configure.';
-      banner.style.display = 'block';
-    }
-  }
-  if (msg.command === 'tailscaleKeySet') {
-    document.getElementById('tailscaleKeyBanner').style.display = 'none';
-    document.getElementById('tailscaleToggle').disabled = false;
-    document.getElementById('tailscaleToggle').title = 'Enable Tailscale auto-install on this server';
-  }
   if (msg.command === 'sshKeysUpdated') {
     SSH_KEYS = msg.keys;
     // Auto-select any newly added keys
@@ -1140,7 +1068,6 @@ document.addEventListener('DOMContentLoaded', () => {
   renderImages();
   renderSshKeys();
   renderNetworks();
-  updateTailscaleState();
 
   // Wire location card listeners (CSP: remove inline onclick, use addEventListener)
   const locationCardsDiv = document.getElementById('locationCards');
@@ -1285,12 +1212,6 @@ document.addEventListener('DOMContentLoaded', () => {
     createBtn.addEventListener('click', createServer);
   }
 
-  // Wire Tailscale toggle listener
-  const tailscaleToggle = document.getElementById('tailscaleToggle');
-  if (tailscaleToggle) {
-    tailscaleToggle.addEventListener('change', updateTailscaleState);
-  }
-
   // Wire SSH key card listeners (CSP: use event delegation)
   const sshKeyCardsDiv = document.getElementById('sshKeyCards');
   if (sshKeyCardsDiv) {
@@ -1340,8 +1261,6 @@ document.addEventListener('DOMContentLoaded', () => {
       createNetworkFromWizard();
     } else if (action === 'create-subnet') {
       createSubnetFromWizard(actionEl);
-    } else if (action === 'set-tailscale-key') {
-      setTailscaleKey();
     } else if (action === 'save-cloud-init-template') {
       saveCloudInitTemplate();
     } else if (action === 'load-cloud-init-template') {
@@ -1411,7 +1330,6 @@ function validateStep(step) {
       return true;
     case 5:
       state.cloudInit = document.getElementById('cloudInitInput').value;
-      state.tailscaleEnabled = document.getElementById('tailscaleToggle').checked;
       return true;
     default: return true;
   }
@@ -1653,16 +1571,6 @@ function createSubnetFromWizard(btn) {
   });
 }
 
-// ── Step 5: Cloud-init / Tailscale ─────────────────────────────────────────
-function updateTailscaleState() {
-  state.tailscaleEnabled = document.getElementById('tailscaleToggle').checked;
-  // Banner is shown/hidden by the extension host after key check
-}
-
-function setTailscaleKey() {
-  vscode.postMessage({ command: 'setTailscaleKey' });
-}
-
 // ── Step 6: Review ─────────────────────────────────────────────────────────
 function renderSummary() {
   const rows = [
@@ -1672,7 +1580,6 @@ function renderSummary() {
     ['OS Image', state.imageDisplay || state.image],
     ['SSH Keys', state.sshKeys.length ? state.sshKeys.join(', ') : 'None'],
     ['Networks', state.networks.length ? state.networks.length + ' network(s)' : 'None (public IP only)'],
-    ['Tailscale', state.tailscaleEnabled ? '✓ Auto-install enabled' : '✗ Disabled'],
     ['Cloud-init', state.cloudInit.trim() ? '✓ Custom script provided' : 'None'],
   ];
 
@@ -1697,7 +1604,6 @@ function createServer() {
       sshKeys: state.sshKeys,
       networks: state.networks,
       cloudInit: state.cloudInit,
-      tailscaleEnabled: state.tailscaleEnabled,
     }
   });
 }

@@ -47,7 +47,6 @@ Hetzner Cloud Toolkit brings the Hetzner Cloud control panel into your editor. C
 - Create firewalls with a default rule set or empty
 - Add and delete individual rules (inbound/outbound, protocol, port, IP ranges)
 - Apply firewalls to servers or remove them
-- Tailscale UDP 41641 rule offered automatically when a Tailscale key is configured
 
 ### 💾 Volumes
 - Create block storage volumes (location list fetched live from API)
@@ -58,7 +57,6 @@ Hetzner Cloud Toolkit brings the Hetzner Cloud control panel into your editor. C
 ### ☁️ Cloud-init Template Library
 - Save, load, and delete named cloud-init templates
 - Stored in VS Code global state (no keychain size limits)
-- Inject Tailscale auth key automatically as a `runcmd` block
 
 ### 🔑 SSH Key Management
 - View all SSH keys in your Hetzner project
@@ -66,13 +64,8 @@ Hetzner Cloud Toolkit brings the Hetzner Cloud control panel into your editor. C
 - Delete keys with confirmation
 - Built-in **SSH Key Generation Guide** — step-by-step for Windows, macOS, WSL, and Linux/RHEL, including Ed25519 vs RSA explainer
 
-### 🐟 Tailscale Auto-Install
-- Set a Tailscale auth key once — stored securely in SecretStorage
-- Toggle auto-injection in the server wizard
-- Automatically appends the correct `runcmd` block to your cloud-init
-
 ### 🚀 First-Use Onboarding
-- **SETUP** panel guides you through: adding your API key, generating SSH keys, and configuring Tailscale
+- **SETUP** panel guides you through: adding your API key and generating SSH keys
 - Prompts the SSH key guide automatically when you add your first project
 
 ---
@@ -105,8 +98,6 @@ Hetzner Cloud Toolkit brings the Hetzner Cloud control panel into your editor. C
 
 | Setting | Default | Description |
 |---|---|---|
-| `Hetzner Cloud Toolkit.tailscale.enableByDefault` | `true` | Pre-check the Tailscale toggle in the server wizard |
-| `Hetzner Cloud Toolkit.tailscale.extraArgs` | `--accept-routes --ssh` | Extra arguments passed to `tailscale up` in cloud-init |
 
 ---
 

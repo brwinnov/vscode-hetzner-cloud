@@ -2,7 +2,7 @@
   "name": "vscode-hetzner-cloud",
   "displayName": "Hetzner Cloud Toolkit",
   "description": "Manage Hetzner Cloud infrastructure directly from VS Code — servers, networks, SSH keys, Tailscale and more",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "publisher": "brwinnovvsce",
   "engines": {
     "vscode": "^1.85.0"
@@ -15,7 +15,6 @@
     "cloud",
     "vps",
     "server",
-    "tailscale",
     "infrastructure"
   ],
   "icon": "resources/icon.png",
@@ -126,10 +125,6 @@
         "command": "hcloud.addSshKey",
         "title": "Hetzner Cloud: Add SSH Key",
         "icon": "$(add)"
-      },
-      {
-        "command": "hcloud.setTailscaleKey",
-        "title": "Hetzner Cloud: Set Tailscale Auth Key"
       },
       {
         "command": "hcloud.refreshProjects",
@@ -257,6 +252,11 @@
         "icon": "$(info)"
       },
       {
+        "command": "hcloud.cidrCalculator",
+        "title": "Hetzner Cloud: CIDR Calculator",
+        "icon": "$(symbol-numeric)"
+      },
+      {
         "command": "hcloud.firewallGuide",
         "title": "Hetzner Cloud: Firewalls Guide",
         "icon": "$(info)"
@@ -339,6 +339,11 @@
         },
         {
           "command": "hcloud.networkGuide",
+          "when": "view == hcloud.networks",
+          "group": "navigation"
+        },
+        {
+          "command": "hcloud.cidrCalculator",
           "when": "view == hcloud.networks",
           "group": "navigation"
         },
@@ -524,16 +529,6 @@
     "configuration": {
       "title": "Hetzner Cloud Toolkit",
       "properties": {
-        "hcloud.tailscale.enableByDefault": {
-          "type": "boolean",
-          "default": true,
-          "description": "Automatically inject Tailscale installation into every cloud-init script."
-        },
-        "hcloud.tailscale.extraArgs": {
-          "type": "string",
-          "default": "--accept-routes --ssh",
-          "description": "Extra arguments passed to `tailscale up` during cloud-init."
-        },
         "hcloud.defaultRegion": {
           "type": "string",
           "default": "nbg1",

@@ -1,15 +1,13 @@
 import * as vscode from 'vscode';
 import { TokenManager } from '../utils/secretStorage';
 import { ServersProvider, ServerItem } from '../providers/serversProvider';
-import { TailscaleAuthKeyManager } from '../tailscale/authKeyManager';
 import { ServerWizardPanel } from '../webviews/serverWizard';
 import { ServerDetailPanel } from '../webviews/serverDetail';
 
 export function registerServerCommands(
   context: vscode.ExtensionContext,
   tokenManager: TokenManager,
-  serversProvider: ServersProvider,
-  tailscaleKeyManager: TailscaleAuthKeyManager
+  serversProvider: ServersProvider
 ) {  // Refresh
   context.subscriptions.push(
     vscode.commands.registerCommand('hcloud.refreshServers', () => serversProvider.refresh())
@@ -116,7 +114,7 @@ export function registerServerCommands(
   // Create Server — opens WebView wizard
   context.subscriptions.push(
     vscode.commands.registerCommand('hcloud.createServer', async () => {
-      await ServerWizardPanel.create(context, tokenManager, tailscaleKeyManager, serversProvider);
+      await ServerWizardPanel.create(context, tokenManager, serversProvider);
     })
   );
 
