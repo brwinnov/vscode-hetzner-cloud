@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
 export class SshKeyGuidePanel {
-  static create(context: vscode.ExtensionContext): void {
+  static create(_context: vscode.ExtensionContext): void {
     const panel = vscode.window.createWebviewPanel(
       'hcloud.sshKeyGuide',
       'SSH Key Generation Guide',

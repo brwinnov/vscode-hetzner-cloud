@@ -185,7 +185,7 @@ export class HetznerClient {
       } catch {
         err = { error: { message: res.statusText } };
       }
-      throw new Error(`Hetzner API error ${res.status}: ${(err as any).error?.message ?? res.statusText}`);
+      throw new Error(`Hetzner API error ${res.status}: ${(err as { error?: { message?: string } }).error?.message ?? res.statusText}`);
     }
 
     // For DELETE requests, Hetzner API may return empty body

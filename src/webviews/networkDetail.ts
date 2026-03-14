@@ -28,8 +28,8 @@ export class NetworkDetailPanel {
           });
           vscode.window.showInformationMessage(`Subnet ${msg.ipRange} removed from network "${network.name}".`);
           this.panel.dispose();
-        } catch (err: any) {
-          vscode.window.showErrorMessage(`Failed to remove subnet: ${err?.message ?? err}`);
+        } catch (err: unknown) {
+          vscode.window.showErrorMessage(`Failed to remove subnet: ${(err as Error).message}`);
         }
       }
       if (msg.command === 'deleteNetwork') {
@@ -54,8 +54,8 @@ export class NetworkDetailPanel {
           await vscode.commands.executeCommand('hcloud.deleteNetwork', { network: network });
           vscode.window.showInformationMessage(`Network "${network.name}" and all subnets deleted.`);
           this.panel.dispose();
-        } catch (err: any) {
-          vscode.window.showErrorMessage(`Failed to delete network or subnets: ${err?.message ?? err}`);
+        } catch (err: unknown) {
+          vscode.window.showErrorMessage(`Failed to delete network or subnets: ${(err as Error).message}`);
         }
       }
       if (msg.command === 'addSubnet') {
@@ -134,8 +134,8 @@ export class NetworkDetailPanel {
 // Command registration helper
 export function registerNetworkDetailCommand(context: vscode.ExtensionContext) {
   context.subscriptions.push(
-    vscode.commands.registerCommand('hcloud.showNetworkDetail', async (item: any) => {
-      const network = item.network || item;
+    vscode.commands.registerCommand('hcloud.showNetworkDetail', async (item: { network?: HNetwork } | HNetwork) => {
+      const network = (item as { network?: HNetwork }).network ?? (item as HNetwork);
       NetworkDetailPanel.open(network);
     })
   );
